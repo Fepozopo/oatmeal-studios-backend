@@ -37,9 +37,3 @@ WHERE id = $1;
 
 -- name: DeleteAllUsers :exec
 DELETE FROM users;
-
--- name: GetUserFromRefreshToken :one
-SELECT users.id, users.created_at, users.updated_at, users.email, users.first_name, users.last_name
-FROM users
-    INNER JOIN refresh_tokens ON users.id = refresh_tokens.user_id
-WHERE refresh_tokens.token = $1;
