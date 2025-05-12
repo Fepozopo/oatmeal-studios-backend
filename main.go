@@ -12,7 +12,6 @@ func main() {
 
 	// Define a handler function for the root path ("/")
 	router.GET("/", func(c *gin.Context) {
-		// Respond with JSON
 		c.JSON(http.StatusOK, gin.H{
 			"message": "Oatmeal Studios Backend API",
 		})
@@ -39,7 +38,7 @@ func main() {
 		})
 	})
 
-	router.POST("/users/:id", func(c *gin.Context) {
+	router.PUT("/users/:id", func(c *gin.Context) {
 		userID := c.Param("id")
 		c.JSON(http.StatusOK, gin.H{
 			"message": "Update user by ID",

@@ -1,10 +1,11 @@
+-- +goose Up
 CREATE TABLE customers (
     id SERIAL PRIMARY KEY,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     business_name TEXT NOT NULL,
     contact_name TEXT, -- Optional contact person within the business
-    email TEXT UNIQUE,
+    email TEXT,
     phone TEXT,
     address_1 TEXT,
     address_2 TEXT,
@@ -16,3 +17,6 @@ CREATE TABLE customers (
     commission DECIMAL NOT NULL DEFAULT 0.0, -- Percentage commission
     notes TEXT
 );
+
+-- +goose Down
+DROP TABLE customers;
