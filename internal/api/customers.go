@@ -1,38 +1,45 @@
 package api
 
 import (
+	"encoding/json"
 	"net/http"
-
-	"github.com/gin-gonic/gin"
+	"strings"
 )
 
-func RegisterCustomerRoutes(r *gin.Engine) {
-	r.GET("/customers", listCustomers)
-	r.GET("/customers/:id", getCustomer)
-	r.POST("/customers", createCustomer)
-	r.PUT("/customers/:id", updateCustomer)
-	r.DELETE("/customers/:id", deleteCustomer)
+func RegisterCustomerRoutes(mux *http.ServeMux) {
+	mux.HandleFunc("/customers", customersHandler)
+	mux.HandleFunc("/customers/", customerHandler)
 }
 
-func listCustomers(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"message": "List all customers"})
+func customersHandler(w http.ResponseWriter, r *http.Request) {
+	switch r.Method {
+	case http.MethodGet:
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(map[string]string{"message": "List all customers"})
+	case http.MethodPost:
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusCreated)
+		json.NewEncoder(w).Encode(map[string]string{"message": "Create a new customer"})
+	default:
+		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+	}
 }
 
-func getCustomer(c *gin.Context) {
-	customerID := c.Param("id")
-	c.JSON(http.StatusOK, gin.H{"message": "Get customer by ID", "id": customerID})
-}
-
-func createCustomer(c *gin.Context) {
-	c.JSON(http.StatusCreated, gin.H{"message": "Create a new customer"})
-}
-
-func updateCustomer(c *gin.Context) {
-	customerID := c.Param("id")
-	c.JSON(http.StatusOK, gin.H{"message": "Update customer by ID", "id": customerID})
-}
-
-func deleteCustomer(c *gin.Context) {
-	customerID := c.Param("id")
-	c.JSON(http.StatusOK, gin.H{"message": "Delete customer by ID", "id": customerID})
+func customerHandler(w http.ResponseWriter, r *http.Request) {
+	id := strings.TrimPrefix(r.URL.Path, "/customers/")
+	if id == "" || strings.Contains(id, "/") {
+		http.NotFound(w, r)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	switch r.Method {
+	case http.MethodGet:
+		json.NewEncoder(w).Encode(map[string]string{"message": "Get customer by ID", "id": id})
+	case http.MethodPut:
+		json.NewEncoder(w).Encode(map[string]string{"message": "Update customer by ID", "id": id})
+	case http.MethodDelete:
+		json.NewEncoder(w).Encode(map[string]string{"message": "Delete customer by ID", "id": id})
+	default:
+		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+	}
 }

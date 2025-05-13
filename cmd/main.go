@@ -1,24 +1,26 @@
 package main
 
 import (
-	"github.com/gin-gonic/gin"
+	"net/http"
 
 	"github.com/Fepozopo/oatmeal-studios-backend/internal/api"
 )
 
 func main() {
-	router := gin.Default()
+	mux := http.NewServeMux()
 
 	// Root route
-	router.GET("/", func(c *gin.Context) {
-		c.JSON(200, gin.H{"message": "Oatmeal Studios Backend API"})
+	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(`{"message": "Oatmeal Studios Backend API"}`))
 	})
 
 	// Register resource routes
-	api.RegisterUserRoutes(router)
-	api.RegisterCustomerRoutes(router)
-	api.RegisterOrderRoutes(router)
+	api.RegisterUserRoutes(mux)
+	api.RegisterCustomerRoutes(mux)
+	api.RegisterOrderRoutes(mux)
 
 	// Run the server on port 8080
-	router.Run(":8080")
+	http.ListenAndServe(":8080", mux)
 }
