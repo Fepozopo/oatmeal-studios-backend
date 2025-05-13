@@ -9,9 +9,9 @@ FROM customers
 ORDER BY business_name;
 
 -- name: CreateCustomer :one
-INSERT INTO customers (business_name, contact_name, email, phone, address_1, address_2, city, state, zip_code, terms, discount, commission, notes)
-VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
-RETURNING id, created_at, updated_at, business_name, contact_name, email, phone, address_1, address_2, city, state, zip_code, terms, discount, commission, notes;
+INSERT INTO customers (business_name, contact_name, email, phone, address_1, address_2, city, state, zip_code, terms, discount, commission, notes, sales_rep)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
+RETURNING id, created_at, updated_at, business_name, contact_name, email, phone, address_1, address_2, city, state, zip_code, terms, discount, commission, notes, sales_rep;
 
 -- name: UpdateCustomer :one
 UPDATE customers
@@ -28,9 +28,10 @@ SET business_name = $2,
     discount = $12,
     commission = $13,
     notes = $14,
+    sales_rep = $15,
     updated_at = NOW()
 WHERE id = $1
-RETURNING id, created_at, updated_at, business_name, contact_name, email, phone, address_1, address_2, city, state, zip_code, terms, discount, commission, notes;
+RETURNING id, created_at, updated_at, business_name, contact_name, email, phone, address_1, address_2, city, state, zip_code, terms, discount, commission, notes, sales_rep;
 
 -- name: DeleteCustomer :exec
 DELETE FROM customers

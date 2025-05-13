@@ -15,7 +15,8 @@ CREATE TABLE customers (
     terms TEXT,
     discount DECIMAL NOT NULL DEFAULT 0.0, -- Percentage discount
     commission DECIMAL NOT NULL DEFAULT 0.0, -- Percentage commission
-    notes TEXT
+    notes TEXT,
+    sales_rep TEXT
 );
 
 -- +goose Down

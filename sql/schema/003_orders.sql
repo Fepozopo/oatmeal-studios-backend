@@ -14,7 +14,8 @@ CREATE TABLE orders (
     shipping_cost DECIMAL NOT NULL DEFAULT 0.0,
     free_shipping BOOLEAN NOT NULL DEFAULT FALSE,
     apply_to_commission BOOLEAN NOT NULL DEFAULT FALSE,
-    notes TEXT
+    notes TEXT,
+    sales_rep TEXT
 );
 
 -- +goose Down
