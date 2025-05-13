@@ -9,9 +9,9 @@ FROM order_items
 WHERE order_id = $1;
 
 -- name: CreateOrderItem :one
-INSERT INTO order_items (order_id, item, quantity, price, discount, item_total)
-VALUES ($1, $2, $3, $4, $5, $6)
-RETURNING id, order_id, item, quantity, price, discount, item_total;
+INSERT INTO order_items (order_id, item, quantity, price, discount, item_total, pocket_number)
+VALUES ($1, $2, $3, $4, $5, $6, $7)
+RETURNING *;
 
 -- name: UpdateOrderItem :one
 UPDATE order_items
@@ -19,9 +19,10 @@ SET item = $2,
     quantity = $3,
     price = $4,
     discount = $5,
-    item_total = $6
+    item_total = $6,
+    pocket_number = $7
 WHERE id = $1
-RETURNING id, order_id, item, quantity, price, discount, item_total;
+RETURNING *;
 
 -- name: DeleteOrderItem :exec
 DELETE FROM order_items

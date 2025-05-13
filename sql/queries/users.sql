@@ -19,7 +19,7 @@ VALUES (
     $3,
     $4
 )
-RETURNING id, created_at, updated_at, email, first_name, last_name;
+RETURNING *;
 
 -- name: UpdateUser :one
 UPDATE users
@@ -29,7 +29,7 @@ SET email = $2,
     password = $5,
     updated_at = NOW()
 WHERE id = $1
-RETURNING id, created_at, updated_at, email, first_name, last_name;
+RETURNING *;
 
 -- name: DeleteUser :exec
 DELETE FROM users

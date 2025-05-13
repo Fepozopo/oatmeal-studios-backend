@@ -11,7 +11,7 @@ ORDER BY business_name;
 -- name: CreateCustomer :one
 INSERT INTO customers (business_name, contact_name, email, phone, address_1, address_2, city, state, zip_code, terms, discount, commission, notes, sales_rep)
 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
-RETURNING id, created_at, updated_at, business_name, contact_name, email, phone, address_1, address_2, city, state, zip_code, terms, discount, commission, notes, sales_rep;
+RETURNING *;
 
 -- name: UpdateCustomer :one
 UPDATE customers
@@ -31,7 +31,7 @@ SET business_name = $2,
     sales_rep = $15,
     updated_at = NOW()
 WHERE id = $1
-RETURNING id, created_at, updated_at, business_name, contact_name, email, phone, address_1, address_2, city, state, zip_code, terms, discount, commission, notes, sales_rep;
+RETURNING *;
 
 -- name: DeleteCustomer :exec
 DELETE FROM customers
