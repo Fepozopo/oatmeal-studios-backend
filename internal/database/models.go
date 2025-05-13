@@ -28,6 +28,21 @@ type Customer struct {
 	Discount     string         `json:"discount"`
 	Commission   string         `json:"commission"`
 	Notes        sql.NullString `json:"notes"`
+	SalesRep     sql.NullString `json:"sales_rep"`
+}
+
+type CustomerLocation struct {
+	ID         int32          `json:"id"`
+	CustomerID int32          `json:"customer_id"`
+	Address1   string         `json:"address_1"`
+	Address2   sql.NullString `json:"address_2"`
+	City       string         `json:"city"`
+	State      string         `json:"state"`
+	ZipCode    string         `json:"zip_code"`
+	Phone      sql.NullString `json:"phone"`
+	Notes      sql.NullString `json:"notes"`
+	CreatedAt  time.Time      `json:"created_at"`
+	UpdatedAt  time.Time      `json:"updated_at"`
 }
 
 type Order struct {
@@ -45,6 +60,7 @@ type Order struct {
 	FreeShipping      bool           `json:"free_shipping"`
 	ApplyToCommission bool           `json:"apply_to_commission"`
 	Notes             sql.NullString `json:"notes"`
+	SalesRep          sql.NullString `json:"sales_rep"`
 }
 
 type OrderItem struct {

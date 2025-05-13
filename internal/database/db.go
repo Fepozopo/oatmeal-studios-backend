@@ -27,6 +27,9 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.createCustomerStmt, err = db.PrepareContext(ctx, createCustomer); err != nil {
 		return nil, fmt.Errorf("error preparing query CreateCustomer: %w", err)
 	}
+	if q.createCustomerLocationStmt, err = db.PrepareContext(ctx, createCustomerLocation); err != nil {
+		return nil, fmt.Errorf("error preparing query CreateCustomerLocation: %w", err)
+	}
 	if q.createOrderStmt, err = db.PrepareContext(ctx, createOrder); err != nil {
 		return nil, fmt.Errorf("error preparing query CreateOrder: %w", err)
 	}
@@ -44,6 +47,9 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	}
 	if q.deleteCustomerStmt, err = db.PrepareContext(ctx, deleteCustomer); err != nil {
 		return nil, fmt.Errorf("error preparing query DeleteCustomer: %w", err)
+	}
+	if q.deleteCustomerLocationStmt, err = db.PrepareContext(ctx, deleteCustomerLocation); err != nil {
+		return nil, fmt.Errorf("error preparing query DeleteCustomerLocation: %w", err)
 	}
 	if q.deleteOrderStmt, err = db.PrepareContext(ctx, deleteOrder); err != nil {
 		return nil, fmt.Errorf("error preparing query DeleteOrder: %w", err)
@@ -63,6 +69,9 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.getCustomerStmt, err = db.PrepareContext(ctx, getCustomer); err != nil {
 		return nil, fmt.Errorf("error preparing query GetCustomer: %w", err)
 	}
+	if q.getCustomerLocationByIDStmt, err = db.PrepareContext(ctx, getCustomerLocationByID); err != nil {
+		return nil, fmt.Errorf("error preparing query GetCustomerLocationByID: %w", err)
+	}
 	if q.getOrderStmt, err = db.PrepareContext(ctx, getOrder); err != nil {
 		return nil, fmt.Errorf("error preparing query GetOrder: %w", err)
 	}
@@ -77,6 +86,9 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	}
 	if q.getUserStmt, err = db.PrepareContext(ctx, getUser); err != nil {
 		return nil, fmt.Errorf("error preparing query GetUser: %w", err)
+	}
+	if q.listCustomerLocationsByCustomerStmt, err = db.PrepareContext(ctx, listCustomerLocationsByCustomer); err != nil {
+		return nil, fmt.Errorf("error preparing query ListCustomerLocationsByCustomer: %w", err)
 	}
 	if q.listCustomersStmt, err = db.PrepareContext(ctx, listCustomers); err != nil {
 		return nil, fmt.Errorf("error preparing query ListCustomers: %w", err)
@@ -95,6 +107,9 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	}
 	if q.updateCustomerStmt, err = db.PrepareContext(ctx, updateCustomer); err != nil {
 		return nil, fmt.Errorf("error preparing query UpdateCustomer: %w", err)
+	}
+	if q.updateCustomerLocationStmt, err = db.PrepareContext(ctx, updateCustomerLocation); err != nil {
+		return nil, fmt.Errorf("error preparing query UpdateCustomerLocation: %w", err)
 	}
 	if q.updateOrderStmt, err = db.PrepareContext(ctx, updateOrder); err != nil {
 		return nil, fmt.Errorf("error preparing query UpdateOrder: %w", err)
@@ -116,6 +131,11 @@ func (q *Queries) Close() error {
 	if q.createCustomerStmt != nil {
 		if cerr := q.createCustomerStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing createCustomerStmt: %w", cerr)
+		}
+	}
+	if q.createCustomerLocationStmt != nil {
+		if cerr := q.createCustomerLocationStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing createCustomerLocationStmt: %w", cerr)
 		}
 	}
 	if q.createOrderStmt != nil {
@@ -148,6 +168,11 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing deleteCustomerStmt: %w", cerr)
 		}
 	}
+	if q.deleteCustomerLocationStmt != nil {
+		if cerr := q.deleteCustomerLocationStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing deleteCustomerLocationStmt: %w", cerr)
+		}
+	}
 	if q.deleteOrderStmt != nil {
 		if cerr := q.deleteOrderStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing deleteOrderStmt: %w", cerr)
@@ -178,6 +203,11 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing getCustomerStmt: %w", cerr)
 		}
 	}
+	if q.getCustomerLocationByIDStmt != nil {
+		if cerr := q.getCustomerLocationByIDStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getCustomerLocationByIDStmt: %w", cerr)
+		}
+	}
 	if q.getOrderStmt != nil {
 		if cerr := q.getOrderStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing getOrderStmt: %w", cerr)
@@ -201,6 +231,11 @@ func (q *Queries) Close() error {
 	if q.getUserStmt != nil {
 		if cerr := q.getUserStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing getUserStmt: %w", cerr)
+		}
+	}
+	if q.listCustomerLocationsByCustomerStmt != nil {
+		if cerr := q.listCustomerLocationsByCustomerStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing listCustomerLocationsByCustomerStmt: %w", cerr)
 		}
 	}
 	if q.listCustomersStmt != nil {
@@ -231,6 +266,11 @@ func (q *Queries) Close() error {
 	if q.updateCustomerStmt != nil {
 		if cerr := q.updateCustomerStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing updateCustomerStmt: %w", cerr)
+		}
+	}
+	if q.updateCustomerLocationStmt != nil {
+		if cerr := q.updateCustomerLocationStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing updateCustomerLocationStmt: %w", cerr)
 		}
 	}
 	if q.updateOrderStmt != nil {
@@ -290,69 +330,79 @@ func (q *Queries) queryRow(ctx context.Context, stmt *sql.Stmt, query string, ar
 }
 
 type Queries struct {
-	db                            DBTX
-	tx                            *sql.Tx
-	createCustomerStmt            *sql.Stmt
-	createOrderStmt               *sql.Stmt
-	createOrderItemStmt           *sql.Stmt
-	createProductStmt             *sql.Stmt
-	createUserStmt                *sql.Stmt
-	deleteAllUsersStmt            *sql.Stmt
-	deleteCustomerStmt            *sql.Stmt
-	deleteOrderStmt               *sql.Stmt
-	deleteOrderItemStmt           *sql.Stmt
-	deleteOrderItemsByOrderIDStmt *sql.Stmt
-	deleteProductStmt             *sql.Stmt
-	deleteUserStmt                *sql.Stmt
-	getCustomerStmt               *sql.Stmt
-	getOrderStmt                  *sql.Stmt
-	getOrderItemStmt              *sql.Stmt
-	getProductByIDStmt            *sql.Stmt
-	getProductBySKUStmt           *sql.Stmt
-	getUserStmt                   *sql.Stmt
-	listCustomersStmt             *sql.Stmt
-	listOrderItemsByOrderIDStmt   *sql.Stmt
-	listOrdersStmt                *sql.Stmt
-	listProductsStmt              *sql.Stmt
-	listUsersStmt                 *sql.Stmt
-	updateCustomerStmt            *sql.Stmt
-	updateOrderStmt               *sql.Stmt
-	updateOrderItemStmt           *sql.Stmt
-	updateProductStmt             *sql.Stmt
-	updateUserStmt                *sql.Stmt
+	db                                  DBTX
+	tx                                  *sql.Tx
+	createCustomerStmt                  *sql.Stmt
+	createCustomerLocationStmt          *sql.Stmt
+	createOrderStmt                     *sql.Stmt
+	createOrderItemStmt                 *sql.Stmt
+	createProductStmt                   *sql.Stmt
+	createUserStmt                      *sql.Stmt
+	deleteAllUsersStmt                  *sql.Stmt
+	deleteCustomerStmt                  *sql.Stmt
+	deleteCustomerLocationStmt          *sql.Stmt
+	deleteOrderStmt                     *sql.Stmt
+	deleteOrderItemStmt                 *sql.Stmt
+	deleteOrderItemsByOrderIDStmt       *sql.Stmt
+	deleteProductStmt                   *sql.Stmt
+	deleteUserStmt                      *sql.Stmt
+	getCustomerStmt                     *sql.Stmt
+	getCustomerLocationByIDStmt         *sql.Stmt
+	getOrderStmt                        *sql.Stmt
+	getOrderItemStmt                    *sql.Stmt
+	getProductByIDStmt                  *sql.Stmt
+	getProductBySKUStmt                 *sql.Stmt
+	getUserStmt                         *sql.Stmt
+	listCustomerLocationsByCustomerStmt *sql.Stmt
+	listCustomersStmt                   *sql.Stmt
+	listOrderItemsByOrderIDStmt         *sql.Stmt
+	listOrdersStmt                      *sql.Stmt
+	listProductsStmt                    *sql.Stmt
+	listUsersStmt                       *sql.Stmt
+	updateCustomerStmt                  *sql.Stmt
+	updateCustomerLocationStmt          *sql.Stmt
+	updateOrderStmt                     *sql.Stmt
+	updateOrderItemStmt                 *sql.Stmt
+	updateProductStmt                   *sql.Stmt
+	updateUserStmt                      *sql.Stmt
 }
 
 func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 	return &Queries{
-		db:                            tx,
-		tx:                            tx,
-		createCustomerStmt:            q.createCustomerStmt,
-		createOrderStmt:               q.createOrderStmt,
-		createOrderItemStmt:           q.createOrderItemStmt,
-		createProductStmt:             q.createProductStmt,
-		createUserStmt:                q.createUserStmt,
-		deleteAllUsersStmt:            q.deleteAllUsersStmt,
-		deleteCustomerStmt:            q.deleteCustomerStmt,
-		deleteOrderStmt:               q.deleteOrderStmt,
-		deleteOrderItemStmt:           q.deleteOrderItemStmt,
-		deleteOrderItemsByOrderIDStmt: q.deleteOrderItemsByOrderIDStmt,
-		deleteProductStmt:             q.deleteProductStmt,
-		deleteUserStmt:                q.deleteUserStmt,
-		getCustomerStmt:               q.getCustomerStmt,
-		getOrderStmt:                  q.getOrderStmt,
-		getOrderItemStmt:              q.getOrderItemStmt,
-		getProductByIDStmt:            q.getProductByIDStmt,
-		getProductBySKUStmt:           q.getProductBySKUStmt,
-		getUserStmt:                   q.getUserStmt,
-		listCustomersStmt:             q.listCustomersStmt,
-		listOrderItemsByOrderIDStmt:   q.listOrderItemsByOrderIDStmt,
-		listOrdersStmt:                q.listOrdersStmt,
-		listProductsStmt:              q.listProductsStmt,
-		listUsersStmt:                 q.listUsersStmt,
-		updateCustomerStmt:            q.updateCustomerStmt,
-		updateOrderStmt:               q.updateOrderStmt,
-		updateOrderItemStmt:           q.updateOrderItemStmt,
-		updateProductStmt:             q.updateProductStmt,
-		updateUserStmt:                q.updateUserStmt,
+		db:                                  tx,
+		tx:                                  tx,
+		createCustomerStmt:                  q.createCustomerStmt,
+		createCustomerLocationStmt:          q.createCustomerLocationStmt,
+		createOrderStmt:                     q.createOrderStmt,
+		createOrderItemStmt:                 q.createOrderItemStmt,
+		createProductStmt:                   q.createProductStmt,
+		createUserStmt:                      q.createUserStmt,
+		deleteAllUsersStmt:                  q.deleteAllUsersStmt,
+		deleteCustomerStmt:                  q.deleteCustomerStmt,
+		deleteCustomerLocationStmt:          q.deleteCustomerLocationStmt,
+		deleteOrderStmt:                     q.deleteOrderStmt,
+		deleteOrderItemStmt:                 q.deleteOrderItemStmt,
+		deleteOrderItemsByOrderIDStmt:       q.deleteOrderItemsByOrderIDStmt,
+		deleteProductStmt:                   q.deleteProductStmt,
+		deleteUserStmt:                      q.deleteUserStmt,
+		getCustomerStmt:                     q.getCustomerStmt,
+		getCustomerLocationByIDStmt:         q.getCustomerLocationByIDStmt,
+		getOrderStmt:                        q.getOrderStmt,
+		getOrderItemStmt:                    q.getOrderItemStmt,
+		getProductByIDStmt:                  q.getProductByIDStmt,
+		getProductBySKUStmt:                 q.getProductBySKUStmt,
+		getUserStmt:                         q.getUserStmt,
+		listCustomerLocationsByCustomerStmt: q.listCustomerLocationsByCustomerStmt,
+		listCustomersStmt:                   q.listCustomersStmt,
+		listOrderItemsByOrderIDStmt:         q.listOrderItemsByOrderIDStmt,
+		listOrdersStmt:                      q.listOrdersStmt,
+		listProductsStmt:                    q.listProductsStmt,
+		listUsersStmt:                       q.listUsersStmt,
+		updateCustomerStmt:                  q.updateCustomerStmt,
+		updateCustomerLocationStmt:          q.updateCustomerLocationStmt,
+		updateOrderStmt:                     q.updateOrderStmt,
+		updateOrderItemStmt:                 q.updateOrderItemStmt,
+		updateProductStmt:                   q.updateProductStmt,
+		updateUserStmt:                      q.updateUserStmt,
 	}
 }
