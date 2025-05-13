@@ -46,31 +46,56 @@ type CustomerLocation struct {
 }
 
 type Order struct {
-	ID                int32          `json:"id"`
-	CreatedAt         time.Time      `json:"created_at"`
-	UpdatedAt         time.Time      `json:"updated_at"`
-	CustomerID        int32          `json:"customer_id"`
-	OrderDate         time.Time      `json:"order_date"`
-	ShipDate          time.Time      `json:"ship_date"`
-	Status            string         `json:"status"`
-	Type              string         `json:"type"`
-	Method            sql.NullString `json:"method"`
-	PoNumber          sql.NullString `json:"po_number"`
-	ShippingCost      string         `json:"shipping_cost"`
-	FreeShipping      bool           `json:"free_shipping"`
-	ApplyToCommission bool           `json:"apply_to_commission"`
-	Notes             sql.NullString `json:"notes"`
-	SalesRep          sql.NullString `json:"sales_rep"`
+	ID                 int32          `json:"id"`
+	CreatedAt          time.Time      `json:"created_at"`
+	UpdatedAt          time.Time      `json:"updated_at"`
+	CustomerID         int32          `json:"customer_id"`
+	CustomerLocationID sql.NullInt32  `json:"customer_location_id"`
+	OrderDate          time.Time      `json:"order_date"`
+	ShipDate           time.Time      `json:"ship_date"`
+	Status             string         `json:"status"`
+	Type               string         `json:"type"`
+	Method             sql.NullString `json:"method"`
+	PoNumber           sql.NullString `json:"po_number"`
+	ShippingCost       string         `json:"shipping_cost"`
+	FreeShipping       bool           `json:"free_shipping"`
+	ApplyToCommission  bool           `json:"apply_to_commission"`
+	Notes              sql.NullString `json:"notes"`
+	SalesRep           sql.NullString `json:"sales_rep"`
 }
 
 type OrderItem struct {
-	ID        int32  `json:"id"`
-	OrderID   int32  `json:"order_id"`
-	Item      string `json:"item"`
-	Quantity  int32  `json:"quantity"`
-	Price     string `json:"price"`
-	Discount  string `json:"discount"`
-	ItemTotal string `json:"item_total"`
+	ID           int32         `json:"id"`
+	OrderID      int32         `json:"order_id"`
+	Item         string        `json:"item"`
+	Quantity     int32         `json:"quantity"`
+	Price        string        `json:"price"`
+	Discount     string        `json:"discount"`
+	ItemTotal    string        `json:"item_total"`
+	PocketNumber sql.NullInt32 `json:"pocket_number"`
+}
+
+type Planogram struct {
+	ID         int32          `json:"id"`
+	Name       string         `json:"name"`
+	NumPockets int32          `json:"num_pockets"`
+	Notes      sql.NullString `json:"notes"`
+	CreatedAt  time.Time      `json:"created_at"`
+	UpdatedAt  time.Time      `json:"updated_at"`
+}
+
+type PlanogramCustomerLocation struct {
+	ID                 int32 `json:"id"`
+	PlanogramID        int32 `json:"planogram_id"`
+	CustomerLocationID int32 `json:"customer_location_id"`
+}
+
+type PlanogramPocket struct {
+	ID           int32         `json:"id"`
+	PlanogramID  int32         `json:"planogram_id"`
+	PocketNumber int32         `json:"pocket_number"`
+	Category     string        `json:"category"`
+	ProductID    sql.NullInt32 `json:"product_id"`
 }
 
 type Product struct {

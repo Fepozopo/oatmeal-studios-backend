@@ -7,21 +7,23 @@ package database
 
 import (
 	"context"
+	"database/sql"
 )
 
 const createOrderItem = `-- name: CreateOrderItem :one
-INSERT INTO order_items (order_id, item, quantity, price, discount, item_total)
-VALUES ($1, $2, $3, $4, $5, $6)
-RETURNING id, order_id, item, quantity, price, discount, item_total
+INSERT INTO order_items (order_id, item, quantity, price, discount, item_total, pocket_number)
+VALUES ($1, $2, $3, $4, $5, $6, $7)
+RETURNING id, order_id, item, quantity, price, discount, item_total, pocket_number
 `
 
 type CreateOrderItemParams struct {
-	OrderID   int32  `json:"order_id"`
-	Item      string `json:"item"`
-	Quantity  int32  `json:"quantity"`
-	Price     string `json:"price"`
-	Discount  string `json:"discount"`
-	ItemTotal string `json:"item_total"`
+	OrderID      int32         `json:"order_id"`
+	Item         string        `json:"item"`
+	Quantity     int32         `json:"quantity"`
+	Price        string        `json:"price"`
+	Discount     string        `json:"discount"`
+	ItemTotal    string        `json:"item_total"`
+	PocketNumber sql.NullInt32 `json:"pocket_number"`
 }
 
 func (q *Queries) CreateOrderItem(ctx context.Context, arg CreateOrderItemParams) (OrderItem, error) {
@@ -32,6 +34,7 @@ func (q *Queries) CreateOrderItem(ctx context.Context, arg CreateOrderItemParams
 		arg.Price,
 		arg.Discount,
 		arg.ItemTotal,
+		arg.PocketNumber,
 	)
 	var i OrderItem
 	err := row.Scan(
@@ -42,6 +45,7 @@ func (q *Queries) CreateOrderItem(ctx context.Context, arg CreateOrderItemParams
 		&i.Price,
 		&i.Discount,
 		&i.ItemTotal,
+		&i.PocketNumber,
 	)
 	return i, err
 }
@@ -67,7 +71,7 @@ func (q *Queries) DeleteOrderItemsByOrderID(ctx context.Context, orderID int32) 
 }
 
 const getOrderItem = `-- name: GetOrderItem :one
-SELECT id, order_id, item, quantity, price, discount, item_total
+SELECT id, order_id, item, quantity, price, discount, item_total, pocket_number
 FROM order_items
 WHERE id = $1
 `
@@ -83,12 +87,13 @@ func (q *Queries) GetOrderItem(ctx context.Context, id int32) (OrderItem, error)
 		&i.Price,
 		&i.Discount,
 		&i.ItemTotal,
+		&i.PocketNumber,
 	)
 	return i, err
 }
 
 const listOrderItemsByOrderID = `-- name: ListOrderItemsByOrderID :many
-SELECT id, order_id, item, quantity, price, discount, item_total
+SELECT id, order_id, item, quantity, price, discount, item_total, pocket_number
 FROM order_items
 WHERE order_id = $1
 `
@@ -110,6 +115,7 @@ func (q *Queries) ListOrderItemsByOrderID(ctx context.Context, orderID int32) ([
 			&i.Price,
 			&i.Discount,
 			&i.ItemTotal,
+			&i.PocketNumber,
 		); err != nil {
 			return nil, err
 		}
@@ -130,18 +136,20 @@ SET item = $2,
     quantity = $3,
     price = $4,
     discount = $5,
-    item_total = $6
+    item_total = $6,
+    pocket_number = $7
 WHERE id = $1
-RETURNING id, order_id, item, quantity, price, discount, item_total
+RETURNING id, order_id, item, quantity, price, discount, item_total, pocket_number
 `
 
 type UpdateOrderItemParams struct {
-	ID        int32  `json:"id"`
-	Item      string `json:"item"`
-	Quantity  int32  `json:"quantity"`
-	Price     string `json:"price"`
-	Discount  string `json:"discount"`
-	ItemTotal string `json:"item_total"`
+	ID           int32         `json:"id"`
+	Item         string        `json:"item"`
+	Quantity     int32         `json:"quantity"`
+	Price        string        `json:"price"`
+	Discount     string        `json:"discount"`
+	ItemTotal    string        `json:"item_total"`
+	PocketNumber sql.NullInt32 `json:"pocket_number"`
 }
 
 func (q *Queries) UpdateOrderItem(ctx context.Context, arg UpdateOrderItemParams) (OrderItem, error) {
@@ -152,6 +160,7 @@ func (q *Queries) UpdateOrderItem(ctx context.Context, arg UpdateOrderItemParams
 		arg.Price,
 		arg.Discount,
 		arg.ItemTotal,
+		arg.PocketNumber,
 	)
 	var i OrderItem
 	err := row.Scan(
@@ -162,6 +171,7 @@ func (q *Queries) UpdateOrderItem(ctx context.Context, arg UpdateOrderItemParams
 		&i.Price,
 		&i.Discount,
 		&i.ItemTotal,
+		&i.PocketNumber,
 	)
 	return i, err
 }

@@ -24,6 +24,9 @@ func New(db DBTX) *Queries {
 func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	q := Queries{db: db}
 	var err error
+	if q.assignPlanogramToLocationStmt, err = db.PrepareContext(ctx, assignPlanogramToLocation); err != nil {
+		return nil, fmt.Errorf("error preparing query AssignPlanogramToLocation: %w", err)
+	}
 	if q.createCustomerStmt, err = db.PrepareContext(ctx, createCustomer); err != nil {
 		return nil, fmt.Errorf("error preparing query CreateCustomer: %w", err)
 	}
@@ -35,6 +38,12 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	}
 	if q.createOrderItemStmt, err = db.PrepareContext(ctx, createOrderItem); err != nil {
 		return nil, fmt.Errorf("error preparing query CreateOrderItem: %w", err)
+	}
+	if q.createPlanogramStmt, err = db.PrepareContext(ctx, createPlanogram); err != nil {
+		return nil, fmt.Errorf("error preparing query CreatePlanogram: %w", err)
+	}
+	if q.createPlanogramPocketStmt, err = db.PrepareContext(ctx, createPlanogramPocket); err != nil {
+		return nil, fmt.Errorf("error preparing query CreatePlanogramPocket: %w", err)
 	}
 	if q.createProductStmt, err = db.PrepareContext(ctx, createProduct); err != nil {
 		return nil, fmt.Errorf("error preparing query CreateProduct: %w", err)
@@ -60,6 +69,12 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.deleteOrderItemsByOrderIDStmt, err = db.PrepareContext(ctx, deleteOrderItemsByOrderID); err != nil {
 		return nil, fmt.Errorf("error preparing query DeleteOrderItemsByOrderID: %w", err)
 	}
+	if q.deletePlanogramStmt, err = db.PrepareContext(ctx, deletePlanogram); err != nil {
+		return nil, fmt.Errorf("error preparing query DeletePlanogram: %w", err)
+	}
+	if q.deletePlanogramPocketStmt, err = db.PrepareContext(ctx, deletePlanogramPocket); err != nil {
+		return nil, fmt.Errorf("error preparing query DeletePlanogramPocket: %w", err)
+	}
 	if q.deleteProductStmt, err = db.PrepareContext(ctx, deleteProduct); err != nil {
 		return nil, fmt.Errorf("error preparing query DeleteProduct: %w", err)
 	}
@@ -78,6 +93,15 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.getOrderItemStmt, err = db.PrepareContext(ctx, getOrderItem); err != nil {
 		return nil, fmt.Errorf("error preparing query GetOrderItem: %w", err)
 	}
+	if q.getPlanogramStmt, err = db.PrepareContext(ctx, getPlanogram); err != nil {
+		return nil, fmt.Errorf("error preparing query GetPlanogram: %w", err)
+	}
+	if q.getPlanogramPocketStmt, err = db.PrepareContext(ctx, getPlanogramPocket); err != nil {
+		return nil, fmt.Errorf("error preparing query GetPlanogramPocket: %w", err)
+	}
+	if q.getPlanogramPocketByNumberStmt, err = db.PrepareContext(ctx, getPlanogramPocketByNumber); err != nil {
+		return nil, fmt.Errorf("error preparing query GetPlanogramPocketByNumber: %w", err)
+	}
 	if q.getProductByIDStmt, err = db.PrepareContext(ctx, getProductByID); err != nil {
 		return nil, fmt.Errorf("error preparing query GetProductByID: %w", err)
 	}
@@ -93,17 +117,32 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.listCustomersStmt, err = db.PrepareContext(ctx, listCustomers); err != nil {
 		return nil, fmt.Errorf("error preparing query ListCustomers: %w", err)
 	}
+	if q.listLocationsByPlanogramStmt, err = db.PrepareContext(ctx, listLocationsByPlanogram); err != nil {
+		return nil, fmt.Errorf("error preparing query ListLocationsByPlanogram: %w", err)
+	}
 	if q.listOrderItemsByOrderIDStmt, err = db.PrepareContext(ctx, listOrderItemsByOrderID); err != nil {
 		return nil, fmt.Errorf("error preparing query ListOrderItemsByOrderID: %w", err)
 	}
 	if q.listOrdersStmt, err = db.PrepareContext(ctx, listOrders); err != nil {
 		return nil, fmt.Errorf("error preparing query ListOrders: %w", err)
 	}
+	if q.listPlanogramsStmt, err = db.PrepareContext(ctx, listPlanograms); err != nil {
+		return nil, fmt.Errorf("error preparing query ListPlanograms: %w", err)
+	}
+	if q.listPlanogramsByLocationStmt, err = db.PrepareContext(ctx, listPlanogramsByLocation); err != nil {
+		return nil, fmt.Errorf("error preparing query ListPlanogramsByLocation: %w", err)
+	}
+	if q.listPocketsForPlanogramStmt, err = db.PrepareContext(ctx, listPocketsForPlanogram); err != nil {
+		return nil, fmt.Errorf("error preparing query ListPocketsForPlanogram: %w", err)
+	}
 	if q.listProductsStmt, err = db.PrepareContext(ctx, listProducts); err != nil {
 		return nil, fmt.Errorf("error preparing query ListProducts: %w", err)
 	}
 	if q.listUsersStmt, err = db.PrepareContext(ctx, listUsers); err != nil {
 		return nil, fmt.Errorf("error preparing query ListUsers: %w", err)
+	}
+	if q.removePlanogramFromLocationStmt, err = db.PrepareContext(ctx, removePlanogramFromLocation); err != nil {
+		return nil, fmt.Errorf("error preparing query RemovePlanogramFromLocation: %w", err)
 	}
 	if q.updateCustomerStmt, err = db.PrepareContext(ctx, updateCustomer); err != nil {
 		return nil, fmt.Errorf("error preparing query UpdateCustomer: %w", err)
@@ -117,6 +156,12 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.updateOrderItemStmt, err = db.PrepareContext(ctx, updateOrderItem); err != nil {
 		return nil, fmt.Errorf("error preparing query UpdateOrderItem: %w", err)
 	}
+	if q.updatePlanogramStmt, err = db.PrepareContext(ctx, updatePlanogram); err != nil {
+		return nil, fmt.Errorf("error preparing query UpdatePlanogram: %w", err)
+	}
+	if q.updatePlanogramPocketStmt, err = db.PrepareContext(ctx, updatePlanogramPocket); err != nil {
+		return nil, fmt.Errorf("error preparing query UpdatePlanogramPocket: %w", err)
+	}
 	if q.updateProductStmt, err = db.PrepareContext(ctx, updateProduct); err != nil {
 		return nil, fmt.Errorf("error preparing query UpdateProduct: %w", err)
 	}
@@ -128,6 +173,11 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 
 func (q *Queries) Close() error {
 	var err error
+	if q.assignPlanogramToLocationStmt != nil {
+		if cerr := q.assignPlanogramToLocationStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing assignPlanogramToLocationStmt: %w", cerr)
+		}
+	}
 	if q.createCustomerStmt != nil {
 		if cerr := q.createCustomerStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing createCustomerStmt: %w", cerr)
@@ -146,6 +196,16 @@ func (q *Queries) Close() error {
 	if q.createOrderItemStmt != nil {
 		if cerr := q.createOrderItemStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing createOrderItemStmt: %w", cerr)
+		}
+	}
+	if q.createPlanogramStmt != nil {
+		if cerr := q.createPlanogramStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing createPlanogramStmt: %w", cerr)
+		}
+	}
+	if q.createPlanogramPocketStmt != nil {
+		if cerr := q.createPlanogramPocketStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing createPlanogramPocketStmt: %w", cerr)
 		}
 	}
 	if q.createProductStmt != nil {
@@ -188,6 +248,16 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing deleteOrderItemsByOrderIDStmt: %w", cerr)
 		}
 	}
+	if q.deletePlanogramStmt != nil {
+		if cerr := q.deletePlanogramStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing deletePlanogramStmt: %w", cerr)
+		}
+	}
+	if q.deletePlanogramPocketStmt != nil {
+		if cerr := q.deletePlanogramPocketStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing deletePlanogramPocketStmt: %w", cerr)
+		}
+	}
 	if q.deleteProductStmt != nil {
 		if cerr := q.deleteProductStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing deleteProductStmt: %w", cerr)
@@ -218,6 +288,21 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing getOrderItemStmt: %w", cerr)
 		}
 	}
+	if q.getPlanogramStmt != nil {
+		if cerr := q.getPlanogramStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getPlanogramStmt: %w", cerr)
+		}
+	}
+	if q.getPlanogramPocketStmt != nil {
+		if cerr := q.getPlanogramPocketStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getPlanogramPocketStmt: %w", cerr)
+		}
+	}
+	if q.getPlanogramPocketByNumberStmt != nil {
+		if cerr := q.getPlanogramPocketByNumberStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getPlanogramPocketByNumberStmt: %w", cerr)
+		}
+	}
 	if q.getProductByIDStmt != nil {
 		if cerr := q.getProductByIDStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing getProductByIDStmt: %w", cerr)
@@ -243,6 +328,11 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing listCustomersStmt: %w", cerr)
 		}
 	}
+	if q.listLocationsByPlanogramStmt != nil {
+		if cerr := q.listLocationsByPlanogramStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing listLocationsByPlanogramStmt: %w", cerr)
+		}
+	}
 	if q.listOrderItemsByOrderIDStmt != nil {
 		if cerr := q.listOrderItemsByOrderIDStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing listOrderItemsByOrderIDStmt: %w", cerr)
@@ -253,6 +343,21 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing listOrdersStmt: %w", cerr)
 		}
 	}
+	if q.listPlanogramsStmt != nil {
+		if cerr := q.listPlanogramsStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing listPlanogramsStmt: %w", cerr)
+		}
+	}
+	if q.listPlanogramsByLocationStmt != nil {
+		if cerr := q.listPlanogramsByLocationStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing listPlanogramsByLocationStmt: %w", cerr)
+		}
+	}
+	if q.listPocketsForPlanogramStmt != nil {
+		if cerr := q.listPocketsForPlanogramStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing listPocketsForPlanogramStmt: %w", cerr)
+		}
+	}
 	if q.listProductsStmt != nil {
 		if cerr := q.listProductsStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing listProductsStmt: %w", cerr)
@@ -261,6 +366,11 @@ func (q *Queries) Close() error {
 	if q.listUsersStmt != nil {
 		if cerr := q.listUsersStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing listUsersStmt: %w", cerr)
+		}
+	}
+	if q.removePlanogramFromLocationStmt != nil {
+		if cerr := q.removePlanogramFromLocationStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing removePlanogramFromLocationStmt: %w", cerr)
 		}
 	}
 	if q.updateCustomerStmt != nil {
@@ -281,6 +391,16 @@ func (q *Queries) Close() error {
 	if q.updateOrderItemStmt != nil {
 		if cerr := q.updateOrderItemStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing updateOrderItemStmt: %w", cerr)
+		}
+	}
+	if q.updatePlanogramStmt != nil {
+		if cerr := q.updatePlanogramStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing updatePlanogramStmt: %w", cerr)
+		}
+	}
+	if q.updatePlanogramPocketStmt != nil {
+		if cerr := q.updatePlanogramPocketStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing updatePlanogramPocketStmt: %w", cerr)
 		}
 	}
 	if q.updateProductStmt != nil {
@@ -332,10 +452,13 @@ func (q *Queries) queryRow(ctx context.Context, stmt *sql.Stmt, query string, ar
 type Queries struct {
 	db                                  DBTX
 	tx                                  *sql.Tx
+	assignPlanogramToLocationStmt       *sql.Stmt
 	createCustomerStmt                  *sql.Stmt
 	createCustomerLocationStmt          *sql.Stmt
 	createOrderStmt                     *sql.Stmt
 	createOrderItemStmt                 *sql.Stmt
+	createPlanogramStmt                 *sql.Stmt
+	createPlanogramPocketStmt           *sql.Stmt
 	createProductStmt                   *sql.Stmt
 	createUserStmt                      *sql.Stmt
 	deleteAllUsersStmt                  *sql.Stmt
@@ -344,25 +467,37 @@ type Queries struct {
 	deleteOrderStmt                     *sql.Stmt
 	deleteOrderItemStmt                 *sql.Stmt
 	deleteOrderItemsByOrderIDStmt       *sql.Stmt
+	deletePlanogramStmt                 *sql.Stmt
+	deletePlanogramPocketStmt           *sql.Stmt
 	deleteProductStmt                   *sql.Stmt
 	deleteUserStmt                      *sql.Stmt
 	getCustomerStmt                     *sql.Stmt
 	getCustomerLocationByIDStmt         *sql.Stmt
 	getOrderStmt                        *sql.Stmt
 	getOrderItemStmt                    *sql.Stmt
+	getPlanogramStmt                    *sql.Stmt
+	getPlanogramPocketStmt              *sql.Stmt
+	getPlanogramPocketByNumberStmt      *sql.Stmt
 	getProductByIDStmt                  *sql.Stmt
 	getProductBySKUStmt                 *sql.Stmt
 	getUserStmt                         *sql.Stmt
 	listCustomerLocationsByCustomerStmt *sql.Stmt
 	listCustomersStmt                   *sql.Stmt
+	listLocationsByPlanogramStmt        *sql.Stmt
 	listOrderItemsByOrderIDStmt         *sql.Stmt
 	listOrdersStmt                      *sql.Stmt
+	listPlanogramsStmt                  *sql.Stmt
+	listPlanogramsByLocationStmt        *sql.Stmt
+	listPocketsForPlanogramStmt         *sql.Stmt
 	listProductsStmt                    *sql.Stmt
 	listUsersStmt                       *sql.Stmt
+	removePlanogramFromLocationStmt     *sql.Stmt
 	updateCustomerStmt                  *sql.Stmt
 	updateCustomerLocationStmt          *sql.Stmt
 	updateOrderStmt                     *sql.Stmt
 	updateOrderItemStmt                 *sql.Stmt
+	updatePlanogramStmt                 *sql.Stmt
+	updatePlanogramPocketStmt           *sql.Stmt
 	updateProductStmt                   *sql.Stmt
 	updateUserStmt                      *sql.Stmt
 }
@@ -371,10 +506,13 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 	return &Queries{
 		db:                                  tx,
 		tx:                                  tx,
+		assignPlanogramToLocationStmt:       q.assignPlanogramToLocationStmt,
 		createCustomerStmt:                  q.createCustomerStmt,
 		createCustomerLocationStmt:          q.createCustomerLocationStmt,
 		createOrderStmt:                     q.createOrderStmt,
 		createOrderItemStmt:                 q.createOrderItemStmt,
+		createPlanogramStmt:                 q.createPlanogramStmt,
+		createPlanogramPocketStmt:           q.createPlanogramPocketStmt,
 		createProductStmt:                   q.createProductStmt,
 		createUserStmt:                      q.createUserStmt,
 		deleteAllUsersStmt:                  q.deleteAllUsersStmt,
@@ -383,25 +521,37 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		deleteOrderStmt:                     q.deleteOrderStmt,
 		deleteOrderItemStmt:                 q.deleteOrderItemStmt,
 		deleteOrderItemsByOrderIDStmt:       q.deleteOrderItemsByOrderIDStmt,
+		deletePlanogramStmt:                 q.deletePlanogramStmt,
+		deletePlanogramPocketStmt:           q.deletePlanogramPocketStmt,
 		deleteProductStmt:                   q.deleteProductStmt,
 		deleteUserStmt:                      q.deleteUserStmt,
 		getCustomerStmt:                     q.getCustomerStmt,
 		getCustomerLocationByIDStmt:         q.getCustomerLocationByIDStmt,
 		getOrderStmt:                        q.getOrderStmt,
 		getOrderItemStmt:                    q.getOrderItemStmt,
+		getPlanogramStmt:                    q.getPlanogramStmt,
+		getPlanogramPocketStmt:              q.getPlanogramPocketStmt,
+		getPlanogramPocketByNumberStmt:      q.getPlanogramPocketByNumberStmt,
 		getProductByIDStmt:                  q.getProductByIDStmt,
 		getProductBySKUStmt:                 q.getProductBySKUStmt,
 		getUserStmt:                         q.getUserStmt,
 		listCustomerLocationsByCustomerStmt: q.listCustomerLocationsByCustomerStmt,
 		listCustomersStmt:                   q.listCustomersStmt,
+		listLocationsByPlanogramStmt:        q.listLocationsByPlanogramStmt,
 		listOrderItemsByOrderIDStmt:         q.listOrderItemsByOrderIDStmt,
 		listOrdersStmt:                      q.listOrdersStmt,
+		listPlanogramsStmt:                  q.listPlanogramsStmt,
+		listPlanogramsByLocationStmt:        q.listPlanogramsByLocationStmt,
+		listPocketsForPlanogramStmt:         q.listPocketsForPlanogramStmt,
 		listProductsStmt:                    q.listProductsStmt,
 		listUsersStmt:                       q.listUsersStmt,
+		removePlanogramFromLocationStmt:     q.removePlanogramFromLocationStmt,
 		updateCustomerStmt:                  q.updateCustomerStmt,
 		updateCustomerLocationStmt:          q.updateCustomerLocationStmt,
 		updateOrderStmt:                     q.updateOrderStmt,
 		updateOrderItemStmt:                 q.updateOrderItemStmt,
+		updatePlanogramStmt:                 q.updatePlanogramStmt,
+		updatePlanogramPocketStmt:           q.updatePlanogramPocketStmt,
 		updateProductStmt:                   q.updateProductStmt,
 		updateUserStmt:                      q.updateUserStmt,
 	}

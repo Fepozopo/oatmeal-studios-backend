@@ -23,7 +23,7 @@ VALUES (
     $3,
     $4
 )
-RETURNING id, created_at, updated_at, email, first_name, last_name
+RETURNING id, created_at, updated_at, email, first_name, last_name, password
 `
 
 type CreateUserParams struct {
@@ -33,23 +33,14 @@ type CreateUserParams struct {
 	LastName  string `json:"last_name"`
 }
 
-type CreateUserRow struct {
-	ID        uuid.UUID `json:"id"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
-	Email     string    `json:"email"`
-	FirstName string    `json:"first_name"`
-	LastName  string    `json:"last_name"`
-}
-
-func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (CreateUserRow, error) {
+func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, error) {
 	row := q.queryRow(ctx, q.createUserStmt, createUser,
 		arg.Email,
 		arg.Password,
 		arg.FirstName,
 		arg.LastName,
 	)
-	var i CreateUserRow
+	var i User
 	err := row.Scan(
 		&i.ID,
 		&i.CreatedAt,
@@ -57,6 +48,7 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (CreateU
 		&i.Email,
 		&i.FirstName,
 		&i.LastName,
+		&i.Password,
 	)
 	return i, err
 }
@@ -162,7 +154,7 @@ SET email = $2,
     password = $5,
     updated_at = NOW()
 WHERE id = $1
-RETURNING id, created_at, updated_at, email, first_name, last_name
+RETURNING id, created_at, updated_at, email, first_name, last_name, password
 `
 
 type UpdateUserParams struct {
@@ -173,16 +165,7 @@ type UpdateUserParams struct {
 	Password  string    `json:"password"`
 }
 
-type UpdateUserRow struct {
-	ID        uuid.UUID `json:"id"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
-	Email     string    `json:"email"`
-	FirstName string    `json:"first_name"`
-	LastName  string    `json:"last_name"`
-}
-
-func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) (UpdateUserRow, error) {
+func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) (User, error) {
 	row := q.queryRow(ctx, q.updateUserStmt, updateUser,
 		arg.ID,
 		arg.Email,
@@ -190,7 +173,7 @@ func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) (UpdateU
 		arg.LastName,
 		arg.Password,
 	)
-	var i UpdateUserRow
+	var i User
 	err := row.Scan(
 		&i.ID,
 		&i.CreatedAt,
@@ -198,6 +181,7 @@ func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) (UpdateU
 		&i.Email,
 		&i.FirstName,
 		&i.LastName,
+		&i.Password,
 	)
 	return i, err
 }

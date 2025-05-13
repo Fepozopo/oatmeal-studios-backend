@@ -12,47 +12,31 @@ import (
 )
 
 const createOrder = `-- name: CreateOrder :one
-INSERT INTO orders (customer_id, order_date, status, type, method, ship_date, po_number, shipping_cost, free_shipping, apply_to_commission, notes, sales_rep)
-VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
-RETURNING id, created_at, updated_at, customer_id, order_date, status, type, method, ship_date, po_number, shipping_cost, free_shipping, apply_to_commission, notes, sales_rep
+INSERT INTO orders (customer_id, customer_location_id, order_date, status, type, method, ship_date, po_number, shipping_cost, free_shipping, apply_to_commission, notes, sales_rep)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
+RETURNING id, created_at, updated_at, customer_id, customer_location_id, order_date, ship_date, status, type, method, po_number, shipping_cost, free_shipping, apply_to_commission, notes, sales_rep
 `
 
 type CreateOrderParams struct {
-	CustomerID        int32          `json:"customer_id"`
-	OrderDate         time.Time      `json:"order_date"`
-	Status            string         `json:"status"`
-	Type              string         `json:"type"`
-	Method            sql.NullString `json:"method"`
-	ShipDate          time.Time      `json:"ship_date"`
-	PoNumber          sql.NullString `json:"po_number"`
-	ShippingCost      string         `json:"shipping_cost"`
-	FreeShipping      bool           `json:"free_shipping"`
-	ApplyToCommission bool           `json:"apply_to_commission"`
-	Notes             sql.NullString `json:"notes"`
-	SalesRep          sql.NullString `json:"sales_rep"`
+	CustomerID         int32          `json:"customer_id"`
+	CustomerLocationID sql.NullInt32  `json:"customer_location_id"`
+	OrderDate          time.Time      `json:"order_date"`
+	Status             string         `json:"status"`
+	Type               string         `json:"type"`
+	Method             sql.NullString `json:"method"`
+	ShipDate           time.Time      `json:"ship_date"`
+	PoNumber           sql.NullString `json:"po_number"`
+	ShippingCost       string         `json:"shipping_cost"`
+	FreeShipping       bool           `json:"free_shipping"`
+	ApplyToCommission  bool           `json:"apply_to_commission"`
+	Notes              sql.NullString `json:"notes"`
+	SalesRep           sql.NullString `json:"sales_rep"`
 }
 
-type CreateOrderRow struct {
-	ID                int32          `json:"id"`
-	CreatedAt         time.Time      `json:"created_at"`
-	UpdatedAt         time.Time      `json:"updated_at"`
-	CustomerID        int32          `json:"customer_id"`
-	OrderDate         time.Time      `json:"order_date"`
-	Status            string         `json:"status"`
-	Type              string         `json:"type"`
-	Method            sql.NullString `json:"method"`
-	ShipDate          time.Time      `json:"ship_date"`
-	PoNumber          sql.NullString `json:"po_number"`
-	ShippingCost      string         `json:"shipping_cost"`
-	FreeShipping      bool           `json:"free_shipping"`
-	ApplyToCommission bool           `json:"apply_to_commission"`
-	Notes             sql.NullString `json:"notes"`
-	SalesRep          sql.NullString `json:"sales_rep"`
-}
-
-func (q *Queries) CreateOrder(ctx context.Context, arg CreateOrderParams) (CreateOrderRow, error) {
+func (q *Queries) CreateOrder(ctx context.Context, arg CreateOrderParams) (Order, error) {
 	row := q.queryRow(ctx, q.createOrderStmt, createOrder,
 		arg.CustomerID,
+		arg.CustomerLocationID,
 		arg.OrderDate,
 		arg.Status,
 		arg.Type,
@@ -65,17 +49,18 @@ func (q *Queries) CreateOrder(ctx context.Context, arg CreateOrderParams) (Creat
 		arg.Notes,
 		arg.SalesRep,
 	)
-	var i CreateOrderRow
+	var i Order
 	err := row.Scan(
 		&i.ID,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.CustomerID,
+		&i.CustomerLocationID,
 		&i.OrderDate,
+		&i.ShipDate,
 		&i.Status,
 		&i.Type,
 		&i.Method,
-		&i.ShipDate,
 		&i.PoNumber,
 		&i.ShippingCost,
 		&i.FreeShipping,
@@ -97,7 +82,7 @@ func (q *Queries) DeleteOrder(ctx context.Context, id int32) error {
 }
 
 const getOrder = `-- name: GetOrder :one
-SELECT id, created_at, updated_at, customer_id, order_date, ship_date, status, type, method, po_number, shipping_cost, free_shipping, apply_to_commission, notes, sales_rep
+SELECT id, created_at, updated_at, customer_id, customer_location_id, order_date, ship_date, status, type, method, po_number, shipping_cost, free_shipping, apply_to_commission, notes, sales_rep
 FROM orders
 WHERE id = $1
 `
@@ -110,6 +95,7 @@ func (q *Queries) GetOrder(ctx context.Context, id int32) (Order, error) {
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.CustomerID,
+		&i.CustomerLocationID,
 		&i.OrderDate,
 		&i.ShipDate,
 		&i.Status,
@@ -126,7 +112,7 @@ func (q *Queries) GetOrder(ctx context.Context, id int32) (Order, error) {
 }
 
 const listOrders = `-- name: ListOrders :many
-SELECT id, created_at, updated_at, customer_id, order_date, ship_date, status, type, method, po_number, shipping_cost, free_shipping, apply_to_commission, notes, sales_rep
+SELECT id, created_at, updated_at, customer_id, customer_location_id, order_date, ship_date, status, type, method, po_number, shipping_cost, free_shipping, apply_to_commission, notes, sales_rep
 FROM orders
 ORDER BY order_date DESC
 `
@@ -145,6 +131,7 @@ func (q *Queries) ListOrders(ctx context.Context) ([]Order, error) {
 			&i.CreatedAt,
 			&i.UpdatedAt,
 			&i.CustomerID,
+			&i.CustomerLocationID,
 			&i.OrderDate,
 			&i.ShipDate,
 			&i.Status,
@@ -173,60 +160,45 @@ func (q *Queries) ListOrders(ctx context.Context) ([]Order, error) {
 const updateOrder = `-- name: UpdateOrder :one
 UPDATE orders
 SET customer_id = $2,
-    order_date = $3,
-    status = $4,
-    type = $5,
-    method = $6,
-    ship_date = $7,
-    po_number = $8,
-    shipping_cost = $9,
-    free_shipping = $10,
-    apply_to_commission = $11,
-    notes = $12,
-    sales_rep = $13,
+    customer_location_id = $3,
+    order_date = $4,
+    status = $5,
+    type = $6,
+    method = $7,
+    ship_date = $8,
+    po_number = $9,
+    shipping_cost = $10,
+    free_shipping = $11,
+    apply_to_commission = $12,
+    notes = $13,
+    sales_rep = $14,
     updated_at = NOW()
 WHERE id = $1
-RETURNING id, created_at, updated_at, customer_id, order_date, status, type, method, ship_date, po_number, shipping_cost, free_shipping, apply_to_commission, notes, sales_rep
+RETURNING id, created_at, updated_at, customer_id, customer_location_id, order_date, ship_date, status, type, method, po_number, shipping_cost, free_shipping, apply_to_commission, notes, sales_rep
 `
 
 type UpdateOrderParams struct {
-	ID                int32          `json:"id"`
-	CustomerID        int32          `json:"customer_id"`
-	OrderDate         time.Time      `json:"order_date"`
-	Status            string         `json:"status"`
-	Type              string         `json:"type"`
-	Method            sql.NullString `json:"method"`
-	ShipDate          time.Time      `json:"ship_date"`
-	PoNumber          sql.NullString `json:"po_number"`
-	ShippingCost      string         `json:"shipping_cost"`
-	FreeShipping      bool           `json:"free_shipping"`
-	ApplyToCommission bool           `json:"apply_to_commission"`
-	Notes             sql.NullString `json:"notes"`
-	SalesRep          sql.NullString `json:"sales_rep"`
+	ID                 int32          `json:"id"`
+	CustomerID         int32          `json:"customer_id"`
+	CustomerLocationID sql.NullInt32  `json:"customer_location_id"`
+	OrderDate          time.Time      `json:"order_date"`
+	Status             string         `json:"status"`
+	Type               string         `json:"type"`
+	Method             sql.NullString `json:"method"`
+	ShipDate           time.Time      `json:"ship_date"`
+	PoNumber           sql.NullString `json:"po_number"`
+	ShippingCost       string         `json:"shipping_cost"`
+	FreeShipping       bool           `json:"free_shipping"`
+	ApplyToCommission  bool           `json:"apply_to_commission"`
+	Notes              sql.NullString `json:"notes"`
+	SalesRep           sql.NullString `json:"sales_rep"`
 }
 
-type UpdateOrderRow struct {
-	ID                int32          `json:"id"`
-	CreatedAt         time.Time      `json:"created_at"`
-	UpdatedAt         time.Time      `json:"updated_at"`
-	CustomerID        int32          `json:"customer_id"`
-	OrderDate         time.Time      `json:"order_date"`
-	Status            string         `json:"status"`
-	Type              string         `json:"type"`
-	Method            sql.NullString `json:"method"`
-	ShipDate          time.Time      `json:"ship_date"`
-	PoNumber          sql.NullString `json:"po_number"`
-	ShippingCost      string         `json:"shipping_cost"`
-	FreeShipping      bool           `json:"free_shipping"`
-	ApplyToCommission bool           `json:"apply_to_commission"`
-	Notes             sql.NullString `json:"notes"`
-	SalesRep          sql.NullString `json:"sales_rep"`
-}
-
-func (q *Queries) UpdateOrder(ctx context.Context, arg UpdateOrderParams) (UpdateOrderRow, error) {
+func (q *Queries) UpdateOrder(ctx context.Context, arg UpdateOrderParams) (Order, error) {
 	row := q.queryRow(ctx, q.updateOrderStmt, updateOrder,
 		arg.ID,
 		arg.CustomerID,
+		arg.CustomerLocationID,
 		arg.OrderDate,
 		arg.Status,
 		arg.Type,
@@ -239,17 +211,18 @@ func (q *Queries) UpdateOrder(ctx context.Context, arg UpdateOrderParams) (Updat
 		arg.Notes,
 		arg.SalesRep,
 	)
-	var i UpdateOrderRow
+	var i Order
 	err := row.Scan(
 		&i.ID,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.CustomerID,
+		&i.CustomerLocationID,
 		&i.OrderDate,
+		&i.ShipDate,
 		&i.Status,
 		&i.Type,
 		&i.Method,
-		&i.ShipDate,
 		&i.PoNumber,
 		&i.ShippingCost,
 		&i.FreeShipping,
