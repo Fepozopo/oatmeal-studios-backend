@@ -13,7 +13,7 @@ CREATE TABLE sales_reps (
     state TEXT,
     zip_code TEXT,
     email TEXT,
-    phone TEXT,
+    phone TEXT
 );
 
 -- +goose Down
