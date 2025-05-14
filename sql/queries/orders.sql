@@ -9,7 +9,7 @@ FROM orders
 ORDER BY order_date DESC;
 
 -- name: CreateOrder :one
-INSERT INTO orders (customer_id, customer_location_id, order_date, status, type, method, ship_date, po_number, shipping_cost, free_shipping, apply_to_commission, notes, sales_rep)
+INSERT INTO orders (customer_id, customer_location_id, order_date, status, type, method, ship_date, po_number, shipping_cost, free_shipping, apply_to_commission, sales_rep, notes)
 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
 RETURNING *;
 
@@ -26,8 +26,8 @@ SET customer_id = $2,
     shipping_cost = $10,
     free_shipping = $11,
     apply_to_commission = $12,
-    notes = $13,
-    sales_rep = $14,
+    sales_rep = $13,
+    notes = $14,
     updated_at = NOW()
 WHERE id = $1
 RETURNING *;
