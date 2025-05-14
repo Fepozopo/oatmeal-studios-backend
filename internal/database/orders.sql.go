@@ -12,9 +12,9 @@ import (
 )
 
 const createOrder = `-- name: CreateOrder :one
-INSERT INTO orders (customer_id, customer_location_id, order_date, status, type, method, ship_date, po_number, shipping_cost, free_shipping, apply_to_commission, notes, sales_rep)
+INSERT INTO orders (customer_id, customer_location_id, order_date, status, type, method, ship_date, po_number, shipping_cost, free_shipping, apply_to_commission, sales_rep, notes)
 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
-RETURNING id, created_at, updated_at, customer_id, customer_location_id, order_date, ship_date, status, type, method, po_number, shipping_cost, free_shipping, apply_to_commission, notes, sales_rep
+RETURNING id, created_at, updated_at, customer_id, customer_location_id, order_date, ship_date, status, type, method, po_number, shipping_cost, free_shipping, apply_to_commission, sales_rep, notes
 `
 
 type CreateOrderParams struct {
@@ -29,8 +29,8 @@ type CreateOrderParams struct {
 	ShippingCost       string         `json:"shipping_cost"`
 	FreeShipping       bool           `json:"free_shipping"`
 	ApplyToCommission  bool           `json:"apply_to_commission"`
-	Notes              sql.NullString `json:"notes"`
 	SalesRep           sql.NullString `json:"sales_rep"`
+	Notes              sql.NullString `json:"notes"`
 }
 
 func (q *Queries) CreateOrder(ctx context.Context, arg CreateOrderParams) (Order, error) {
@@ -46,8 +46,8 @@ func (q *Queries) CreateOrder(ctx context.Context, arg CreateOrderParams) (Order
 		arg.ShippingCost,
 		arg.FreeShipping,
 		arg.ApplyToCommission,
-		arg.Notes,
 		arg.SalesRep,
+		arg.Notes,
 	)
 	var i Order
 	err := row.Scan(
@@ -65,8 +65,8 @@ func (q *Queries) CreateOrder(ctx context.Context, arg CreateOrderParams) (Order
 		&i.ShippingCost,
 		&i.FreeShipping,
 		&i.ApplyToCommission,
-		&i.Notes,
 		&i.SalesRep,
+		&i.Notes,
 	)
 	return i, err
 }
@@ -82,7 +82,7 @@ func (q *Queries) DeleteOrder(ctx context.Context, id int32) error {
 }
 
 const getOrder = `-- name: GetOrder :one
-SELECT id, created_at, updated_at, customer_id, customer_location_id, order_date, ship_date, status, type, method, po_number, shipping_cost, free_shipping, apply_to_commission, notes, sales_rep
+SELECT id, created_at, updated_at, customer_id, customer_location_id, order_date, ship_date, status, type, method, po_number, shipping_cost, free_shipping, apply_to_commission, sales_rep, notes
 FROM orders
 WHERE id = $1
 `
@@ -105,14 +105,14 @@ func (q *Queries) GetOrder(ctx context.Context, id int32) (Order, error) {
 		&i.ShippingCost,
 		&i.FreeShipping,
 		&i.ApplyToCommission,
-		&i.Notes,
 		&i.SalesRep,
+		&i.Notes,
 	)
 	return i, err
 }
 
 const listOrders = `-- name: ListOrders :many
-SELECT id, created_at, updated_at, customer_id, customer_location_id, order_date, ship_date, status, type, method, po_number, shipping_cost, free_shipping, apply_to_commission, notes, sales_rep
+SELECT id, created_at, updated_at, customer_id, customer_location_id, order_date, ship_date, status, type, method, po_number, shipping_cost, free_shipping, apply_to_commission, sales_rep, notes
 FROM orders
 ORDER BY order_date DESC
 `
@@ -141,8 +141,8 @@ func (q *Queries) ListOrders(ctx context.Context) ([]Order, error) {
 			&i.ShippingCost,
 			&i.FreeShipping,
 			&i.ApplyToCommission,
-			&i.Notes,
 			&i.SalesRep,
+			&i.Notes,
 		); err != nil {
 			return nil, err
 		}
@@ -170,11 +170,11 @@ SET customer_id = $2,
     shipping_cost = $10,
     free_shipping = $11,
     apply_to_commission = $12,
-    notes = $13,
-    sales_rep = $14,
+    sales_rep = $13,
+    notes = $14,
     updated_at = NOW()
 WHERE id = $1
-RETURNING id, created_at, updated_at, customer_id, customer_location_id, order_date, ship_date, status, type, method, po_number, shipping_cost, free_shipping, apply_to_commission, notes, sales_rep
+RETURNING id, created_at, updated_at, customer_id, customer_location_id, order_date, ship_date, status, type, method, po_number, shipping_cost, free_shipping, apply_to_commission, sales_rep, notes
 `
 
 type UpdateOrderParams struct {
@@ -190,8 +190,8 @@ type UpdateOrderParams struct {
 	ShippingCost       string         `json:"shipping_cost"`
 	FreeShipping       bool           `json:"free_shipping"`
 	ApplyToCommission  bool           `json:"apply_to_commission"`
-	Notes              sql.NullString `json:"notes"`
 	SalesRep           sql.NullString `json:"sales_rep"`
+	Notes              sql.NullString `json:"notes"`
 }
 
 func (q *Queries) UpdateOrder(ctx context.Context, arg UpdateOrderParams) (Order, error) {
@@ -208,8 +208,8 @@ func (q *Queries) UpdateOrder(ctx context.Context, arg UpdateOrderParams) (Order
 		arg.ShippingCost,
 		arg.FreeShipping,
 		arg.ApplyToCommission,
-		arg.Notes,
 		arg.SalesRep,
+		arg.Notes,
 	)
 	var i Order
 	err := row.Scan(
@@ -227,8 +227,8 @@ func (q *Queries) UpdateOrder(ctx context.Context, arg UpdateOrderParams) (Order
 		&i.ShippingCost,
 		&i.FreeShipping,
 		&i.ApplyToCommission,
-		&i.Notes,
 		&i.SalesRep,
+		&i.Notes,
 	)
 	return i, err
 }

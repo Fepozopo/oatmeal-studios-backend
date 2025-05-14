@@ -27,8 +27,8 @@ type Customer struct {
 	Terms        sql.NullString `json:"terms"`
 	Discount     string         `json:"discount"`
 	Commission   string         `json:"commission"`
-	Notes        sql.NullString `json:"notes"`
 	SalesRep     sql.NullString `json:"sales_rep"`
+	Notes        sql.NullString `json:"notes"`
 }
 
 type CustomerLocation struct {
@@ -60,8 +60,8 @@ type Order struct {
 	ShippingCost       string         `json:"shipping_cost"`
 	FreeShipping       bool           `json:"free_shipping"`
 	ApplyToCommission  bool           `json:"apply_to_commission"`
-	Notes              sql.NullString `json:"notes"`
 	SalesRep           sql.NullString `json:"sales_rep"`
+	Notes              sql.NullString `json:"notes"`
 }
 
 type OrderItem struct {
@@ -116,6 +116,23 @@ type Product struct {
 	Description    sql.NullString `json:"description"`
 	TextFront      sql.NullString `json:"text_front"`
 	TextInside     sql.NullString `json:"text_inside"`
+}
+
+type SalesRep struct {
+	ID        int32          `json:"id"`
+	CreatedAt time.Time      `json:"created_at"`
+	UpdatedAt time.Time      `json:"updated_at"`
+	Status    string         `json:"status"`
+	FirstName string         `json:"first_name"`
+	LastName  string         `json:"last_name"`
+	Company   string         `json:"company"`
+	Address1  sql.NullString `json:"address_1"`
+	Address2  sql.NullString `json:"address_2"`
+	City      sql.NullString `json:"city"`
+	State     sql.NullString `json:"state"`
+	ZipCode   sql.NullString `json:"zip_code"`
+	Email     sql.NullString `json:"email"`
+	Phone     sql.NullString `json:"phone"`
 }
 
 type User struct {

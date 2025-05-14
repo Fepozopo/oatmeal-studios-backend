@@ -11,9 +11,9 @@ import (
 )
 
 const createCustomer = `-- name: CreateCustomer :one
-INSERT INTO customers (business_name, contact_name, email, phone, address_1, address_2, city, state, zip_code, terms, discount, commission, notes, sales_rep)
+INSERT INTO customers (business_name, contact_name, email, phone, address_1, address_2, city, state, zip_code, terms, discount, commission, sales_rep, notes)
 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
-RETURNING id, created_at, updated_at, business_name, contact_name, email, phone, address_1, address_2, city, state, zip_code, terms, discount, commission, notes, sales_rep
+RETURNING id, created_at, updated_at, business_name, contact_name, email, phone, address_1, address_2, city, state, zip_code, terms, discount, commission, sales_rep, notes
 `
 
 type CreateCustomerParams struct {
@@ -29,8 +29,8 @@ type CreateCustomerParams struct {
 	Terms        sql.NullString `json:"terms"`
 	Discount     string         `json:"discount"`
 	Commission   string         `json:"commission"`
-	Notes        sql.NullString `json:"notes"`
 	SalesRep     sql.NullString `json:"sales_rep"`
+	Notes        sql.NullString `json:"notes"`
 }
 
 func (q *Queries) CreateCustomer(ctx context.Context, arg CreateCustomerParams) (Customer, error) {
@@ -47,8 +47,8 @@ func (q *Queries) CreateCustomer(ctx context.Context, arg CreateCustomerParams) 
 		arg.Terms,
 		arg.Discount,
 		arg.Commission,
-		arg.Notes,
 		arg.SalesRep,
+		arg.Notes,
 	)
 	var i Customer
 	err := row.Scan(
@@ -67,8 +67,8 @@ func (q *Queries) CreateCustomer(ctx context.Context, arg CreateCustomerParams) 
 		&i.Terms,
 		&i.Discount,
 		&i.Commission,
-		&i.Notes,
 		&i.SalesRep,
+		&i.Notes,
 	)
 	return i, err
 }
@@ -84,7 +84,7 @@ func (q *Queries) DeleteCustomer(ctx context.Context, id int32) error {
 }
 
 const getCustomer = `-- name: GetCustomer :one
-SELECT id, created_at, updated_at, business_name, contact_name, email, phone, address_1, address_2, city, state, zip_code, terms, discount, commission, notes, sales_rep
+SELECT id, created_at, updated_at, business_name, contact_name, email, phone, address_1, address_2, city, state, zip_code, terms, discount, commission, sales_rep, notes
 FROM customers
 WHERE id = $1
 `
@@ -108,14 +108,14 @@ func (q *Queries) GetCustomer(ctx context.Context, id int32) (Customer, error) {
 		&i.Terms,
 		&i.Discount,
 		&i.Commission,
-		&i.Notes,
 		&i.SalesRep,
+		&i.Notes,
 	)
 	return i, err
 }
 
 const listCustomers = `-- name: ListCustomers :many
-SELECT id, created_at, updated_at, business_name, contact_name, email, phone, address_1, address_2, city, state, zip_code, terms, discount, commission, notes, sales_rep
+SELECT id, created_at, updated_at, business_name, contact_name, email, phone, address_1, address_2, city, state, zip_code, terms, discount, commission, sales_rep, notes
 FROM customers
 ORDER BY business_name
 `
@@ -145,8 +145,8 @@ func (q *Queries) ListCustomers(ctx context.Context) ([]Customer, error) {
 			&i.Terms,
 			&i.Discount,
 			&i.Commission,
-			&i.Notes,
 			&i.SalesRep,
+			&i.Notes,
 		); err != nil {
 			return nil, err
 		}
@@ -175,11 +175,11 @@ SET business_name = $2,
     terms = $11,
     discount = $12,
     commission = $13,
-    notes = $14,
-    sales_rep = $15,
+    sales_rep = $14,
+    notes = $15,
     updated_at = NOW()
 WHERE id = $1
-RETURNING id, created_at, updated_at, business_name, contact_name, email, phone, address_1, address_2, city, state, zip_code, terms, discount, commission, notes, sales_rep
+RETURNING id, created_at, updated_at, business_name, contact_name, email, phone, address_1, address_2, city, state, zip_code, terms, discount, commission, sales_rep, notes
 `
 
 type UpdateCustomerParams struct {
@@ -196,8 +196,8 @@ type UpdateCustomerParams struct {
 	Terms        sql.NullString `json:"terms"`
 	Discount     string         `json:"discount"`
 	Commission   string         `json:"commission"`
-	Notes        sql.NullString `json:"notes"`
 	SalesRep     sql.NullString `json:"sales_rep"`
+	Notes        sql.NullString `json:"notes"`
 }
 
 func (q *Queries) UpdateCustomer(ctx context.Context, arg UpdateCustomerParams) (Customer, error) {
@@ -215,8 +215,8 @@ func (q *Queries) UpdateCustomer(ctx context.Context, arg UpdateCustomerParams) 
 		arg.Terms,
 		arg.Discount,
 		arg.Commission,
-		arg.Notes,
 		arg.SalesRep,
+		arg.Notes,
 	)
 	var i Customer
 	err := row.Scan(
@@ -235,8 +235,8 @@ func (q *Queries) UpdateCustomer(ctx context.Context, arg UpdateCustomerParams) 
 		&i.Terms,
 		&i.Discount,
 		&i.Commission,
-		&i.Notes,
 		&i.SalesRep,
+		&i.Notes,
 	)
 	return i, err
 }

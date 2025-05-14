@@ -48,6 +48,9 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.createProductStmt, err = db.PrepareContext(ctx, createProduct); err != nil {
 		return nil, fmt.Errorf("error preparing query CreateProduct: %w", err)
 	}
+	if q.createSalesRepStmt, err = db.PrepareContext(ctx, createSalesRep); err != nil {
+		return nil, fmt.Errorf("error preparing query CreateSalesRep: %w", err)
+	}
 	if q.createUserStmt, err = db.PrepareContext(ctx, createUser); err != nil {
 		return nil, fmt.Errorf("error preparing query CreateUser: %w", err)
 	}
@@ -77,6 +80,9 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	}
 	if q.deleteProductStmt, err = db.PrepareContext(ctx, deleteProduct); err != nil {
 		return nil, fmt.Errorf("error preparing query DeleteProduct: %w", err)
+	}
+	if q.deleteSalesRepStmt, err = db.PrepareContext(ctx, deleteSalesRep); err != nil {
+		return nil, fmt.Errorf("error preparing query DeleteSalesRep: %w", err)
 	}
 	if q.deleteUserStmt, err = db.PrepareContext(ctx, deleteUser); err != nil {
 		return nil, fmt.Errorf("error preparing query DeleteUser: %w", err)
@@ -108,6 +114,9 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.getProductBySKUStmt, err = db.PrepareContext(ctx, getProductBySKU); err != nil {
 		return nil, fmt.Errorf("error preparing query GetProductBySKU: %w", err)
 	}
+	if q.getSalesRepStmt, err = db.PrepareContext(ctx, getSalesRep); err != nil {
+		return nil, fmt.Errorf("error preparing query GetSalesRep: %w", err)
+	}
 	if q.getUserStmt, err = db.PrepareContext(ctx, getUser); err != nil {
 		return nil, fmt.Errorf("error preparing query GetUser: %w", err)
 	}
@@ -138,6 +147,9 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.listProductsStmt, err = db.PrepareContext(ctx, listProducts); err != nil {
 		return nil, fmt.Errorf("error preparing query ListProducts: %w", err)
 	}
+	if q.listSalesRepsStmt, err = db.PrepareContext(ctx, listSalesReps); err != nil {
+		return nil, fmt.Errorf("error preparing query ListSalesReps: %w", err)
+	}
 	if q.listUsersStmt, err = db.PrepareContext(ctx, listUsers); err != nil {
 		return nil, fmt.Errorf("error preparing query ListUsers: %w", err)
 	}
@@ -164,6 +176,9 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	}
 	if q.updateProductStmt, err = db.PrepareContext(ctx, updateProduct); err != nil {
 		return nil, fmt.Errorf("error preparing query UpdateProduct: %w", err)
+	}
+	if q.updateSalesRepStmt, err = db.PrepareContext(ctx, updateSalesRep); err != nil {
+		return nil, fmt.Errorf("error preparing query UpdateSalesRep: %w", err)
 	}
 	if q.updateUserStmt, err = db.PrepareContext(ctx, updateUser); err != nil {
 		return nil, fmt.Errorf("error preparing query UpdateUser: %w", err)
@@ -211,6 +226,11 @@ func (q *Queries) Close() error {
 	if q.createProductStmt != nil {
 		if cerr := q.createProductStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing createProductStmt: %w", cerr)
+		}
+	}
+	if q.createSalesRepStmt != nil {
+		if cerr := q.createSalesRepStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing createSalesRepStmt: %w", cerr)
 		}
 	}
 	if q.createUserStmt != nil {
@@ -263,6 +283,11 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing deleteProductStmt: %w", cerr)
 		}
 	}
+	if q.deleteSalesRepStmt != nil {
+		if cerr := q.deleteSalesRepStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing deleteSalesRepStmt: %w", cerr)
+		}
+	}
 	if q.deleteUserStmt != nil {
 		if cerr := q.deleteUserStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing deleteUserStmt: %w", cerr)
@@ -311,6 +336,11 @@ func (q *Queries) Close() error {
 	if q.getProductBySKUStmt != nil {
 		if cerr := q.getProductBySKUStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing getProductBySKUStmt: %w", cerr)
+		}
+	}
+	if q.getSalesRepStmt != nil {
+		if cerr := q.getSalesRepStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getSalesRepStmt: %w", cerr)
 		}
 	}
 	if q.getUserStmt != nil {
@@ -363,6 +393,11 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing listProductsStmt: %w", cerr)
 		}
 	}
+	if q.listSalesRepsStmt != nil {
+		if cerr := q.listSalesRepsStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing listSalesRepsStmt: %w", cerr)
+		}
+	}
 	if q.listUsersStmt != nil {
 		if cerr := q.listUsersStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing listUsersStmt: %w", cerr)
@@ -406,6 +441,11 @@ func (q *Queries) Close() error {
 	if q.updateProductStmt != nil {
 		if cerr := q.updateProductStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing updateProductStmt: %w", cerr)
+		}
+	}
+	if q.updateSalesRepStmt != nil {
+		if cerr := q.updateSalesRepStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing updateSalesRepStmt: %w", cerr)
 		}
 	}
 	if q.updateUserStmt != nil {
@@ -460,6 +500,7 @@ type Queries struct {
 	createPlanogramStmt                 *sql.Stmt
 	createPlanogramPocketStmt           *sql.Stmt
 	createProductStmt                   *sql.Stmt
+	createSalesRepStmt                  *sql.Stmt
 	createUserStmt                      *sql.Stmt
 	deleteAllUsersStmt                  *sql.Stmt
 	deleteCustomerStmt                  *sql.Stmt
@@ -470,6 +511,7 @@ type Queries struct {
 	deletePlanogramStmt                 *sql.Stmt
 	deletePlanogramPocketStmt           *sql.Stmt
 	deleteProductStmt                   *sql.Stmt
+	deleteSalesRepStmt                  *sql.Stmt
 	deleteUserStmt                      *sql.Stmt
 	getCustomerStmt                     *sql.Stmt
 	getCustomerLocationByIDStmt         *sql.Stmt
@@ -480,6 +522,7 @@ type Queries struct {
 	getPlanogramPocketByNumberStmt      *sql.Stmt
 	getProductByIDStmt                  *sql.Stmt
 	getProductBySKUStmt                 *sql.Stmt
+	getSalesRepStmt                     *sql.Stmt
 	getUserStmt                         *sql.Stmt
 	listCustomerLocationsByCustomerStmt *sql.Stmt
 	listCustomersStmt                   *sql.Stmt
@@ -490,6 +533,7 @@ type Queries struct {
 	listPlanogramsByLocationStmt        *sql.Stmt
 	listPocketsForPlanogramStmt         *sql.Stmt
 	listProductsStmt                    *sql.Stmt
+	listSalesRepsStmt                   *sql.Stmt
 	listUsersStmt                       *sql.Stmt
 	removePlanogramFromLocationStmt     *sql.Stmt
 	updateCustomerStmt                  *sql.Stmt
@@ -499,6 +543,7 @@ type Queries struct {
 	updatePlanogramStmt                 *sql.Stmt
 	updatePlanogramPocketStmt           *sql.Stmt
 	updateProductStmt                   *sql.Stmt
+	updateSalesRepStmt                  *sql.Stmt
 	updateUserStmt                      *sql.Stmt
 }
 
@@ -514,6 +559,7 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		createPlanogramStmt:                 q.createPlanogramStmt,
 		createPlanogramPocketStmt:           q.createPlanogramPocketStmt,
 		createProductStmt:                   q.createProductStmt,
+		createSalesRepStmt:                  q.createSalesRepStmt,
 		createUserStmt:                      q.createUserStmt,
 		deleteAllUsersStmt:                  q.deleteAllUsersStmt,
 		deleteCustomerStmt:                  q.deleteCustomerStmt,
@@ -524,6 +570,7 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		deletePlanogramStmt:                 q.deletePlanogramStmt,
 		deletePlanogramPocketStmt:           q.deletePlanogramPocketStmt,
 		deleteProductStmt:                   q.deleteProductStmt,
+		deleteSalesRepStmt:                  q.deleteSalesRepStmt,
 		deleteUserStmt:                      q.deleteUserStmt,
 		getCustomerStmt:                     q.getCustomerStmt,
 		getCustomerLocationByIDStmt:         q.getCustomerLocationByIDStmt,
@@ -534,6 +581,7 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		getPlanogramPocketByNumberStmt:      q.getPlanogramPocketByNumberStmt,
 		getProductByIDStmt:                  q.getProductByIDStmt,
 		getProductBySKUStmt:                 q.getProductBySKUStmt,
+		getSalesRepStmt:                     q.getSalesRepStmt,
 		getUserStmt:                         q.getUserStmt,
 		listCustomerLocationsByCustomerStmt: q.listCustomerLocationsByCustomerStmt,
 		listCustomersStmt:                   q.listCustomersStmt,
@@ -544,6 +592,7 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		listPlanogramsByLocationStmt:        q.listPlanogramsByLocationStmt,
 		listPocketsForPlanogramStmt:         q.listPocketsForPlanogramStmt,
 		listProductsStmt:                    q.listProductsStmt,
+		listSalesRepsStmt:                   q.listSalesRepsStmt,
 		listUsersStmt:                       q.listUsersStmt,
 		removePlanogramFromLocationStmt:     q.removePlanogramFromLocationStmt,
 		updateCustomerStmt:                  q.updateCustomerStmt,
@@ -553,6 +602,7 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		updatePlanogramStmt:                 q.updatePlanogramStmt,
 		updatePlanogramPocketStmt:           q.updatePlanogramPocketStmt,
 		updateProductStmt:                   q.updateProductStmt,
+		updateSalesRepStmt:                  q.updateSalesRepStmt,
 		updateUserStmt:                      q.updateUserStmt,
 	}
 }
