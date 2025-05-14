@@ -1,4 +1,4 @@
--- name: GetSalesRep:one
+-- name: GetSalesRep :one
 SELECT *
 FROM sales_reps
 WHERE id = $1;
