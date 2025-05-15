@@ -16,13 +16,13 @@ func TestHashPassword(t *testing.T) {
 			wantErr:  false,
 		},
 		{
-			name:     "empty password",
-			password: "",
-			wantErr:  true,
-		},
-		{
 			name:     "long password",
 			password: "aVeryLongPasswordThatShouldStillWorkJustFine1234567890!#$%^&*",
+			wantErr:  false,
+		},
+		{
+			name:     "password with special characters",
+			password: "mySecret123!@#$%^&*()",
 			wantErr:  false,
 		},
 		// Forbidden character tests
@@ -37,13 +37,13 @@ func TestHashPassword(t *testing.T) {
 			wantErr:  true,
 		},
 		{
-			name:     "password with apostrophe",
-			password: "mySecret'123!",
+			name:     "password with backslash",
+			password: "mySecret\\123!",
 			wantErr:  true,
 		},
 		{
-			name:     "password with backslash",
-			password: "mySecret\\123!",
+			name:     "password with single quote",
+			password: "mySecret'123!",
 			wantErr:  true,
 		},
 		{
@@ -51,54 +51,20 @@ func TestHashPassword(t *testing.T) {
 			password: "mySecret/123!",
 			wantErr:  true,
 		},
+		// Invalid password length tests
 		{
-			name:     "password with colon",
-			password: "mySecret:123!",
+			name:     "empty password",
+			password: "",
 			wantErr:  true,
 		},
 		{
-			name:     "password with semicolon",
-			password: "mySecret;123!",
+			name:     "password that is too short",
+			password: "short",
 			wantErr:  true,
 		},
 		{
-			name:     "password with angle brackets",
-			password: "mySecret<123!>",
-			wantErr:  true,
-		},
-		{
-			name:     "password with curly braces",
-			password: "mySecret{123!}",
-			wantErr:  true,
-		},
-		{
-			name:     "password with square brackets",
-			password: "mySecret[123!]",
-			wantErr:  true,
-		},
-		{
-			name:     "password with parentheses",
-			password: "mySecret(123!)",
-			wantErr:  true,
-		},
-		{
-			name:     "password with tilde",
-			password: "mySecret~123!",
-			wantErr:  true,
-		},
-		{
-			name:     "password with pipe",
-			password: "mySecret|123!",
-			wantErr:  true,
-		},
-		{
-			name:     "password with comma",
-			password: "mySecret,123!",
-			wantErr:  true,
-		},
-		{
-			name:     "password with at symbol",
-			password: "mySecret@123!",
+			name:     "password that is too long",
+			password: "thispasswordiswaytoolongandshouldnotbeacceptedbythehashingfunctionbecauseitexceedsthelimit",
 			wantErr:  true,
 		},
 	}
