@@ -120,6 +120,9 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.getUserStmt, err = db.PrepareContext(ctx, getUser); err != nil {
 		return nil, fmt.Errorf("error preparing query GetUser: %w", err)
 	}
+	if q.getUserByEmailStmt, err = db.PrepareContext(ctx, getUserByEmail); err != nil {
+		return nil, fmt.Errorf("error preparing query GetUserByEmail: %w", err)
+	}
 	if q.listCustomerLocationsByCustomerStmt, err = db.PrepareContext(ctx, listCustomerLocationsByCustomer); err != nil {
 		return nil, fmt.Errorf("error preparing query ListCustomerLocationsByCustomer: %w", err)
 	}
@@ -348,6 +351,11 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing getUserStmt: %w", cerr)
 		}
 	}
+	if q.getUserByEmailStmt != nil {
+		if cerr := q.getUserByEmailStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getUserByEmailStmt: %w", cerr)
+		}
+	}
 	if q.listCustomerLocationsByCustomerStmt != nil {
 		if cerr := q.listCustomerLocationsByCustomerStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing listCustomerLocationsByCustomerStmt: %w", cerr)
@@ -524,6 +532,7 @@ type Queries struct {
 	getProductBySKUStmt                 *sql.Stmt
 	getSalesRepStmt                     *sql.Stmt
 	getUserStmt                         *sql.Stmt
+	getUserByEmailStmt                  *sql.Stmt
 	listCustomerLocationsByCustomerStmt *sql.Stmt
 	listCustomersStmt                   *sql.Stmt
 	listLocationsByPlanogramStmt        *sql.Stmt
@@ -583,6 +592,7 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		getProductBySKUStmt:                 q.getProductBySKUStmt,
 		getSalesRepStmt:                     q.getSalesRepStmt,
 		getUserStmt:                         q.getUserStmt,
+		getUserByEmailStmt:                  q.getUserByEmailStmt,
 		listCustomerLocationsByCustomerStmt: q.listCustomerLocationsByCustomerStmt,
 		listCustomersStmt:                   q.listCustomersStmt,
 		listLocationsByPlanogramStmt:        q.listLocationsByPlanogramStmt,

@@ -3,6 +3,11 @@ SELECT id, created_at, updated_at, email, first_name, last_name
 FROM users
 WHERE id = $1;
 
+-- name: GetUserByEmail :one
+SELECT id, created_at, updated_at, email, first_name, last_name, password
+FROM users
+WHERE email = $1;
+
 -- name: ListUsers :many
 SELECT id, created_at, updated_at, email, first_name, last_name
 FROM users

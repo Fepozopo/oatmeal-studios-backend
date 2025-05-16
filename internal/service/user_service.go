@@ -54,3 +54,24 @@ func RegisterUser(ctx context.Context, db *database.Queries, input RegisterUserI
 
 	return RegisterUserResponse{Success: true, User: &user}
 }
+
+// AuthenticateUser checks the user's credentials and returns the user if valid.
+func AuthenticateUser(ctx context.Context, db *database.Queries, email, password string) (*database.User, error) {
+	// Validate input
+	if email == "" || password == "" {
+		return nil, fmt.Errorf("email and password are required")
+	}
+
+	// Fetch user by email
+	user, err := db.GetUserByEmail(ctx, email)
+	if err != nil {
+		return nil, fmt.Errorf("user not found: %w", err)
+	}
+
+	// Verify password
+	if err := auth.CheckPasswordHash(password, user.Password); err != nil {
+		return nil, fmt.Errorf("invalid password: %w", err)
+	}
+
+	return &user, nil
+}
