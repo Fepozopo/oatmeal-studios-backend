@@ -117,11 +117,11 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.getSalesRepStmt, err = db.PrepareContext(ctx, getSalesRep); err != nil {
 		return nil, fmt.Errorf("error preparing query GetSalesRep: %w", err)
 	}
-	if q.getUserStmt, err = db.PrepareContext(ctx, getUser); err != nil {
-		return nil, fmt.Errorf("error preparing query GetUser: %w", err)
-	}
 	if q.getUserByEmailStmt, err = db.PrepareContext(ctx, getUserByEmail); err != nil {
 		return nil, fmt.Errorf("error preparing query GetUserByEmail: %w", err)
+	}
+	if q.getUserByIDStmt, err = db.PrepareContext(ctx, getUserByID); err != nil {
+		return nil, fmt.Errorf("error preparing query GetUserByID: %w", err)
 	}
 	if q.listCustomerLocationsByCustomerStmt, err = db.PrepareContext(ctx, listCustomerLocationsByCustomer); err != nil {
 		return nil, fmt.Errorf("error preparing query ListCustomerLocationsByCustomer: %w", err)
@@ -346,14 +346,14 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing getSalesRepStmt: %w", cerr)
 		}
 	}
-	if q.getUserStmt != nil {
-		if cerr := q.getUserStmt.Close(); cerr != nil {
-			err = fmt.Errorf("error closing getUserStmt: %w", cerr)
-		}
-	}
 	if q.getUserByEmailStmt != nil {
 		if cerr := q.getUserByEmailStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing getUserByEmailStmt: %w", cerr)
+		}
+	}
+	if q.getUserByIDStmt != nil {
+		if cerr := q.getUserByIDStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getUserByIDStmt: %w", cerr)
 		}
 	}
 	if q.listCustomerLocationsByCustomerStmt != nil {
@@ -531,8 +531,8 @@ type Queries struct {
 	getProductByIDStmt                  *sql.Stmt
 	getProductBySKUStmt                 *sql.Stmt
 	getSalesRepStmt                     *sql.Stmt
-	getUserStmt                         *sql.Stmt
 	getUserByEmailStmt                  *sql.Stmt
+	getUserByIDStmt                     *sql.Stmt
 	listCustomerLocationsByCustomerStmt *sql.Stmt
 	listCustomersStmt                   *sql.Stmt
 	listLocationsByPlanogramStmt        *sql.Stmt
@@ -591,8 +591,8 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		getProductByIDStmt:                  q.getProductByIDStmt,
 		getProductBySKUStmt:                 q.getProductBySKUStmt,
 		getSalesRepStmt:                     q.getSalesRepStmt,
-		getUserStmt:                         q.getUserStmt,
 		getUserByEmailStmt:                  q.getUserByEmailStmt,
+		getUserByIDStmt:                     q.getUserByIDStmt,
 		listCustomerLocationsByCustomerStmt: q.listCustomerLocationsByCustomerStmt,
 		listCustomersStmt:                   q.listCustomersStmt,
 		listLocationsByPlanogramStmt:        q.listLocationsByPlanogramStmt,

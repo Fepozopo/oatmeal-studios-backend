@@ -1,5 +1,5 @@
--- name: GetUser :one
-SELECT id, created_at, updated_at, email, first_name, last_name
+-- name: GetUserByID :one
+SELECT id, created_at, updated_at, email, first_name, last_name, password
 FROM users
 WHERE id = $1;
 

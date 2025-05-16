@@ -31,6 +31,13 @@ type UpdateUserInput struct {
 	LastName  string
 }
 
+// UpdateUserPasswordInput holds the details for changing a user's password.
+type UpdateUserPasswordInput struct {
+	UserID      uuid.UUID
+	OldPassword string
+	NewPassword string
+}
+
 // RegisterUser registers a new user after validating input and hashing the password.
 func RegisterUser(ctx context.Context, db *database.Queries, input RegisterUserInput) RegisterUserResponse {
 	// Validate input fields
@@ -84,6 +91,7 @@ func AuthenticateUser(ctx context.Context, db *database.Queries, email, password
 	return &user, nil
 }
 
+// UpdateUser updates the user's profile information after validating input.
 func UpdateUser(ctx context.Context, db *database.Queries, input UpdateUserInput) (*database.User, error) {
 	// Validate input
 	if input.FirstName == "" || input.LastName == "" {
@@ -103,4 +111,40 @@ func UpdateUser(ctx context.Context, db *database.Queries, input UpdateUserInput
 	}
 
 	return &user, nil
+}
+
+func ChangeUserPassword(ctx context.Context, db *database.Queries, input UpdateUserPasswordInput) error {
+	// Validate input
+	if input.OldPassword == "" || input.NewPassword == "" {
+		return fmt.Errorf("old password and new password are required")
+	}
+
+	// Fetch user by ID
+	user, err := db.GetUserByID(ctx, input.UserID)
+	if err != nil {
+		return fmt.Errorf("user not found: %w", err)
+	}
+
+	// Verify old password
+	if err := auth.CheckPasswordHash(input.OldPassword, user.Password); err != nil {
+		return fmt.Errorf("invalid old password: %w", err)
+	}
+
+	// Hash the new password
+	hashedNewPassword, err := auth.HashPassword(input.NewPassword)
+	if err != nil {
+		return fmt.Errorf("failed to hash new password: %w", err)
+	}
+
+	// Update user's password
+	params := database.UpdateUserParams{
+		ID:       input.UserID,
+		Password: hashedNewPassword,
+	}
+
+	if _, err := db.UpdateUser(ctx, params); err != nil {
+		return fmt.Errorf("failed to update password: %w", err)
+	}
+
+	return nil
 }
