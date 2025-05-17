@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/Fepozopo/oatmeal-studios-backend/internal/auth"
@@ -9,19 +10,19 @@ import (
 )
 
 // RegisterUser registers a new user after validating input and hashing the password.
-func RegisterUser(ctx context.Context, db *database.Queries, input RegisterUserInput) RegisterUserResponse {
+func RegisterUser(ctx context.Context, db *database.Queries, input RegisterUserInput) (*database.User, error) {
 	// Validate input fields
 	if input.Email == "" || input.Password == "" || input.FirstName == "" || input.LastName == "" {
-		return RegisterUserResponse{Success: false, Error: "all fields are required"}
+		return nil, errors.New("all fields are required")
 	}
 	if err := auth.IsValidEmail(input.Email); err != nil {
-		return RegisterUserResponse{Success: false, Error: err.Error()}
+		return nil, err
 	}
 
 	// Hash the password (includes strength validation)
 	hashedPassword, err := auth.HashPassword(input.Password)
 	if err != nil {
-		return RegisterUserResponse{Success: false, Error: err.Error()}
+		return nil, err
 	}
 
 	// Prepare params for DB insert
@@ -34,17 +35,17 @@ func RegisterUser(ctx context.Context, db *database.Queries, input RegisterUserI
 
 	user, err := db.CreateUser(ctx, params)
 	if err != nil {
-		return RegisterUserResponse{Success: false, Error: fmt.Sprintf("failed to create user: %v", err)}
+		return nil, fmt.Errorf("failed to create user: %w", err)
 	}
 
-	return RegisterUserResponse{Success: true, User: &user}
+	return &user, nil
 }
 
 // AuthenticateUser checks the user's credentials and returns the user if valid.
 func AuthenticateUser(ctx context.Context, db *database.Queries, email, password string) (*database.User, error) {
 	// Validate input
 	if email == "" || password == "" {
-		return nil, fmt.Errorf("email and password are required")
+		return nil, errors.New("email and password are required")
 	}
 
 	// Fetch user by email
@@ -65,7 +66,7 @@ func AuthenticateUser(ctx context.Context, db *database.Queries, email, password
 func UpdateUser(ctx context.Context, db *database.Queries, input UpdateUserInput) (*database.User, error) {
 	// Validate input
 	if input.FirstName == "" || input.LastName == "" {
-		return nil, fmt.Errorf("first name and last name are required")
+		return nil, errors.New("first name and last name are required")
 	}
 
 	// Update user profile
