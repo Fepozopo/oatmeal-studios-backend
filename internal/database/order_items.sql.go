@@ -20,9 +20,9 @@ type CreateOrderItemParams struct {
 	OrderID      int32         `json:"order_id"`
 	Item         string        `json:"item"`
 	Quantity     int32         `json:"quantity"`
-	Price        string        `json:"price"`
-	Discount     string        `json:"discount"`
-	ItemTotal    string        `json:"item_total"`
+	Price        float64       `json:"price"`
+	Discount     float64       `json:"discount"`
+	ItemTotal    float64       `json:"item_total"`
 	PocketNumber sql.NullInt32 `json:"pocket_number"`
 }
 
@@ -146,9 +146,9 @@ type UpdateOrderItemParams struct {
 	ID           int32         `json:"id"`
 	Item         string        `json:"item"`
 	Quantity     int32         `json:"quantity"`
-	Price        string        `json:"price"`
-	Discount     string        `json:"discount"`
-	ItemTotal    string        `json:"item_total"`
+	Price        float64       `json:"price"`
+	Discount     float64       `json:"discount"`
+	ItemTotal    float64       `json:"item_total"`
 	PocketNumber sql.NullInt32 `json:"pocket_number"`
 }
 

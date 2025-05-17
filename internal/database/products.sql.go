@@ -26,8 +26,8 @@ type CreateProductParams struct {
 	Sku            string         `json:"sku"`
 	Upc            string         `json:"upc"`
 	Status         string         `json:"status"`
-	Cost           string         `json:"cost"`
-	Price          string         `json:"price"`
+	Cost           float64        `json:"cost"`
+	Price          float64        `json:"price"`
 	Envelope       sql.NullString `json:"envelope"`
 	Artist         sql.NullString `json:"artist"`
 	Category       sql.NullString `json:"category"`
@@ -217,8 +217,8 @@ type UpdateProductParams struct {
 	Sku            string         `json:"sku"`
 	Upc            string         `json:"upc"`
 	Status         string         `json:"status"`
-	Cost           string         `json:"cost"`
-	Price          string         `json:"price"`
+	Cost           float64        `json:"cost"`
+	Price          float64        `json:"price"`
 	Envelope       sql.NullString `json:"envelope"`
 	Artist         sql.NullString `json:"artist"`
 	Category       sql.NullString `json:"category"`

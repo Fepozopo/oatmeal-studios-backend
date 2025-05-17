@@ -12,7 +12,7 @@ CREATE TABLE orders (
     type TEXT NOT NULL, -- e.g., 'reorder', 'credit'
     method TEXT, -- e.g., 'online', 'phone', 'email'
     po_number TEXT,
-    shipping_cost DECIMAL NOT NULL DEFAULT 0.0,
+    shipping_cost FLOAT NOT NULL DEFAULT 0.0,
     free_shipping BOOLEAN NOT NULL DEFAULT FALSE,
     apply_to_commission BOOLEAN NOT NULL DEFAULT FALSE,
     sales_rep TEXT,

@@ -25,8 +25,8 @@ type Customer struct {
 	State        sql.NullString `json:"state"`
 	ZipCode      sql.NullString `json:"zip_code"`
 	Terms        sql.NullString `json:"terms"`
-	Discount     string         `json:"discount"`
-	Commission   string         `json:"commission"`
+	Discount     float64        `json:"discount"`
+	Commission   float64        `json:"commission"`
 	SalesRep     sql.NullString `json:"sales_rep"`
 	Notes        sql.NullString `json:"notes"`
 }
@@ -57,7 +57,7 @@ type Order struct {
 	Type               string         `json:"type"`
 	Method             sql.NullString `json:"method"`
 	PoNumber           sql.NullString `json:"po_number"`
-	ShippingCost       string         `json:"shipping_cost"`
+	ShippingCost       float64        `json:"shipping_cost"`
 	FreeShipping       bool           `json:"free_shipping"`
 	ApplyToCommission  bool           `json:"apply_to_commission"`
 	SalesRep           sql.NullString `json:"sales_rep"`
@@ -69,9 +69,9 @@ type OrderItem struct {
 	OrderID      int32         `json:"order_id"`
 	Item         string        `json:"item"`
 	Quantity     int32         `json:"quantity"`
-	Price        string        `json:"price"`
-	Discount     string        `json:"discount"`
-	ItemTotal    string        `json:"item_total"`
+	Price        float64       `json:"price"`
+	Discount     float64       `json:"discount"`
+	ItemTotal    float64       `json:"item_total"`
 	PocketNumber sql.NullInt32 `json:"pocket_number"`
 }
 
@@ -106,8 +106,8 @@ type Product struct {
 	Sku            string         `json:"sku"`
 	Upc            string         `json:"upc"`
 	Status         string         `json:"status"`
-	Cost           string         `json:"cost"`
-	Price          string         `json:"price"`
+	Cost           float64        `json:"cost"`
+	Price          float64        `json:"price"`
 	Envelope       sql.NullString `json:"envelope"`
 	Artist         sql.NullString `json:"artist"`
 	Category       sql.NullString `json:"category"`

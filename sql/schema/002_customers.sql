@@ -13,8 +13,8 @@ CREATE TABLE customers (
     state TEXT,
     zip_code TEXT,
     terms TEXT,
-    discount DECIMAL NOT NULL DEFAULT 0.0, -- Percentage discount
-    commission DECIMAL NOT NULL DEFAULT 0.0, -- Percentage commission
+    discount FLOAT NOT NULL DEFAULT 0.0, -- Percentage discount
+    commission FLOAT NOT NULL DEFAULT 0.0, -- Percentage commission
     sales_rep TEXT,
     notes TEXT
 );

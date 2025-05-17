@@ -27,8 +27,8 @@ type CreateCustomerParams struct {
 	State        sql.NullString `json:"state"`
 	ZipCode      sql.NullString `json:"zip_code"`
 	Terms        sql.NullString `json:"terms"`
-	Discount     string         `json:"discount"`
-	Commission   string         `json:"commission"`
+	Discount     float64        `json:"discount"`
+	Commission   float64        `json:"commission"`
 	SalesRep     sql.NullString `json:"sales_rep"`
 	Notes        sql.NullString `json:"notes"`
 }
@@ -194,8 +194,8 @@ type UpdateCustomerParams struct {
 	State        sql.NullString `json:"state"`
 	ZipCode      sql.NullString `json:"zip_code"`
 	Terms        sql.NullString `json:"terms"`
-	Discount     string         `json:"discount"`
-	Commission   string         `json:"commission"`
+	Discount     float64        `json:"discount"`
+	Commission   float64        `json:"commission"`
 	SalesRep     sql.NullString `json:"sales_rep"`
 	Notes        sql.NullString `json:"notes"`
 }

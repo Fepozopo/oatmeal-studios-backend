@@ -26,7 +26,7 @@ type CreateOrderParams struct {
 	Method             sql.NullString `json:"method"`
 	ShipDate           time.Time      `json:"ship_date"`
 	PoNumber           sql.NullString `json:"po_number"`
-	ShippingCost       string         `json:"shipping_cost"`
+	ShippingCost       float64        `json:"shipping_cost"`
 	FreeShipping       bool           `json:"free_shipping"`
 	ApplyToCommission  bool           `json:"apply_to_commission"`
 	SalesRep           sql.NullString `json:"sales_rep"`
@@ -187,7 +187,7 @@ type UpdateOrderParams struct {
 	Method             sql.NullString `json:"method"`
 	ShipDate           time.Time      `json:"ship_date"`
 	PoNumber           sql.NullString `json:"po_number"`
-	ShippingCost       string         `json:"shipping_cost"`
+	ShippingCost       float64        `json:"shipping_cost"`
 	FreeShipping       bool           `json:"free_shipping"`
 	ApplyToCommission  bool           `json:"apply_to_commission"`
 	SalesRep           sql.NullString `json:"sales_rep"`
