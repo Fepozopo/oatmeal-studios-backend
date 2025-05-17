@@ -48,6 +48,9 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.createProductStmt, err = db.PrepareContext(ctx, createProduct); err != nil {
 		return nil, fmt.Errorf("error preparing query CreateProduct: %w", err)
 	}
+	if q.createRefreshTokenStmt, err = db.PrepareContext(ctx, createRefreshToken); err != nil {
+		return nil, fmt.Errorf("error preparing query CreateRefreshToken: %w", err)
+	}
 	if q.createSalesRepStmt, err = db.PrepareContext(ctx, createSalesRep); err != nil {
 		return nil, fmt.Errorf("error preparing query CreateSalesRep: %w", err)
 	}
@@ -114,6 +117,9 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.getProductBySKUStmt, err = db.PrepareContext(ctx, getProductBySKU); err != nil {
 		return nil, fmt.Errorf("error preparing query GetProductBySKU: %w", err)
 	}
+	if q.getRefreshTokenStmt, err = db.PrepareContext(ctx, getRefreshToken); err != nil {
+		return nil, fmt.Errorf("error preparing query GetRefreshToken: %w", err)
+	}
 	if q.getSalesRepStmt, err = db.PrepareContext(ctx, getSalesRep); err != nil {
 		return nil, fmt.Errorf("error preparing query GetSalesRep: %w", err)
 	}
@@ -158,6 +164,9 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	}
 	if q.removePlanogramFromLocationStmt, err = db.PrepareContext(ctx, removePlanogramFromLocation); err != nil {
 		return nil, fmt.Errorf("error preparing query RemovePlanogramFromLocation: %w", err)
+	}
+	if q.revokeRefreshTokenStmt, err = db.PrepareContext(ctx, revokeRefreshToken); err != nil {
+		return nil, fmt.Errorf("error preparing query RevokeRefreshToken: %w", err)
 	}
 	if q.updateCustomerStmt, err = db.PrepareContext(ctx, updateCustomer); err != nil {
 		return nil, fmt.Errorf("error preparing query UpdateCustomer: %w", err)
@@ -229,6 +238,11 @@ func (q *Queries) Close() error {
 	if q.createProductStmt != nil {
 		if cerr := q.createProductStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing createProductStmt: %w", cerr)
+		}
+	}
+	if q.createRefreshTokenStmt != nil {
+		if cerr := q.createRefreshTokenStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing createRefreshTokenStmt: %w", cerr)
 		}
 	}
 	if q.createSalesRepStmt != nil {
@@ -341,6 +355,11 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing getProductBySKUStmt: %w", cerr)
 		}
 	}
+	if q.getRefreshTokenStmt != nil {
+		if cerr := q.getRefreshTokenStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getRefreshTokenStmt: %w", cerr)
+		}
+	}
 	if q.getSalesRepStmt != nil {
 		if cerr := q.getSalesRepStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing getSalesRepStmt: %w", cerr)
@@ -414,6 +433,11 @@ func (q *Queries) Close() error {
 	if q.removePlanogramFromLocationStmt != nil {
 		if cerr := q.removePlanogramFromLocationStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing removePlanogramFromLocationStmt: %w", cerr)
+		}
+	}
+	if q.revokeRefreshTokenStmt != nil {
+		if cerr := q.revokeRefreshTokenStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing revokeRefreshTokenStmt: %w", cerr)
 		}
 	}
 	if q.updateCustomerStmt != nil {
@@ -508,6 +532,7 @@ type Queries struct {
 	createPlanogramStmt                 *sql.Stmt
 	createPlanogramPocketStmt           *sql.Stmt
 	createProductStmt                   *sql.Stmt
+	createRefreshTokenStmt              *sql.Stmt
 	createSalesRepStmt                  *sql.Stmt
 	createUserStmt                      *sql.Stmt
 	deleteAllUsersStmt                  *sql.Stmt
@@ -530,6 +555,7 @@ type Queries struct {
 	getPlanogramPocketByNumberStmt      *sql.Stmt
 	getProductByIDStmt                  *sql.Stmt
 	getProductBySKUStmt                 *sql.Stmt
+	getRefreshTokenStmt                 *sql.Stmt
 	getSalesRepStmt                     *sql.Stmt
 	getUserByEmailStmt                  *sql.Stmt
 	getUserByIDStmt                     *sql.Stmt
@@ -545,6 +571,7 @@ type Queries struct {
 	listSalesRepsStmt                   *sql.Stmt
 	listUsersStmt                       *sql.Stmt
 	removePlanogramFromLocationStmt     *sql.Stmt
+	revokeRefreshTokenStmt              *sql.Stmt
 	updateCustomerStmt                  *sql.Stmt
 	updateCustomerLocationStmt          *sql.Stmt
 	updateOrderStmt                     *sql.Stmt
@@ -568,6 +595,7 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		createPlanogramStmt:                 q.createPlanogramStmt,
 		createPlanogramPocketStmt:           q.createPlanogramPocketStmt,
 		createProductStmt:                   q.createProductStmt,
+		createRefreshTokenStmt:              q.createRefreshTokenStmt,
 		createSalesRepStmt:                  q.createSalesRepStmt,
 		createUserStmt:                      q.createUserStmt,
 		deleteAllUsersStmt:                  q.deleteAllUsersStmt,
@@ -590,6 +618,7 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		getPlanogramPocketByNumberStmt:      q.getPlanogramPocketByNumberStmt,
 		getProductByIDStmt:                  q.getProductByIDStmt,
 		getProductBySKUStmt:                 q.getProductBySKUStmt,
+		getRefreshTokenStmt:                 q.getRefreshTokenStmt,
 		getSalesRepStmt:                     q.getSalesRepStmt,
 		getUserByEmailStmt:                  q.getUserByEmailStmt,
 		getUserByIDStmt:                     q.getUserByIDStmt,
@@ -605,6 +634,7 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		listSalesRepsStmt:                   q.listSalesRepsStmt,
 		listUsersStmt:                       q.listUsersStmt,
 		removePlanogramFromLocationStmt:     q.removePlanogramFromLocationStmt,
+		revokeRefreshTokenStmt:              q.revokeRefreshTokenStmt,
 		updateCustomerStmt:                  q.updateCustomerStmt,
 		updateCustomerLocationStmt:          q.updateCustomerLocationStmt,
 		updateOrderStmt:                     q.updateOrderStmt,
