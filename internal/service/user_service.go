@@ -63,28 +63,28 @@ func AuthenticateUser(ctx context.Context, db *database.Queries, email, password
 }
 
 // UpdateUser updates the user's profile information after validating input.
-func UpdateUser(ctx context.Context, db *database.Queries, input UpdateUserInput) (*database.User, error) {
+func UpdateUserName(ctx context.Context, db *database.Queries, input UpdateUserNameInput) error {
 	// Validate input
 	if input.FirstName == "" || input.LastName == "" {
-		return nil, errors.New("first name and last name are required")
+		return errors.New("first name and last name are required")
 	}
 
 	// Update user profile
-	params := database.UpdateUserParams{
+	params := database.UpdateUserNameParams{
 		ID:        input.UserID,
 		FirstName: input.FirstName,
 		LastName:  input.LastName,
 	}
 
-	user, err := db.UpdateUser(ctx, params)
+	err := db.UpdateUserName(ctx, params)
 	if err != nil {
-		return nil, fmt.Errorf("failed to update user profile: %w", err)
+		return fmt.Errorf("failed to update user profile: %w", err)
 	}
 
-	return &user, nil
+	return nil
 }
 
-func ChangeUserPassword(ctx context.Context, db *database.Queries, input UpdateUserPasswordInput) error {
+func UpdateUserPassword(ctx context.Context, db *database.Queries, input UpdateUserPasswordInput) error {
 	// Validate input
 	if input.OldPassword == "" || input.NewPassword == "" {
 		return fmt.Errorf("old password and new password are required")
@@ -108,12 +108,12 @@ func ChangeUserPassword(ctx context.Context, db *database.Queries, input UpdateU
 	}
 
 	// Update user's password
-	params := database.UpdateUserParams{
+	params := database.UpdateUserPasswordParams{
 		ID:       input.UserID,
 		Password: hashedNewPassword,
 	}
 
-	if _, err := db.UpdateUser(ctx, params); err != nil {
+	if err := db.UpdateUserPassword(ctx, params); err != nil {
 		return fmt.Errorf("failed to update password: %w", err)
 	}
 

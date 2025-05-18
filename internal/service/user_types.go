@@ -12,8 +12,8 @@ type RegisterUserInput struct {
 	LastName  string `json:"last_name"`
 }
 
-// UpdateUserInput holds the details for updating a user's profile.
-type UpdateUserInput struct {
+// UpdateUserNameInput holds the details for updating a user's name.
+type UpdateUserNameInput struct {
 	UserID    uuid.UUID `json:"user_id"`
 	FirstName string    `json:"first_name"`
 	LastName  string    `json:"last_name"`
