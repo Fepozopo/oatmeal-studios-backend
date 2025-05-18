@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"fmt"
 
 	"github.com/Fepozopo/oatmeal-studios-backend/internal/database"
 )
@@ -38,5 +39,17 @@ func CreateCustomer(ctx context.Context, db *database.Queries, input CreateCusto
 		return nil, err
 	}
 
+	return &customer, nil
+}
+
+// GetCustomerByID retrieves a customer by their ID using the GetCustomer query.
+func GetCustomerByID(ctx context.Context, db *database.Queries, id int32) (*database.Customer, error) {
+	customer, err := db.GetCustomer(ctx, id)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, errors.New("customer not found")
+		}
+		return nil, fmt.Errorf("failed to get customer: %w", err)
+	}
 	return &customer, nil
 }
