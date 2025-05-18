@@ -69,3 +69,18 @@ func IsValidPassword(password string) error {
 
 	return nil
 }
+
+// IsValidPhone checks if the phone number is in a valid format.
+func IsValidPhone(phone string) error {
+	// Basic format check using regex
+	// Require area code: E.164 format with country code and at least 10 digits total (e.g., +1234567890)
+	phoneRegex := `^\+?[1-9]\d{9,14}$`
+	matched, err := regexp.MatchString(phoneRegex, phone)
+	if err != nil {
+		return fmt.Errorf("error validating phone number: %w", err)
+	}
+	if !matched {
+		return fmt.Errorf("invalid phone number format")
+	}
+	return nil
+}

@@ -146,3 +146,46 @@ func TestIsValidPassword(t *testing.T) {
 		})
 	}
 }
+
+func TestIsValidPhone(t *testing.T) {
+	tests := []struct {
+		name    string
+		phone   string
+		wantErr bool
+	}{
+		{
+			name:    "valid phone",
+			phone:   "+1234567890",
+			wantErr: false,
+		},
+		{
+			name:    "invalid phone format",
+			phone:   "123-456-7890",
+			wantErr: true,
+		},
+		{
+			name:    "missing area code",
+			phone:   "4567890",
+			wantErr: true,
+		},
+		{
+			name:    "empty phone number",
+			phone:   "",
+			wantErr: true,
+		},
+		{
+			name:    "valid phone without country code",
+			phone:   "4567890123",
+			wantErr: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := IsValidPhone(tt.phone)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("%s: IsValidPhone(%q) = %v, want %v", tt.name, tt.phone, err, tt.wantErr)
+			}
+		})
+	}
+}
