@@ -10,16 +10,12 @@ import (
 
 // CreateCustomer creates a new customer and returns the created customer.
 func CreateCustomer(ctx context.Context, db *database.Queries, input CreateCustomerInput) (*database.Customer, error) {
-	// Validate required fields
-	// BusinessName is required, others are optional
-	if db == nil {
-		return nil, errors.New("database connection is required")
-	}
 	// Check if BusinessName is provided
 	if input.BusinessName == "" {
 		return nil, errors.New("business name is required")
 	}
 
+	// Prepare parameters for database insertion
 	params := database.CreateCustomerParams{
 		BusinessName: input.BusinessName,
 		ContactName:  sql.NullString{String: input.ContactName, Valid: input.ContactName != ""},
