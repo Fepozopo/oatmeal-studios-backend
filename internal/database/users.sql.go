@@ -159,42 +159,38 @@ func (q *Queries) ListUsers(ctx context.Context) ([]ListUsersRow, error) {
 	return items, nil
 }
 
-const updateUser = `-- name: UpdateUser :one
+const updateUserName = `-- name: UpdateUserName :exec
 UPDATE users
-SET email = $2,
-    first_name = $3,
-    last_name = $4,
-    password = $5,
+SET first_name = $2,
+    last_name = $3,
     updated_at = NOW()
 WHERE id = $1
-RETURNING id, created_at, updated_at, email, first_name, last_name, password
 `
 
-type UpdateUserParams struct {
+type UpdateUserNameParams struct {
 	ID        uuid.UUID `json:"id"`
-	Email     string    `json:"email"`
 	FirstName string    `json:"first_name"`
 	LastName  string    `json:"last_name"`
-	Password  string    `json:"password"`
 }
 
-func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) (User, error) {
-	row := q.queryRow(ctx, q.updateUserStmt, updateUser,
-		arg.ID,
-		arg.Email,
-		arg.FirstName,
-		arg.LastName,
-		arg.Password,
-	)
-	var i User
-	err := row.Scan(
-		&i.ID,
-		&i.CreatedAt,
-		&i.UpdatedAt,
-		&i.Email,
-		&i.FirstName,
-		&i.LastName,
-		&i.Password,
-	)
-	return i, err
+func (q *Queries) UpdateUserName(ctx context.Context, arg UpdateUserNameParams) error {
+	_, err := q.exec(ctx, q.updateUserNameStmt, updateUserName, arg.ID, arg.FirstName, arg.LastName)
+	return err
+}
+
+const updateUserPassword = `-- name: UpdateUserPassword :exec
+UPDATE users
+SET password = $2,
+    updated_at = NOW()
+WHERE id = $1
+`
+
+type UpdateUserPasswordParams struct {
+	ID       uuid.UUID `json:"id"`
+	Password string    `json:"password"`
+}
+
+func (q *Queries) UpdateUserPassword(ctx context.Context, arg UpdateUserPasswordParams) error {
+	_, err := q.exec(ctx, q.updateUserPasswordStmt, updateUserPassword, arg.ID, arg.Password)
+	return err
 }

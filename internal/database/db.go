@@ -192,8 +192,11 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.updateSalesRepStmt, err = db.PrepareContext(ctx, updateSalesRep); err != nil {
 		return nil, fmt.Errorf("error preparing query UpdateSalesRep: %w", err)
 	}
-	if q.updateUserStmt, err = db.PrepareContext(ctx, updateUser); err != nil {
-		return nil, fmt.Errorf("error preparing query UpdateUser: %w", err)
+	if q.updateUserNameStmt, err = db.PrepareContext(ctx, updateUserName); err != nil {
+		return nil, fmt.Errorf("error preparing query UpdateUserName: %w", err)
+	}
+	if q.updateUserPasswordStmt, err = db.PrepareContext(ctx, updateUserPassword); err != nil {
+		return nil, fmt.Errorf("error preparing query UpdateUserPassword: %w", err)
 	}
 	return &q, nil
 }
@@ -480,9 +483,14 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing updateSalesRepStmt: %w", cerr)
 		}
 	}
-	if q.updateUserStmt != nil {
-		if cerr := q.updateUserStmt.Close(); cerr != nil {
-			err = fmt.Errorf("error closing updateUserStmt: %w", cerr)
+	if q.updateUserNameStmt != nil {
+		if cerr := q.updateUserNameStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing updateUserNameStmt: %w", cerr)
+		}
+	}
+	if q.updateUserPasswordStmt != nil {
+		if cerr := q.updateUserPasswordStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing updateUserPasswordStmt: %w", cerr)
 		}
 	}
 	return err
@@ -580,7 +588,8 @@ type Queries struct {
 	updatePlanogramPocketStmt           *sql.Stmt
 	updateProductStmt                   *sql.Stmt
 	updateSalesRepStmt                  *sql.Stmt
-	updateUserStmt                      *sql.Stmt
+	updateUserNameStmt                  *sql.Stmt
+	updateUserPasswordStmt              *sql.Stmt
 }
 
 func (q *Queries) WithTx(tx *sql.Tx) *Queries {
@@ -643,6 +652,7 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		updatePlanogramPocketStmt:           q.updatePlanogramPocketStmt,
 		updateProductStmt:                   q.updateProductStmt,
 		updateSalesRepStmt:                  q.updateSalesRepStmt,
-		updateUserStmt:                      q.updateUserStmt,
+		updateUserNameStmt:                  q.updateUserNameStmt,
+		updateUserPasswordStmt:              q.updateUserPasswordStmt,
 	}
 }

@@ -26,15 +26,18 @@ VALUES (
 )
 RETURNING *;
 
--- name: UpdateUser :one
+-- name: UpdateUserName :exec
 UPDATE users
-SET email = $2,
-    first_name = $3,
-    last_name = $4,
-    password = $5,
+SET first_name = $2,
+    last_name = $3,
     updated_at = NOW()
-WHERE id = $1
-RETURNING *;
+WHERE id = $1;
+
+-- name: UpdateUserPassword :exec
+UPDATE users
+SET password = $2,
+    updated_at = NOW()
+WHERE id = $1;
 
 -- name: DeleteUser :exec
 DELETE FROM users
