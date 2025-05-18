@@ -10,8 +10,7 @@ import (
 
 // --- TestCreateCustomer ---
 func TestCreateCustomer_Success(t *testing.T) {
-	dbQueries, mock, cleanup := newTestDB(t)
-	defer cleanup()
+	dbQueries, mock := newTestDB(t)
 	ctx := newTestContext()
 	currentTime := time.Now()
 
@@ -24,7 +23,6 @@ func TestCreateCustomer_Success(t *testing.T) {
 	`).
 		WithArgs(
 			"Test Biz",
-			sql.NullString{String: "", Valid: false},
 			sql.NullString{String: "", Valid: false},
 			sql.NullString{String: "", Valid: false},
 			sql.NullString{String: "", Valid: false},
@@ -57,9 +55,12 @@ func TestCreateCustomer_Success(t *testing.T) {
 	if customer != nil && customer.BusinessName != "Test Biz" {
 		t.Errorf("expected business name 'Test Biz', got '%s'", customer.BusinessName)
 	}
+}
 
-	// Test for missing business name
-	customer, err = CreateCustomer(ctx, dbQueries, CreateCustomerInput{
+func TestCreateCustomer_InvalidInput(t *testing.T) {
+	dbQueries, mock := newTestDB(t)
+	ctx := newTestContext()
+	customer, err := CreateCustomer(ctx, dbQueries, CreateCustomerInput{
 		BusinessName: "",
 	})
 	if err == nil {
@@ -76,9 +77,8 @@ func TestCreateCustomer_Success(t *testing.T) {
 }
 
 // --- TestGetCustomerByID ---
-func TestGetCustomerByID(t *testing.T) {
-	dbQueries, mock, cleanup := newTestDB(t)
-	defer cleanup()
+func TestGetCustomerByID_Success(t *testing.T) {
+	dbQueries, mock := newTestDB(t)
 	ctx := newTestContext()
 
 	// Mock customer data
@@ -100,8 +100,22 @@ func TestGetCustomerByID(t *testing.T) {
 	if customer != nil && customer.ID != customerID {
 		t.Errorf("expected customer ID '%d', got '%d'", customerID, customer.ID)
 	}
+}
 
-	// Not found case
+func TestGetCustomerByID_NotFound(t *testing.T) {
+	dbQueries, mock := newTestDB(t)
+	ctx := newTestContext()
+
+	// Mock not found scenario
+	customer, err := GetCustomerByID(ctx, dbQueries, 999)
+	if err == nil {
+		t.Errorf("GetCustomerByID should have returned an error for not found")
+	}
+	if customer != nil {
+		t.Errorf("GetCustomerByID should have returned nil for not found, got: %v", customer)
+	}
+
+	// Mock the database query for not found
 	notFoundID := int32(999)
 	mock.ExpectQuery(`SELECT id, created_at, updated_at, business_name, contact_name, email, phone, address_1, address_2, city, state, zip_code, terms, discount, commission, sales_rep, notes FROM customers WHERE id = \$1`).
 		WithArgs(notFoundID).

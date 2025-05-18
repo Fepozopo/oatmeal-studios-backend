@@ -12,8 +12,7 @@ import (
 
 // --- RegisterUser ---
 func TestRegisterUser_Success(t *testing.T) {
-	dbQueries, mock, cleanup := newTestDB(t)
-	defer cleanup()
+	dbQueries, mock := newTestDB(t)
 	ctx := newTestContext()
 	defer func() {
 		if err := mock.ExpectationsWereMet(); err != nil {
@@ -52,8 +51,7 @@ func TestRegisterUser_Success(t *testing.T) {
 }
 
 func TestRegisterUser_InvalidInput(t *testing.T) {
-	dbQueries, _, cleanup := newTestDB(t)
-	defer cleanup()
+	dbQueries, _ := newTestDB(t)
 	ctx := newTestContext()
 
 	input := RegisterUserInput{}
@@ -68,8 +66,7 @@ func TestRegisterUser_InvalidInput(t *testing.T) {
 
 // --- AuthenticateUser ---
 func TestAuthenticateUser_Success(t *testing.T) {
-	dbQueries, mock, cleanup := newTestDB(t)
-	defer cleanup()
+	dbQueries, mock := newTestDB(t)
 	ctx := newTestContext()
 	defer func() {
 		if err := mock.ExpectationsWereMet(); err != nil {
@@ -100,8 +97,7 @@ func TestAuthenticateUser_Success(t *testing.T) {
 }
 
 func TestAuthenticateUser_InvalidPassword(t *testing.T) {
-	dbQueries, mock, cleanup := newTestDB(t)
-	defer cleanup()
+	dbQueries, mock := newTestDB(t)
 	ctx := newTestContext()
 	defer func() {
 		if err := mock.ExpectationsWereMet(); err != nil {
@@ -133,8 +129,7 @@ func TestAuthenticateUser_InvalidPassword(t *testing.T) {
 
 // --- UpdateUser ---
 func TestUpdateUserName_Success(t *testing.T) {
-	dbQueries, mock, cleanup := newTestDB(t)
-	defer cleanup()
+	dbQueries, mock := newTestDB(t)
 	ctx := newTestContext()
 	defer func() {
 		if err := mock.ExpectationsWereMet(); err != nil {
@@ -151,6 +146,11 @@ func TestUpdateUserName_Success(t *testing.T) {
 	mock.ExpectExec(regexp.QuoteMeta(`UPDATE users`)).
 		WithArgs(input.UserID, input.FirstName, input.LastName).
 		WillReturnResult(sqlmock.NewResult(0, 1))
+
+	mock.ExpectQuery(regexp.QuoteMeta(`SELECT id, created_at, updated_at, email, first_name, last_name, password FROM users WHERE id = $1`)).
+		WithArgs(input.UserID).
+		WillReturnRows(sqlmock.NewRows([]string{"id", "created_at", "updated_at", "email", "first_name", "last_name", "password"}).
+			AddRow(input.UserID, time.Now(), time.Now(), "test@example.com", input.FirstName, input.LastName, "hashedpassword"))
 
 	user, err := UpdateUserName(ctx, dbQueries, input)
 	if err != nil {
@@ -169,8 +169,7 @@ func TestUpdateUserName_Success(t *testing.T) {
 }
 
 func TestUpdateUser_InvalidInput(t *testing.T) {
-	dbQueries, _, cleanup := newTestDB(t)
-	defer cleanup()
+	dbQueries, _ := newTestDB(t)
 	ctx := newTestContext()
 
 	input := UpdateUserNameInput{UserID: uuid.New()}
@@ -185,8 +184,7 @@ func TestUpdateUser_InvalidInput(t *testing.T) {
 
 // --- UpdateUserPassword ---
 func TestUpdateUserPassword_Success(t *testing.T) {
-	dbQueries, mock, cleanup := newTestDB(t)
-	defer cleanup()
+	dbQueries, mock := newTestDB(t)
 	ctx := newTestContext()
 	defer func() {
 		if err := mock.ExpectationsWereMet(); err != nil {
@@ -223,8 +221,7 @@ func TestUpdateUserPassword_Success(t *testing.T) {
 }
 
 func TestUpdateUserPassword_InvalidOldPassword(t *testing.T) {
-	dbQueries, mock, cleanup := newTestDB(t)
-	defer cleanup()
+	dbQueries, mock := newTestDB(t)
 	ctx := newTestContext()
 	defer func() {
 		if err := mock.ExpectationsWereMet(); err != nil {

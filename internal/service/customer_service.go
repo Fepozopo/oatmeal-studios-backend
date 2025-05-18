@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/Fepozopo/oatmeal-studios-backend/internal/auth"
 	"github.com/Fepozopo/oatmeal-studios-backend/internal/database"
 )
 
@@ -14,6 +15,25 @@ func CreateCustomer(ctx context.Context, db *database.Queries, input CreateCusto
 	// Check if BusinessName is provided
 	if input.BusinessName == "" {
 		return nil, errors.New("business name is required")
+	}
+	// Validate discount and commission values
+	if input.Discount < 0 || input.Discount > 100 {
+		return nil, errors.New("discount must be between 0 and 100")
+	}
+	if input.Commission < 0 || input.Commission > 100 {
+		return nil, errors.New("commission must be between 0 and 100")
+	}
+	// Validate email format if provided
+	if input.Email != "" {
+		if err := auth.IsValidEmail(input.Email); err != nil {
+			return nil, fmt.Errorf("invalid email format: %w", err)
+		}
+	}
+	// Validate phone format if provided
+	if input.Phone != "" {
+		if err := auth.IsValidPhone(input.Phone); err != nil {
+			return nil, fmt.Errorf("invalid phone format: %w", err)
+		}
 	}
 
 	// Prepare parameters for database insertion
