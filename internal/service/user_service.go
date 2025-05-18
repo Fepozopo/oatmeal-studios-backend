@@ -63,10 +63,10 @@ func AuthenticateUser(ctx context.Context, db *database.Queries, email, password
 }
 
 // UpdateUser updates the user's profile information after validating input.
-func UpdateUserName(ctx context.Context, db *database.Queries, input UpdateUserNameInput) error {
+func UpdateUserName(ctx context.Context, db *database.Queries, input UpdateUserNameInput) (*database.User, error) {
 	// Validate input
 	if input.FirstName == "" || input.LastName == "" {
-		return errors.New("first name and last name are required")
+		return nil, errors.New("first name and last name are required")
 	}
 
 	// Update user profile
@@ -78,10 +78,15 @@ func UpdateUserName(ctx context.Context, db *database.Queries, input UpdateUserN
 
 	err := db.UpdateUserName(ctx, params)
 	if err != nil {
-		return fmt.Errorf("failed to update user profile: %w", err)
+		return nil, fmt.Errorf("failed to update user profile: %w", err)
 	}
 
-	return nil
+	// Fetch updated user
+	user, err := db.GetUserByID(ctx, input.UserID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch updated user: %w", err)
+	}
+	return &user, nil
 }
 
 func UpdateUserPassword(ctx context.Context, db *database.Queries, input UpdateUserPasswordInput) error {

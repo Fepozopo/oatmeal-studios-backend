@@ -1,26 +1,18 @@
 package service
 
 import (
-	"context"
 	"database/sql"
 	"testing"
 	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
-	"github.com/Fepozopo/oatmeal-studios-backend/internal/database"
-	"github.com/stretchr/testify/assert"
 )
 
-// TestCreateCustomer tests the CreateCustomer function.
-func TestCreateCustomer(t *testing.T) {
-	db, mock, err := sqlmock.New()
-	if err != nil {
-		t.Fatalf("failed to open sqlmock database: %s", err)
-	}
-	defer db.Close()
-
-	dbQueries := database.New(db)
-	ctx := context.Background()
+// --- TestCreateCustomer ---
+func TestCreateCustomer_Success(t *testing.T) {
+	dbQueries, mock, cleanup := newTestDB(t)
+	defer cleanup()
+	ctx := newTestContext()
 	currentTime := time.Now()
 
 	// Mock customer data
@@ -32,6 +24,7 @@ func TestCreateCustomer(t *testing.T) {
 	`).
 		WithArgs(
 			"Test Biz",
+			sql.NullString{String: "", Valid: false},
 			sql.NullString{String: "", Valid: false},
 			sql.NullString{String: "", Valid: false},
 			sql.NullString{String: "", Valid: false},
@@ -55,16 +48,26 @@ func TestCreateCustomer(t *testing.T) {
 	customer, err := CreateCustomer(ctx, dbQueries, CreateCustomerInput{
 		BusinessName: "Test Biz",
 	})
-	assert.NoError(t, err)
-	assert.NotNil(t, customer)
-	assert.Equal(t, "Test Biz", customer.BusinessName)
+	if err != nil {
+		t.Errorf("CreateCustomer returned error: %v", err)
+	}
+	if customer == nil {
+		t.Errorf("CreateCustomer should have returned a non-nil customer")
+	}
+	if customer != nil && customer.BusinessName != "Test Biz" {
+		t.Errorf("expected business name 'Test Biz', got '%s'", customer.BusinessName)
+	}
 
 	// Test for missing business name
 	customer, err = CreateCustomer(ctx, dbQueries, CreateCustomerInput{
 		BusinessName: "",
 	})
-	assert.Error(t, err)
-	assert.Nil(t, customer)
+	if err == nil {
+		t.Errorf("CreateCustomer should have returned an error for missing business name")
+	}
+	if customer != nil {
+		t.Errorf("CreateCustomer should have returned nil for missing business name, got: %v", customer)
+	}
 
 	// Ensure all expectations were met
 	if err := mock.ExpectationsWereMet(); err != nil {
@@ -72,16 +75,11 @@ func TestCreateCustomer(t *testing.T) {
 	}
 }
 
-// TestGetCustomerByID tests the GetCustomerByID function.
+// --- TestGetCustomerByID ---
 func TestGetCustomerByID(t *testing.T) {
-	db, mock, err := sqlmock.New()
-	if err != nil {
-		t.Fatalf("failed to open sqlmock database: %s", err)
-	}
-	defer db.Close()
-
-	dbQueries := database.New(db)
-	ctx := context.Background()
+	dbQueries, mock, cleanup := newTestDB(t)
+	defer cleanup()
+	ctx := newTestContext()
 
 	// Mock customer data
 	customerID := int32(1)
@@ -93,9 +91,15 @@ func TestGetCustomerByID(t *testing.T) {
 			AddRow(1, time.Now(), time.Now(), "Test Biz", sql.NullString{}, sql.NullString{}, sql.NullString{}, sql.NullString{}, sql.NullString{}, sql.NullString{}, sql.NullString{}, sql.NullString{}, sql.NullString{}, 0.0, 0.0, sql.NullString{}, sql.NullString{}))
 
 	customer, err := GetCustomerByID(ctx, dbQueries, customerID)
-	assert.NoError(t, err)
-	assert.NotNil(t, customer)
-	assert.Equal(t, customerID, customer.ID)
+	if err != nil {
+		t.Errorf("GetCustomerByID returned error: %v", err)
+	}
+	if customer == nil {
+		t.Errorf("GetCustomerByID should have returned a non-nil customer")
+	}
+	if customer != nil && customer.ID != customerID {
+		t.Errorf("expected customer ID '%d', got '%d'", customerID, customer.ID)
+	}
 
 	// Not found case
 	notFoundID := int32(999)
@@ -104,7 +108,17 @@ func TestGetCustomerByID(t *testing.T) {
 		WillReturnError(sql.ErrNoRows)
 
 	customer, err = GetCustomerByID(ctx, dbQueries, notFoundID)
-	assert.Error(t, err)
-	assert.EqualError(t, err, "customer not found")
-	assert.Nil(t, customer)
+	if err == nil {
+		t.Errorf("GetCustomerByID should have returned an error for not found")
+	}
+	if err != nil && err.Error() != "customer not found" {
+		t.Errorf("expected error 'customer not found', got '%s'", err.Error())
+	}
+	if customer != nil {
+		t.Errorf("GetCustomerByID should have returned nil for not found, got: %v", customer)
+	}
+
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("there were unfulfilled expectations: %s", err)
+	}
 }
