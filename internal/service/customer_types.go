@@ -1,6 +1,6 @@
 package service
 
-type CreateCustomerInput struct {
+type CreateOrUpdateCustomerInput struct {
 	BusinessName string  `json:"business_name"`
 	ContactName  string  `json:"contact_name,omitempty"`
 	Email        string  `json:"email,omitempty"`

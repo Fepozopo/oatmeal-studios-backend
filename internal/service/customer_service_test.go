@@ -43,7 +43,7 @@ func TestCreateCustomer_Success(t *testing.T) {
 			1, currentTime, currentTime, "Test Biz", "Test Contact", "test@example.com", "1234567890", "123 Test St", "Suite 100", "Test City", "Test State", "12345", "Test Terms", 10.0, 5.0, "Test Sales Rep", "Test Notes",
 		))
 
-	customer, err := CreateCustomer(ctx, dbQueries, CreateCustomerInput{
+	customer, err := CreateCustomer(ctx, dbQueries, CreateOrUpdateCustomerInput{
 		BusinessName: "Test Biz",
 		ContactName:  "Test Contact",
 		Email:        "test@example.com",
@@ -73,7 +73,7 @@ func TestCreateCustomer_Success(t *testing.T) {
 func TestCreateCustomer_InvalidInput(t *testing.T) {
 	dbQueries, mock := newTestDB(t)
 	ctx := newTestContext()
-	customer, err := CreateCustomer(ctx, dbQueries, CreateCustomerInput{
+	customer, err := CreateCustomer(ctx, dbQueries, CreateOrUpdateCustomerInput{
 		BusinessName: "",
 	})
 	if err == nil {
@@ -193,6 +193,108 @@ func TestListCustomers_Failure(t *testing.T) {
 	}
 	if customers != nil {
 		t.Errorf("ListCustomers should have returned nil on DB failure, got: %v", customers)
+	}
+
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("there were unfulfilled expectations: %s", err)
+	}
+}
+
+// --- TestUpdateCustomer ---
+func TestUpdateCustomer_Success(t *testing.T) {
+	dbQueries, mock := newTestDB(t)
+	ctx := newTestContext()
+	currentTime := time.Now()
+	customerID := int32(1)
+
+	mock.ExpectQuery(`-- name: UpdateCustomer :one`).
+		WithArgs(
+			customerID,
+			"Updated Biz",
+			"Updated Contact",
+			"updated@example.com",
+			"9876543210",
+			"456 Updated St",
+			"Suite 200",
+			"Updated City",
+			"Updated State",
+			"54321",
+			"Updated Terms",
+			15.0,
+			7.5,
+			"Updated Sales Rep",
+			"Updated Notes",
+		).
+		WillReturnRows(sqlmock.NewRows([]string{
+			"id", "created_at", "updated_at", "business_name", "contact_name", "email", "phone", "address_1", "address_2", "city", "state", "zip_code", "terms", "discount", "commission", "sales_rep", "notes",
+		}).AddRow(
+			customerID, currentTime, currentTime, "Updated Biz", "Updated Contact", "updated@example.com", "9876543210", "456 Updated St", "Suite 200", "Updated City", "Updated State", "54321", "Updated Terms", 15.0, 7.5, "Updated Sales Rep", "Updated Notes",
+		))
+
+	customer, err := UpdateCustomer(ctx, dbQueries, customerID, CreateOrUpdateCustomerInput{
+		BusinessName: "Updated Biz",
+		ContactName:  "Updated Contact",
+		Email:        "updated@example.com",
+		Phone:        "9876543210",
+		Address1:     "456 Updated St",
+		Address2:     "Suite 200",
+		City:         "Updated City",
+		State:        "Updated State",
+		ZipCode:      "54321",
+		Terms:        "Updated Terms",
+		Discount:     15.0,
+		Commission:   7.5,
+		SalesRep:     "Updated Sales Rep",
+		Notes:        "Updated Notes",
+	})
+	if err != nil {
+		t.Errorf("UpdateCustomer returned error: %v", err)
+	}
+	if customer == nil {
+		t.Errorf("UpdateCustomer should have returned a non-nil customer")
+	}
+	if customer != nil && customer.BusinessName != "Updated Biz" {
+		t.Errorf("expected business name 'Updated Biz', got '%s'", customer.BusinessName)
+	}
+}
+
+func TestUpdateCustomer_Failure(t *testing.T) {
+	dbQueries, mock := newTestDB(t)
+	ctx := newTestContext()
+	customerID := int32(999)
+
+	// Simulate not found error
+	mock.ExpectQuery(`-- name: UpdateCustomer :one`).
+		WithArgs(
+			customerID,
+			"Nonexistent Biz",
+			sql.NullString{String: "", Valid: false},
+			sql.NullString{String: "", Valid: false},
+			sql.NullString{String: "", Valid: false},
+			sql.NullString{String: "", Valid: false},
+			sql.NullString{String: "", Valid: false},
+			sql.NullString{String: "", Valid: false},
+			sql.NullString{String: "", Valid: false},
+			sql.NullString{String: "", Valid: false},
+			sql.NullString{String: "", Valid: false},
+			0.0,
+			0.0,
+			sql.NullString{String: "", Valid: false},
+			sql.NullString{String: "", Valid: false},
+		).
+		WillReturnError(sql.ErrNoRows)
+
+	customer, err := UpdateCustomer(ctx, dbQueries, customerID, CreateOrUpdateCustomerInput{
+		BusinessName: "Nonexistent Biz",
+	})
+	if err == nil {
+		t.Errorf("UpdateCustomer should have returned an error for not found")
+	}
+	if err != nil && err.Error() != "customer not found" {
+		t.Errorf("expected error 'customer not found', got '%s'", err.Error())
+	}
+	if customer != nil {
+		t.Errorf("UpdateCustomer should have returned nil for not found, got: %v", customer)
 	}
 
 	if err := mock.ExpectationsWereMet(); err != nil {

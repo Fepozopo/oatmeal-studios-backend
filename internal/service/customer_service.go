@@ -11,7 +11,7 @@ import (
 )
 
 // CreateCustomer creates a new customer and returns the created customer.
-func CreateCustomer(ctx context.Context, db *database.Queries, input CreateCustomerInput) (*database.Customer, error) {
+func CreateCustomer(ctx context.Context, db *database.Queries, input CreateOrUpdateCustomerInput) (*database.Customer, error) {
 	// Check if BusinessName is provided
 	if input.BusinessName == "" {
 		return nil, errors.New("business name is required")
@@ -81,4 +81,58 @@ func ListCustomers(ctx context.Context, db *database.Queries) ([]database.Custom
 		return nil, fmt.Errorf("failed to get customers: %w", err)
 	}
 	return customers, nil
+}
+
+// UpdateCustomer updates an existing customer's details by ID.
+func UpdateCustomer(ctx context.Context, db *database.Queries, id int32, input CreateOrUpdateCustomerInput) (*database.Customer, error) {
+	// Check if BusinessName is provided
+	if input.BusinessName == "" {
+		return nil, errors.New("business name is required")
+	}
+	// Validate discount and commission values
+	if input.Discount < 0 || input.Discount > 100 {
+		return nil, errors.New("discount must be between 0 and 100")
+	}
+	if input.Commission < 0 || input.Commission > 100 {
+		return nil, errors.New("commission must be between 0 and 100")
+	}
+	// Validate email format if provided
+	if input.Email != "" {
+		if err := auth.IsValidEmail(input.Email); err != nil {
+			return nil, fmt.Errorf("invalid email format: %w", err)
+		}
+	}
+	// Validate phone format if provided
+	if input.Phone != "" {
+		if err := auth.IsValidPhone(input.Phone); err != nil {
+			return nil, fmt.Errorf("invalid phone format: %w", err)
+		}
+	}
+
+	params := database.UpdateCustomerParams{
+		ID:           id,
+		BusinessName: input.BusinessName,
+		ContactName:  sql.NullString{String: input.ContactName, Valid: input.ContactName != ""},
+		Email:        sql.NullString{String: input.Email, Valid: input.Email != ""},
+		Phone:        sql.NullString{String: input.Phone, Valid: input.Phone != ""},
+		Address1:     sql.NullString{String: input.Address1, Valid: input.Address1 != ""},
+		Address2:     sql.NullString{String: input.Address2, Valid: input.Address2 != ""},
+		City:         sql.NullString{String: input.City, Valid: input.City != ""},
+		State:        sql.NullString{String: input.State, Valid: input.State != ""},
+		ZipCode:      sql.NullString{String: input.ZipCode, Valid: input.ZipCode != ""},
+		Terms:        sql.NullString{String: input.Terms, Valid: input.Terms != ""},
+		Discount:     input.Discount,
+		Commission:   input.Commission,
+		SalesRep:     sql.NullString{String: input.SalesRep, Valid: input.SalesRep != ""},
+		Notes:        sql.NullString{String: input.Notes, Valid: input.Notes != ""},
+	}
+
+	customer, err := db.UpdateCustomer(ctx, params)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, errors.New("customer not found")
+		}
+		return nil, fmt.Errorf("failed to update customer: %w", err)
+	}
+	return &customer, nil
 }
