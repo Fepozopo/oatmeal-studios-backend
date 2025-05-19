@@ -149,3 +149,53 @@ func TestGetCustomerByID_NotFound(t *testing.T) {
 		t.Errorf("there were unfulfilled expectations: %s", err)
 	}
 }
+
+// --- TestListCustomers ---
+func TestListCustomers_Success(t *testing.T) {
+	dbQueries, mock := newTestDB(t)
+	ctx := newTestContext()
+	now := time.Now()
+
+	mock.ExpectQuery(`SELECT id, created_at, updated_at, business_name, contact_name, email, phone, address_1, address_2, city, state, zip_code, terms, discount, commission, sales_rep, notes FROM customers`).
+		WillReturnRows(sqlmock.NewRows([]string{
+			"id", "created_at", "updated_at", "business_name", "contact_name", "email", "phone", "address_1", "address_2", "city", "state", "zip_code", "terms", "discount", "commission", "sales_rep", "notes",
+		}).AddRow(
+			1, now, now, "Biz1", "Contact1", "email1@example.com", "1111111111", "Addr1", "Apt1", "City1", "State1", "11111", "Terms1", 10.0, 5.0, "Rep1", "Notes1",
+		).AddRow(
+			2, now, now, "Biz2", "Contact2", "email2@example.com", "2222222222", "Addr2", "Apt2", "City2", "State2", "22222", "Terms2", 20.0, 10.0, "Rep2", "Notes2",
+		))
+
+	customers, err := ListCustomers(ctx, dbQueries)
+	if err != nil {
+		t.Errorf("ListCustomers returned error: %v", err)
+	}
+	if customers == nil {
+		t.Errorf("ListCustomers should have returned a non-nil slice")
+	}
+	if len(customers) != 2 {
+		t.Errorf("expected 2 customers, got %d", len(customers))
+	}
+	if customers[0].BusinessName != "Biz1" || customers[1].BusinessName != "Biz2" {
+		t.Errorf("unexpected business names: got %v, %v", customers[0].BusinessName, customers[1].BusinessName)
+	}
+}
+
+func TestListCustomers_Failure(t *testing.T) {
+	dbQueries, mock := newTestDB(t)
+	ctx := newTestContext()
+
+	mock.ExpectQuery(`SELECT id, created_at, updated_at, business_name, contact_name, email, phone, address_1, address_2, city, state, zip_code, terms, discount, commission, sales_rep, notes FROM customers`).
+		WillReturnError(sql.ErrConnDone)
+
+	customers, err := ListCustomers(ctx, dbQueries)
+	if err == nil {
+		t.Errorf("ListCustomers should have returned an error on DB failure")
+	}
+	if customers != nil {
+		t.Errorf("ListCustomers should have returned nil on DB failure, got: %v", customers)
+	}
+
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("there were unfulfilled expectations: %s", err)
+	}
+}

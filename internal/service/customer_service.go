@@ -73,3 +73,12 @@ func GetCustomerByID(ctx context.Context, db *database.Queries, id int32) (*data
 	}
 	return &customer, nil
 }
+
+// GetAllCustomers retrieves all customers from the database.
+func ListCustomers(ctx context.Context, db *database.Queries) ([]database.Customer, error) {
+	customers, err := db.ListCustomers(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get customers: %w", err)
+	}
+	return customers, nil
+}
