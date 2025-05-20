@@ -11,3 +11,15 @@ type AddCustomerLocationInput struct {
 	Phone      string `json:"phone,omitempty"`
 	Notes      string `json:"notes,omitempty"`
 }
+
+// UpdateCustomerLocationInput defines the input for updating a customer location
+type UpdateCustomerLocationInput struct {
+	ID       int32  `json:"id"`
+	Address1 string `json:"address_1"`
+	Address2 string `json:"address_2,omitempty"`
+	City     string `json:"city"`
+	State    string `json:"state"`
+	ZipCode  string `json:"zip_code"`
+	Phone    string `json:"phone,omitempty"`
+	Notes    string `json:"notes,omitempty"`
+}

@@ -53,3 +53,46 @@ func AddCustomerLocation(ctx context.Context, db *database.Queries, input AddCus
 	}
 	return &location, nil
 }
+
+// UpdateCustomerLocation updates an existing customer location and returns the updated location.
+func UpdateCustomerLocation(ctx context.Context, db *database.Queries, input UpdateCustomerLocationInput) (*database.CustomerLocation, error) {
+	// Check if the input is valid
+	if input.ID == 0 {
+		return nil, errors.New("id is required")
+	}
+	// Check for required fields
+	if input.Address1 == "" {
+		return nil, errors.New("address_1 is required")
+	}
+	if input.City == "" {
+		return nil, errors.New("city is required")
+	}
+	if input.State == "" {
+		return nil, errors.New("state is required")
+	}
+	if input.ZipCode == "" {
+		return nil, errors.New("zip_code is required")
+	}
+	if input.Phone != "" {
+		if err := auth.IsValidPhone(input.Phone); err != nil {
+			return nil, fmt.Errorf("invalid phone format: %w", err)
+		}
+	}
+
+	params := database.UpdateCustomerLocationParams{
+		ID:       input.ID,
+		Address1: input.Address1,
+		Address2: sql.NullString{String: input.Address2, Valid: input.Address2 != ""},
+		City:     input.City,
+		State:    input.State,
+		ZipCode:  input.ZipCode,
+		Phone:    sql.NullString{String: input.Phone, Valid: input.Phone != ""},
+		Notes:    sql.NullString{String: input.Notes, Valid: input.Notes != ""},
+	}
+
+	location, err := db.UpdateCustomerLocation(ctx, params)
+	if err != nil {
+		return nil, fmt.Errorf("failed to update customer location: %w", err)
+	}
+	return &location, nil
+}
