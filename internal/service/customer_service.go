@@ -12,9 +12,21 @@ import (
 
 // CreateCustomer creates a new customer and returns the created customer.
 func CreateCustomer(ctx context.Context, db *database.Queries, input CreateOrUpdateCustomerInput) (*database.Customer, error) {
-	// Check if BusinessName is provided
+	// Check for required fields
 	if input.BusinessName == "" {
 		return nil, errors.New("business name is required")
+	}
+	if input.Address1 == "" {
+		return nil, errors.New("address1 is required")
+	}
+	if input.City == "" {
+		return nil, errors.New("city is required")
+	}
+	if input.State == "" {
+		return nil, errors.New("state is required")
+	}
+	if input.ZipCode == "" {
+		return nil, errors.New("zip code is required")
 	}
 	// Validate discount and commission values
 	if input.Discount < 0 || input.Discount > 100 {
@@ -42,12 +54,12 @@ func CreateCustomer(ctx context.Context, db *database.Queries, input CreateOrUpd
 		ContactName:  sql.NullString{String: input.ContactName, Valid: input.ContactName != ""},
 		Email:        sql.NullString{String: input.Email, Valid: input.Email != ""},
 		Phone:        sql.NullString{String: input.Phone, Valid: input.Phone != ""},
-		Address1:     sql.NullString{String: input.Address1, Valid: input.Address1 != ""},
+		Address1:     input.Address1,
 		Address2:     sql.NullString{String: input.Address2, Valid: input.Address2 != ""},
-		City:         sql.NullString{String: input.City, Valid: input.City != ""},
-		State:        sql.NullString{String: input.State, Valid: input.State != ""},
-		ZipCode:      sql.NullString{String: input.ZipCode, Valid: input.ZipCode != ""},
-		Terms:        sql.NullString{String: input.Terms, Valid: input.Terms != ""},
+		City:         input.City,
+		State:        input.State,
+		ZipCode:      input.ZipCode,
+		Terms:        input.Terms,
 		Discount:     input.Discount,
 		Commission:   input.Commission,
 		SalesRep:     sql.NullString{String: input.SalesRep, Valid: input.SalesRep != ""},
@@ -56,7 +68,7 @@ func CreateCustomer(ctx context.Context, db *database.Queries, input CreateOrUpd
 
 	customer, err := db.CreateCustomer(ctx, params)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to create customer: %w", err)
 	}
 
 	return &customer, nil
@@ -85,9 +97,21 @@ func ListCustomers(ctx context.Context, db *database.Queries) ([]database.Custom
 
 // UpdateCustomer updates an existing customer's details by ID.
 func UpdateCustomer(ctx context.Context, db *database.Queries, id int32, input CreateOrUpdateCustomerInput) (*database.Customer, error) {
-	// Check if BusinessName is provided
+	// Check for required fields
 	if input.BusinessName == "" {
 		return nil, errors.New("business name is required")
+	}
+	if input.Address1 == "" {
+		return nil, errors.New("address1 is required")
+	}
+	if input.City == "" {
+		return nil, errors.New("city is required")
+	}
+	if input.State == "" {
+		return nil, errors.New("state is required")
+	}
+	if input.ZipCode == "" {
+		return nil, errors.New("zip code is required")
 	}
 	// Validate discount and commission values
 	if input.Discount < 0 || input.Discount > 100 {
@@ -115,12 +139,12 @@ func UpdateCustomer(ctx context.Context, db *database.Queries, id int32, input C
 		ContactName:  sql.NullString{String: input.ContactName, Valid: input.ContactName != ""},
 		Email:        sql.NullString{String: input.Email, Valid: input.Email != ""},
 		Phone:        sql.NullString{String: input.Phone, Valid: input.Phone != ""},
-		Address1:     sql.NullString{String: input.Address1, Valid: input.Address1 != ""},
+		Address1:     input.Address1,
 		Address2:     sql.NullString{String: input.Address2, Valid: input.Address2 != ""},
-		City:         sql.NullString{String: input.City, Valid: input.City != ""},
-		State:        sql.NullString{String: input.State, Valid: input.State != ""},
-		ZipCode:      sql.NullString{String: input.ZipCode, Valid: input.ZipCode != ""},
-		Terms:        sql.NullString{String: input.Terms, Valid: input.Terms != ""},
+		City:         input.City,
+		State:        input.State,
+		ZipCode:      input.ZipCode,
+		Terms:        input.Terms,
 		Discount:     input.Discount,
 		Commission:   input.Commission,
 		SalesRep:     sql.NullString{String: input.SalesRep, Valid: input.SalesRep != ""},

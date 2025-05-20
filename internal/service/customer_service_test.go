@@ -271,21 +271,31 @@ func TestUpdateCustomer_Failure(t *testing.T) {
 			sql.NullString{String: "", Valid: false},
 			sql.NullString{String: "", Valid: false},
 			sql.NullString{String: "", Valid: false},
-			sql.NullString{String: "", Valid: false},
-			sql.NullString{String: "", Valid: false},
-			sql.NullString{String: "", Valid: false},
-			sql.NullString{String: "", Valid: false},
-			sql.NullString{String: "", Valid: false},
-			sql.NullString{String: "", Valid: false},
+			"123 Nonexistent St",
+			"Suite 300",
+			"Nonexistent City",
+			"Nonexistent State",
+			"00000",
+			"Nonexistent Terms",
 			0.0,
 			0.0,
-			sql.NullString{String: "", Valid: false},
-			sql.NullString{String: "", Valid: false},
+			"Nonexistent Sales Rep",
+			"Nonexistent Notes",
 		).
 		WillReturnError(sql.ErrNoRows)
 
 	customer, err := UpdateCustomer(ctx, dbQueries, customerID, CreateOrUpdateCustomerInput{
 		BusinessName: "Nonexistent Biz",
+		Address1:     "123 Nonexistent St",
+		Address2:     "Suite 300",
+		City:         "Nonexistent City",
+		State:        "Nonexistent State",
+		ZipCode:      "00000",
+		Terms:        "Nonexistent Terms",
+		Discount:     0.0,
+		Commission:   0.0,
+		SalesRep:     "Nonexistent Sales Rep",
+		Notes:        "Nonexistent Notes",
 	})
 	if err == nil {
 		t.Errorf("UpdateCustomer should have returned an error for not found")
