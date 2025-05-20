@@ -136,3 +136,15 @@ func UpdateCustomer(ctx context.Context, db *database.Queries, id int32, input C
 	}
 	return &customer, nil
 }
+
+// DeleteCustomer deletes a customer by their ID.
+func DeleteCustomer(ctx context.Context, db *database.Queries, id int32) error {
+	err := db.DeleteCustomer(ctx, id)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return errors.New("customer not found")
+		}
+		return fmt.Errorf("failed to delete customer: %w", err)
+	}
+	return nil
+}

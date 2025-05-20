@@ -301,3 +301,47 @@ func TestUpdateCustomer_Failure(t *testing.T) {
 		t.Errorf("there were unfulfilled expectations: %s", err)
 	}
 }
+
+// --- TestDeleteCustomer ---
+func TestDeleteCustomer_Success(t *testing.T) {
+	dbQueries, mock := newTestDB(t)
+	ctx := newTestContext()
+	customerID := int32(1)
+
+	// Expect the delete query to succeed
+	mock.ExpectExec(`DELETE FROM customers WHERE id = \$1`).
+		WithArgs(customerID).
+		WillReturnResult(sqlmock.NewResult(0, 1))
+
+	err := DeleteCustomer(ctx, dbQueries, customerID)
+	if err != nil {
+		t.Errorf("DeleteCustomer returned error: %v", err)
+	}
+
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("there were unfulfilled expectations: %s", err)
+	}
+}
+
+func TestDeleteCustomer_Failure(t *testing.T) {
+	dbQueries, mock := newTestDB(t)
+	ctx := newTestContext()
+	customerID := int32(999)
+
+	// Simulate not found error
+	mock.ExpectExec(`DELETE FROM customers WHERE id = \$1`).
+		WithArgs(customerID).
+		WillReturnError(sql.ErrNoRows)
+
+	err := DeleteCustomer(ctx, dbQueries, customerID)
+	if err == nil {
+		t.Errorf("DeleteCustomer should have returned an error for not found")
+	}
+	if err != nil && err.Error() != "customer not found" {
+		t.Errorf("expected error 'customer not found', got '%s'", err.Error())
+	}
+
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("there were unfulfilled expectations: %s", err)
+	}
+}
