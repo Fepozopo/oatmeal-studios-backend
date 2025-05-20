@@ -16,13 +16,13 @@ func RegisterUser(ctx context.Context, db *database.Queries, input RegisterUserI
 		return nil, errors.New("all fields are required")
 	}
 	if err := auth.IsValidEmail(input.Email); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("invalid email format: %w", err)
 	}
 
 	// Hash the password (includes strength validation)
 	hashedPassword, err := auth.HashPassword(input.Password)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to hash password: %w", err)
 	}
 
 	// Prepare params for DB insert
