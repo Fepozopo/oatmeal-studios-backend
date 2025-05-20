@@ -7,12 +7,12 @@ CREATE TABLE customers (
     contact_name TEXT, -- Optional contact person within the business
     email TEXT,
     phone TEXT,
-    address_1 TEXT,
+    address_1 TEXT NOT NULL,
     address_2 TEXT,
-    city TEXT,
-    state TEXT,
-    zip_code TEXT,
-    terms TEXT,
+    city TEXT NOT NULL,
+    state TEXT NOT NULL,
+    zip_code TEXT NOT NULL,
+    terms TEXT NOT NULL DEFAULT 'Net 30', -- Payment terms
     discount FLOAT NOT NULL DEFAULT 0.0, -- Percentage discount
     commission FLOAT NOT NULL DEFAULT 0.0, -- Percentage commission
     sales_rep TEXT,

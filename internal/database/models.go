@@ -19,12 +19,12 @@ type Customer struct {
 	ContactName  sql.NullString `json:"contact_name"`
 	Email        sql.NullString `json:"email"`
 	Phone        sql.NullString `json:"phone"`
-	Address1     sql.NullString `json:"address_1"`
+	Address1     string         `json:"address_1"`
 	Address2     sql.NullString `json:"address_2"`
-	City         sql.NullString `json:"city"`
-	State        sql.NullString `json:"state"`
-	ZipCode      sql.NullString `json:"zip_code"`
-	Terms        sql.NullString `json:"terms"`
+	City         string         `json:"city"`
+	State        string         `json:"state"`
+	ZipCode      string         `json:"zip_code"`
+	Terms        string         `json:"terms"`
 	Discount     float64        `json:"discount"`
 	Commission   float64        `json:"commission"`
 	SalesRep     sql.NullString `json:"sales_rep"`
