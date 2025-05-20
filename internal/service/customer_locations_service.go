@@ -12,9 +12,11 @@ import (
 
 // AddCustomerLocation adds a new customer location and returns the created location.
 func AddCustomerLocation(ctx context.Context, db *database.Queries, input AddCustomerLocationInput) (*database.CustomerLocation, error) {
+	// Check if the input is valid
 	if input.CustomerID == 0 {
 		return nil, errors.New("customer_id is required")
 	}
+	// Check for required fields
 	if input.Address1 == "" {
 		return nil, errors.New("address_1 is required")
 	}
@@ -27,6 +29,7 @@ func AddCustomerLocation(ctx context.Context, db *database.Queries, input AddCus
 	if input.ZipCode == "" {
 		return nil, errors.New("zip_code is required")
 	}
+	// Validate phone number if provided
 	if input.Phone != "" {
 		if err := auth.IsValidPhone(input.Phone); err != nil {
 			return nil, fmt.Errorf("invalid phone format: %w", err)
@@ -46,7 +49,7 @@ func AddCustomerLocation(ctx context.Context, db *database.Queries, input AddCus
 
 	location, err := db.CreateCustomerLocation(ctx, params)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to create customer location: %w", err)
 	}
 	return &location, nil
 }
