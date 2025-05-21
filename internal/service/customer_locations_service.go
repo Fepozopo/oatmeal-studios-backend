@@ -96,3 +96,16 @@ func UpdateCustomerLocation(ctx context.Context, db *database.Queries, input Upd
 	}
 	return &location, nil
 }
+
+// GetCustomerLocationByID retrieves a customer location by its ID.
+// It returns the location if found, or an error if not.
+func GetCustomerLocationByID(ctx context.Context, db *database.Queries, id int32) (*database.CustomerLocation, error) {
+	location, err := db.GetCustomerLocationByID(ctx, id)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, errors.New("customer location not found")
+		}
+		return nil, fmt.Errorf("failed to get customer location: %w", err)
+	}
+	return &location, nil
+}

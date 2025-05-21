@@ -139,3 +139,45 @@ func TestUpdateCustomerLocation_Failure(t *testing.T) {
 		t.Errorf("UpdateCustomerLocation should have returned nil for missing required fields, got: %v", location)
 	}
 }
+
+func TestGetCustomerLocationByID_Success(t *testing.T) {
+	dbQueries, mock := newTestDB(t)
+	ctx := newTestContext()
+	currentTime := time.Now()
+
+	mock.ExpectQuery(`-- name: GetCustomerLocationByID :one`).
+		WithArgs(int32(10)).
+		WillReturnRows(sqlmock.NewRows([]string{
+			"id", "customer_id", "address_1", "address_2", "city", "state", "zip_code", "phone", "notes", "created_at", "updated_at",
+		}).AddRow(
+			10, 1, "123 Main St", "Apt 2", "Springfield", "IL", "62704", "+11234567890", "Front entrance", currentTime, currentTime,
+		))
+
+	location, err := GetCustomerLocationByID(ctx, dbQueries, 10)
+	if err != nil {
+		t.Errorf("GetCustomerLocationByID returned error: %v", err)
+	}
+	if location == nil {
+		t.Errorf("GetCustomerLocationByID should have returned a non-nil location")
+	}
+	if location != nil && location.ID != 10 {
+		t.Errorf("expected id 10, got %d", location.ID)
+	}
+}
+
+func TestGetCustomerLocationByID_Failure(t *testing.T) {
+	dbQueries, mock := newTestDB(t)
+	ctx := newTestContext()
+
+	mock.ExpectQuery(`-- name: GetCustomerLocationByID :one`).
+		WithArgs(int32(999)).
+		WillReturnError(sql.ErrNoRows)
+
+	location, err := GetCustomerLocationByID(ctx, dbQueries, 999)
+	if err == nil {
+		t.Errorf("GetCustomerLocationByID should have returned an error for not found")
+	}
+	if location != nil {
+		t.Errorf("GetCustomerLocationByID should have returned nil for not found, got: %v", location)
+	}
+}
