@@ -54,6 +54,22 @@ func AddCustomerLocation(ctx context.Context, db *database.Queries, input AddCus
 	return &location, nil
 }
 
+// DeleteCustomerLocation deletes a customer location by its ID.
+// It returns nil if successful, or an error if not.
+func DeleteCustomerLocation(ctx context.Context, db *database.Queries, id int32) error {
+	if id == 0 {
+		return errors.New("id is required")
+	}
+	err := db.DeleteCustomerLocation(ctx, id)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return errors.New("customer location not found")
+		}
+		return fmt.Errorf("failed to delete customer location: %w", err)
+	}
+	return nil
+}
+
 // UpdateCustomerLocation updates an existing customer location and returns the updated location.
 func UpdateCustomerLocation(ctx context.Context, db *database.Queries, input UpdateCustomerLocationInput) (*database.CustomerLocation, error) {
 	// Check if the input is valid

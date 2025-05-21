@@ -8,6 +8,7 @@ import (
 	"github.com/DATA-DOG/go-sqlmock"
 )
 
+// --- AddCustomerLocation tests ---
 func TestAddCustomerLocation_Success(t *testing.T) {
 	dbQueries, mock := newTestDB(t)
 	ctx := newTestContext()
@@ -74,6 +75,43 @@ func TestAddCustomerLocation_Failure(t *testing.T) {
 	}
 }
 
+// --- DeleteCustomerLocation tests ---
+func TestDeleteCustomerLocation_Success(t *testing.T) {
+	dbQueries, mock := newTestDB(t)
+	ctx := newTestContext()
+
+	mock.ExpectExec(`-- name: DeleteCustomerLocation :exec`).
+		WithArgs(int32(10)).
+		WillReturnResult(sqlmock.NewResult(0, 1))
+
+	err := DeleteCustomerLocation(ctx, dbQueries, 10)
+	if err != nil {
+		t.Errorf("DeleteCustomerLocation returned error: %v", err)
+	}
+}
+
+func TestDeleteCustomerLocation_Failure(t *testing.T) {
+	dbQueries, mock := newTestDB(t)
+	ctx := newTestContext()
+
+	// Test missing ID
+	err := DeleteCustomerLocation(ctx, dbQueries, 0)
+	if err == nil {
+		t.Errorf("DeleteCustomerLocation should have returned an error for missing id")
+	}
+
+	// Test not found (sql.ErrNoRows)
+	mock.ExpectExec(`-- name: DeleteCustomerLocation :exec`).
+		WithArgs(int32(999)).
+		WillReturnError(sql.ErrNoRows)
+
+	err = DeleteCustomerLocation(ctx, dbQueries, 999)
+	if err == nil {
+		t.Errorf("DeleteCustomerLocation should have returned an error for not found")
+	}
+}
+
+// --- UpdateCustomerLocation tests ---
 func TestUpdateCustomerLocation_Success(t *testing.T) {
 	dbQueries, mock := newTestDB(t)
 	ctx := newTestContext()
@@ -140,6 +178,7 @@ func TestUpdateCustomerLocation_Failure(t *testing.T) {
 	}
 }
 
+// --- GetCustomerLocationByID tests ---
 func TestGetCustomerLocationByID_Success(t *testing.T) {
 	dbQueries, mock := newTestDB(t)
 	ctx := newTestContext()
