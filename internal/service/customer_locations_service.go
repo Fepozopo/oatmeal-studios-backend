@@ -125,3 +125,19 @@ func GetCustomerLocationByID(ctx context.Context, db *database.Queries, id int32
 	}
 	return &location, nil
 }
+
+// ListCustomerLocations retrieves all locations for a given customer ID.
+// It returns a slice of locations if found, or an error if not.
+func ListCustomerLocations(ctx context.Context, db *database.Queries, customerID int32) ([]database.CustomerLocation, error) {
+	if customerID == 0 {
+		return nil, errors.New("customer_id is required")
+	}
+	locations, err := db.ListCustomerLocationsByCustomer(ctx, customerID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to list customer locations: %w", err)
+	}
+	if len(locations) == 0 {
+		return nil, errors.New("no customer locations found")
+	}
+	return locations, nil
+}

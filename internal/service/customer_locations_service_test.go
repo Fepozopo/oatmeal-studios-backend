@@ -220,3 +220,60 @@ func TestGetCustomerLocationByID_Failure(t *testing.T) {
 		t.Errorf("GetCustomerLocationByID should have returned nil for not found, got: %v", location)
 	}
 }
+
+// --- ListCustomerLocations tests ---
+func TestListCustomerLocations_Success(t *testing.T) {
+	dbQueries, mock := newTestDB(t)
+	ctx := newTestContext()
+	currentTime := time.Now()
+
+	mock.ExpectQuery(`-- name: ListCustomerLocationsByCustomer :many`).
+		WithArgs(int32(1)).
+		WillReturnRows(sqlmock.NewRows([]string{
+			"id", "customer_id", "address_1", "address_2", "city", "state", "zip_code", "phone", "notes", "created_at", "updated_at",
+		}).AddRow(
+			10, 1, "123 Main St", "Apt 2", "Springfield", "IL", "62704", "+11234567890", "Front entrance", currentTime, currentTime,
+		).AddRow(
+			11, 1, "456 Oak Ave", sql.NullString{String: "", Valid: false}, "Springfield", "IL", "62705", sql.NullString{String: "", Valid: false}, sql.NullString{String: "", Valid: false}, currentTime, currentTime,
+		))
+
+	locations, err := ListCustomerLocations(ctx, dbQueries, 1)
+	if err != nil {
+		t.Errorf("ListCustomerLocations returned error: %v", err)
+	}
+	if locations == nil || len(locations) != 2 {
+		t.Errorf("expected 2 locations, got %v", locations)
+	}
+	if locations != nil && locations[0].Address1 != "123 Main St" {
+		t.Errorf("expected first address_1 '123 Main St', got '%s'", locations[0].Address1)
+	}
+}
+
+func TestListCustomerLocations_Failure(t *testing.T) {
+	dbQueries, mock := newTestDB(t)
+	ctx := newTestContext()
+
+	// Test missing customerID
+	locations, err := ListCustomerLocations(ctx, dbQueries, 0)
+	if err == nil {
+		t.Errorf("ListCustomerLocations should have returned an error for missing customer_id")
+	}
+	if locations != nil {
+		t.Errorf("ListCustomerLocations should have returned nil for missing customer_id, got: %v", locations)
+	}
+
+	// Test no locations found
+	mock.ExpectQuery(`-- name: ListCustomerLocationsByCustomer :many`).
+		WithArgs(int32(999)).
+		WillReturnRows(sqlmock.NewRows([]string{
+			"id", "customer_id", "address_1", "address_2", "city", "state", "zip_code", "phone", "notes", "created_at", "updated_at",
+		}))
+
+	locations, err = ListCustomerLocations(ctx, dbQueries, 999)
+	if err == nil {
+		t.Errorf("ListCustomerLocations should have returned an error for no customer locations found")
+	}
+	if locations != nil {
+		t.Errorf("ListCustomerLocations should have returned nil for no customer locations found, got: %v", locations)
+	}
+}
