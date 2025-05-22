@@ -63,7 +63,7 @@ type Order struct {
 	CreatedAt          time.Time      `json:"created_at"`
 	UpdatedAt          time.Time      `json:"updated_at"`
 	CustomerID         int32          `json:"customer_id"`
-	CustomerLocationID sql.NullInt32  `json:"customer_location_id"`
+	CustomerLocationID int32          `json:"customer_location_id"`
 	OrderDate          time.Time      `json:"order_date"`
 	ShipDate           time.Time      `json:"ship_date"`
 	Status             string         `json:"status"`

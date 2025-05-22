@@ -19,7 +19,7 @@ RETURNING id, created_at, updated_at, customer_id, customer_location_id, order_d
 
 type CreateOrderParams struct {
 	CustomerID         int32          `json:"customer_id"`
-	CustomerLocationID sql.NullInt32  `json:"customer_location_id"`
+	CustomerLocationID int32          `json:"customer_location_id"`
 	OrderDate          time.Time      `json:"order_date"`
 	Status             string         `json:"status"`
 	Type               string         `json:"type"`
@@ -228,7 +228,7 @@ RETURNING id, created_at, updated_at, customer_id, customer_location_id, order_d
 type UpdateOrderParams struct {
 	ID                 int32          `json:"id"`
 	CustomerID         int32          `json:"customer_id"`
-	CustomerLocationID sql.NullInt32  `json:"customer_location_id"`
+	CustomerLocationID int32          `json:"customer_location_id"`
 	OrderDate          time.Time      `json:"order_date"`
 	Status             string         `json:"status"`
 	Type               string         `json:"type"`
