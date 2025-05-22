@@ -111,14 +111,62 @@ func (q *Queries) GetOrder(ctx context.Context, id int32) (Order, error) {
 	return i, err
 }
 
-const listOrders = `-- name: ListOrders :many
+const listOrdersByCustomer = `-- name: ListOrdersByCustomer :many
 SELECT id, created_at, updated_at, customer_id, customer_location_id, order_date, ship_date, status, type, method, po_number, shipping_cost, free_shipping, apply_to_commission, sales_rep, notes
 FROM orders
+WHERE customer_id = $1
 ORDER BY order_date DESC
 `
 
-func (q *Queries) ListOrders(ctx context.Context) ([]Order, error) {
-	rows, err := q.query(ctx, q.listOrdersStmt, listOrders)
+func (q *Queries) ListOrdersByCustomer(ctx context.Context, customerID int32) ([]Order, error) {
+	rows, err := q.query(ctx, q.listOrdersByCustomerStmt, listOrdersByCustomer, customerID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Order
+	for rows.Next() {
+		var i Order
+		if err := rows.Scan(
+			&i.ID,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.CustomerID,
+			&i.CustomerLocationID,
+			&i.OrderDate,
+			&i.ShipDate,
+			&i.Status,
+			&i.Type,
+			&i.Method,
+			&i.PoNumber,
+			&i.ShippingCost,
+			&i.FreeShipping,
+			&i.ApplyToCommission,
+			&i.SalesRep,
+			&i.Notes,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listOrdersOpen = `-- name: ListOrdersOpen :many
+SELECT id, created_at, updated_at, customer_id, customer_location_id, order_date, ship_date, status, type, method, po_number, shipping_cost, free_shipping, apply_to_commission, sales_rep, notes
+FROM orders
+WHERE status = 'Open'
+ORDER BY order_date DESC
+`
+
+func (q *Queries) ListOrdersOpen(ctx context.Context) ([]Order, error) {
+	rows, err := q.query(ctx, q.listOrdersOpenStmt, listOrdersOpen)
 	if err != nil {
 		return nil, err
 	}

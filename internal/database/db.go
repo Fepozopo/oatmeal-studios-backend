@@ -33,6 +33,9 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.createCustomerLocationStmt, err = db.PrepareContext(ctx, createCustomerLocation); err != nil {
 		return nil, fmt.Errorf("error preparing query CreateCustomerLocation: %w", err)
 	}
+	if q.createInvoiceStmt, err = db.PrepareContext(ctx, createInvoice); err != nil {
+		return nil, fmt.Errorf("error preparing query CreateInvoice: %w", err)
+	}
 	if q.createOrderStmt, err = db.PrepareContext(ctx, createOrder); err != nil {
 		return nil, fmt.Errorf("error preparing query CreateOrder: %w", err)
 	}
@@ -66,6 +69,9 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.deleteCustomerLocationStmt, err = db.PrepareContext(ctx, deleteCustomerLocation); err != nil {
 		return nil, fmt.Errorf("error preparing query DeleteCustomerLocation: %w", err)
 	}
+	if q.deleteInvoiceStmt, err = db.PrepareContext(ctx, deleteInvoice); err != nil {
+		return nil, fmt.Errorf("error preparing query DeleteInvoice: %w", err)
+	}
 	if q.deleteOrderStmt, err = db.PrepareContext(ctx, deleteOrder); err != nil {
 		return nil, fmt.Errorf("error preparing query DeleteOrder: %w", err)
 	}
@@ -95,6 +101,12 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	}
 	if q.getCustomerLocationByIDStmt, err = db.PrepareContext(ctx, getCustomerLocationByID); err != nil {
 		return nil, fmt.Errorf("error preparing query GetCustomerLocationByID: %w", err)
+	}
+	if q.getInvoiceStmt, err = db.PrepareContext(ctx, getInvoice); err != nil {
+		return nil, fmt.Errorf("error preparing query GetInvoice: %w", err)
+	}
+	if q.getInvoicesByOrderStmt, err = db.PrepareContext(ctx, getInvoicesByOrder); err != nil {
+		return nil, fmt.Errorf("error preparing query GetInvoicesByOrder: %w", err)
 	}
 	if q.getOrderStmt, err = db.PrepareContext(ctx, getOrder); err != nil {
 		return nil, fmt.Errorf("error preparing query GetOrder: %w", err)
@@ -135,14 +147,23 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.listCustomersStmt, err = db.PrepareContext(ctx, listCustomers); err != nil {
 		return nil, fmt.Errorf("error preparing query ListCustomers: %w", err)
 	}
+	if q.listInvoicesByCustomerStmt, err = db.PrepareContext(ctx, listInvoicesByCustomer); err != nil {
+		return nil, fmt.Errorf("error preparing query ListInvoicesByCustomer: %w", err)
+	}
+	if q.listInvoicesByCustomerLocationStmt, err = db.PrepareContext(ctx, listInvoicesByCustomerLocation); err != nil {
+		return nil, fmt.Errorf("error preparing query ListInvoicesByCustomerLocation: %w", err)
+	}
 	if q.listLocationsByPlanogramStmt, err = db.PrepareContext(ctx, listLocationsByPlanogram); err != nil {
 		return nil, fmt.Errorf("error preparing query ListLocationsByPlanogram: %w", err)
 	}
 	if q.listOrderItemsByOrderIDStmt, err = db.PrepareContext(ctx, listOrderItemsByOrderID); err != nil {
 		return nil, fmt.Errorf("error preparing query ListOrderItemsByOrderID: %w", err)
 	}
-	if q.listOrdersStmt, err = db.PrepareContext(ctx, listOrders); err != nil {
-		return nil, fmt.Errorf("error preparing query ListOrders: %w", err)
+	if q.listOrdersByCustomerStmt, err = db.PrepareContext(ctx, listOrdersByCustomer); err != nil {
+		return nil, fmt.Errorf("error preparing query ListOrdersByCustomer: %w", err)
+	}
+	if q.listOrdersOpenStmt, err = db.PrepareContext(ctx, listOrdersOpen); err != nil {
+		return nil, fmt.Errorf("error preparing query ListOrdersOpen: %w", err)
 	}
 	if q.listPlanogramsStmt, err = db.PrepareContext(ctx, listPlanograms); err != nil {
 		return nil, fmt.Errorf("error preparing query ListPlanograms: %w", err)
@@ -173,6 +194,9 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	}
 	if q.updateCustomerLocationStmt, err = db.PrepareContext(ctx, updateCustomerLocation); err != nil {
 		return nil, fmt.Errorf("error preparing query UpdateCustomerLocation: %w", err)
+	}
+	if q.updateInvoiceStmt, err = db.PrepareContext(ctx, updateInvoice); err != nil {
+		return nil, fmt.Errorf("error preparing query UpdateInvoice: %w", err)
 	}
 	if q.updateOrderStmt, err = db.PrepareContext(ctx, updateOrder); err != nil {
 		return nil, fmt.Errorf("error preparing query UpdateOrder: %w", err)
@@ -216,6 +240,11 @@ func (q *Queries) Close() error {
 	if q.createCustomerLocationStmt != nil {
 		if cerr := q.createCustomerLocationStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing createCustomerLocationStmt: %w", cerr)
+		}
+	}
+	if q.createInvoiceStmt != nil {
+		if cerr := q.createInvoiceStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing createInvoiceStmt: %w", cerr)
 		}
 	}
 	if q.createOrderStmt != nil {
@@ -273,6 +302,11 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing deleteCustomerLocationStmt: %w", cerr)
 		}
 	}
+	if q.deleteInvoiceStmt != nil {
+		if cerr := q.deleteInvoiceStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing deleteInvoiceStmt: %w", cerr)
+		}
+	}
 	if q.deleteOrderStmt != nil {
 		if cerr := q.deleteOrderStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing deleteOrderStmt: %w", cerr)
@@ -321,6 +355,16 @@ func (q *Queries) Close() error {
 	if q.getCustomerLocationByIDStmt != nil {
 		if cerr := q.getCustomerLocationByIDStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing getCustomerLocationByIDStmt: %w", cerr)
+		}
+	}
+	if q.getInvoiceStmt != nil {
+		if cerr := q.getInvoiceStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getInvoiceStmt: %w", cerr)
+		}
+	}
+	if q.getInvoicesByOrderStmt != nil {
+		if cerr := q.getInvoicesByOrderStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getInvoicesByOrderStmt: %w", cerr)
 		}
 	}
 	if q.getOrderStmt != nil {
@@ -388,6 +432,16 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing listCustomersStmt: %w", cerr)
 		}
 	}
+	if q.listInvoicesByCustomerStmt != nil {
+		if cerr := q.listInvoicesByCustomerStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing listInvoicesByCustomerStmt: %w", cerr)
+		}
+	}
+	if q.listInvoicesByCustomerLocationStmt != nil {
+		if cerr := q.listInvoicesByCustomerLocationStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing listInvoicesByCustomerLocationStmt: %w", cerr)
+		}
+	}
 	if q.listLocationsByPlanogramStmt != nil {
 		if cerr := q.listLocationsByPlanogramStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing listLocationsByPlanogramStmt: %w", cerr)
@@ -398,9 +452,14 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing listOrderItemsByOrderIDStmt: %w", cerr)
 		}
 	}
-	if q.listOrdersStmt != nil {
-		if cerr := q.listOrdersStmt.Close(); cerr != nil {
-			err = fmt.Errorf("error closing listOrdersStmt: %w", cerr)
+	if q.listOrdersByCustomerStmt != nil {
+		if cerr := q.listOrdersByCustomerStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing listOrdersByCustomerStmt: %w", cerr)
+		}
+	}
+	if q.listOrdersOpenStmt != nil {
+		if cerr := q.listOrdersOpenStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing listOrdersOpenStmt: %w", cerr)
 		}
 	}
 	if q.listPlanogramsStmt != nil {
@@ -451,6 +510,11 @@ func (q *Queries) Close() error {
 	if q.updateCustomerLocationStmt != nil {
 		if cerr := q.updateCustomerLocationStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing updateCustomerLocationStmt: %w", cerr)
+		}
+	}
+	if q.updateInvoiceStmt != nil {
+		if cerr := q.updateInvoiceStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing updateInvoiceStmt: %w", cerr)
 		}
 	}
 	if q.updateOrderStmt != nil {
@@ -535,6 +599,7 @@ type Queries struct {
 	assignPlanogramToLocationStmt       *sql.Stmt
 	createCustomerStmt                  *sql.Stmt
 	createCustomerLocationStmt          *sql.Stmt
+	createInvoiceStmt                   *sql.Stmt
 	createOrderStmt                     *sql.Stmt
 	createOrderItemStmt                 *sql.Stmt
 	createPlanogramStmt                 *sql.Stmt
@@ -546,6 +611,7 @@ type Queries struct {
 	deleteAllUsersStmt                  *sql.Stmt
 	deleteCustomerStmt                  *sql.Stmt
 	deleteCustomerLocationStmt          *sql.Stmt
+	deleteInvoiceStmt                   *sql.Stmt
 	deleteOrderStmt                     *sql.Stmt
 	deleteOrderItemStmt                 *sql.Stmt
 	deleteOrderItemsByOrderIDStmt       *sql.Stmt
@@ -556,6 +622,8 @@ type Queries struct {
 	deleteUserStmt                      *sql.Stmt
 	getCustomerStmt                     *sql.Stmt
 	getCustomerLocationByIDStmt         *sql.Stmt
+	getInvoiceStmt                      *sql.Stmt
+	getInvoicesByOrderStmt              *sql.Stmt
 	getOrderStmt                        *sql.Stmt
 	getOrderItemStmt                    *sql.Stmt
 	getPlanogramStmt                    *sql.Stmt
@@ -569,9 +637,12 @@ type Queries struct {
 	getUserByIDStmt                     *sql.Stmt
 	listCustomerLocationsByCustomerStmt *sql.Stmt
 	listCustomersStmt                   *sql.Stmt
+	listInvoicesByCustomerStmt          *sql.Stmt
+	listInvoicesByCustomerLocationStmt  *sql.Stmt
 	listLocationsByPlanogramStmt        *sql.Stmt
 	listOrderItemsByOrderIDStmt         *sql.Stmt
-	listOrdersStmt                      *sql.Stmt
+	listOrdersByCustomerStmt            *sql.Stmt
+	listOrdersOpenStmt                  *sql.Stmt
 	listPlanogramsStmt                  *sql.Stmt
 	listPlanogramsByLocationStmt        *sql.Stmt
 	listPocketsForPlanogramStmt         *sql.Stmt
@@ -582,6 +653,7 @@ type Queries struct {
 	revokeRefreshTokenStmt              *sql.Stmt
 	updateCustomerStmt                  *sql.Stmt
 	updateCustomerLocationStmt          *sql.Stmt
+	updateInvoiceStmt                   *sql.Stmt
 	updateOrderStmt                     *sql.Stmt
 	updateOrderItemStmt                 *sql.Stmt
 	updatePlanogramStmt                 *sql.Stmt
@@ -599,6 +671,7 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		assignPlanogramToLocationStmt:       q.assignPlanogramToLocationStmt,
 		createCustomerStmt:                  q.createCustomerStmt,
 		createCustomerLocationStmt:          q.createCustomerLocationStmt,
+		createInvoiceStmt:                   q.createInvoiceStmt,
 		createOrderStmt:                     q.createOrderStmt,
 		createOrderItemStmt:                 q.createOrderItemStmt,
 		createPlanogramStmt:                 q.createPlanogramStmt,
@@ -610,6 +683,7 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		deleteAllUsersStmt:                  q.deleteAllUsersStmt,
 		deleteCustomerStmt:                  q.deleteCustomerStmt,
 		deleteCustomerLocationStmt:          q.deleteCustomerLocationStmt,
+		deleteInvoiceStmt:                   q.deleteInvoiceStmt,
 		deleteOrderStmt:                     q.deleteOrderStmt,
 		deleteOrderItemStmt:                 q.deleteOrderItemStmt,
 		deleteOrderItemsByOrderIDStmt:       q.deleteOrderItemsByOrderIDStmt,
@@ -620,6 +694,8 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		deleteUserStmt:                      q.deleteUserStmt,
 		getCustomerStmt:                     q.getCustomerStmt,
 		getCustomerLocationByIDStmt:         q.getCustomerLocationByIDStmt,
+		getInvoiceStmt:                      q.getInvoiceStmt,
+		getInvoicesByOrderStmt:              q.getInvoicesByOrderStmt,
 		getOrderStmt:                        q.getOrderStmt,
 		getOrderItemStmt:                    q.getOrderItemStmt,
 		getPlanogramStmt:                    q.getPlanogramStmt,
@@ -633,9 +709,12 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		getUserByIDStmt:                     q.getUserByIDStmt,
 		listCustomerLocationsByCustomerStmt: q.listCustomerLocationsByCustomerStmt,
 		listCustomersStmt:                   q.listCustomersStmt,
+		listInvoicesByCustomerStmt:          q.listInvoicesByCustomerStmt,
+		listInvoicesByCustomerLocationStmt:  q.listInvoicesByCustomerLocationStmt,
 		listLocationsByPlanogramStmt:        q.listLocationsByPlanogramStmt,
 		listOrderItemsByOrderIDStmt:         q.listOrderItemsByOrderIDStmt,
-		listOrdersStmt:                      q.listOrdersStmt,
+		listOrdersByCustomerStmt:            q.listOrdersByCustomerStmt,
+		listOrdersOpenStmt:                  q.listOrdersOpenStmt,
 		listPlanogramsStmt:                  q.listPlanogramsStmt,
 		listPlanogramsByLocationStmt:        q.listPlanogramsByLocationStmt,
 		listPocketsForPlanogramStmt:         q.listPocketsForPlanogramStmt,
@@ -646,6 +725,7 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		revokeRefreshTokenStmt:              q.revokeRefreshTokenStmt,
 		updateCustomerStmt:                  q.updateCustomerStmt,
 		updateCustomerLocationStmt:          q.updateCustomerLocationStmt,
+		updateInvoiceStmt:                   q.updateInvoiceStmt,
 		updateOrderStmt:                     q.updateOrderStmt,
 		updateOrderItemStmt:                 q.updateOrderItemStmt,
 		updatePlanogramStmt:                 q.updatePlanogramStmt,

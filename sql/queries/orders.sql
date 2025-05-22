@@ -3,9 +3,16 @@ SELECT *
 FROM orders
 WHERE id = $1;
 
--- name: ListOrders :many
+-- name: ListOrdersOpen :many
 SELECT *
 FROM orders
+WHERE status = 'Open'
+ORDER BY order_date DESC;
+
+-- name: ListOrdersByCustomer :many
+SELECT *
+FROM orders
+WHERE customer_id = $1
 ORDER BY order_date DESC;
 
 -- name: CreateOrder :one
