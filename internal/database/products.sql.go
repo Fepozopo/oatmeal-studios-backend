@@ -145,12 +145,147 @@ func (q *Queries) GetProductBySKU(ctx context.Context, sku string) (Product, err
 	return i, err
 }
 
-const listProducts = `-- name: ListProducts :many
-SELECT id, created_at, updated_at, type, sku, upc, status, cost, price, envelope, artist, category, release_date, last_bought_date, description, text_front, text_inside FROM products ORDER BY created_at DESC
+const listProductsByArtist = `-- name: ListProductsByArtist :many
+SELECT id, created_at, updated_at, type, sku, upc, status, cost, price, envelope, artist, category, release_date, last_bought_date, description, text_front, text_inside FROM products WHERE artist = $1 ORDER BY sku ASC
 `
 
-func (q *Queries) ListProducts(ctx context.Context) ([]Product, error) {
-	rows, err := q.query(ctx, q.listProductsStmt, listProducts)
+func (q *Queries) ListProductsByArtist(ctx context.Context, artist sql.NullString) ([]Product, error) {
+	rows, err := q.query(ctx, q.listProductsByArtistStmt, listProductsByArtist, artist)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Product
+	for rows.Next() {
+		var i Product
+		if err := rows.Scan(
+			&i.ID,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.Type,
+			&i.Sku,
+			&i.Upc,
+			&i.Status,
+			&i.Cost,
+			&i.Price,
+			&i.Envelope,
+			&i.Artist,
+			&i.Category,
+			&i.ReleaseDate,
+			&i.LastBoughtDate,
+			&i.Description,
+			&i.TextFront,
+			&i.TextInside,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listProductsByCategory = `-- name: ListProductsByCategory :many
+SELECT id, created_at, updated_at, type, sku, upc, status, cost, price, envelope, artist, category, release_date, last_bought_date, description, text_front, text_inside FROM products WHERE category = $1 ORDER BY sku ASC
+`
+
+func (q *Queries) ListProductsByCategory(ctx context.Context, category sql.NullString) ([]Product, error) {
+	rows, err := q.query(ctx, q.listProductsByCategoryStmt, listProductsByCategory, category)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Product
+	for rows.Next() {
+		var i Product
+		if err := rows.Scan(
+			&i.ID,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.Type,
+			&i.Sku,
+			&i.Upc,
+			&i.Status,
+			&i.Cost,
+			&i.Price,
+			&i.Envelope,
+			&i.Artist,
+			&i.Category,
+			&i.ReleaseDate,
+			&i.LastBoughtDate,
+			&i.Description,
+			&i.TextFront,
+			&i.TextInside,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listProductsByStatus = `-- name: ListProductsByStatus :many
+SELECT id, created_at, updated_at, type, sku, upc, status, cost, price, envelope, artist, category, release_date, last_bought_date, description, text_front, text_inside FROM products WHERE status = $1 ORDER BY sku ASC
+`
+
+func (q *Queries) ListProductsByStatus(ctx context.Context, status string) ([]Product, error) {
+	rows, err := q.query(ctx, q.listProductsByStatusStmt, listProductsByStatus, status)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Product
+	for rows.Next() {
+		var i Product
+		if err := rows.Scan(
+			&i.ID,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.Type,
+			&i.Sku,
+			&i.Upc,
+			&i.Status,
+			&i.Cost,
+			&i.Price,
+			&i.Envelope,
+			&i.Artist,
+			&i.Category,
+			&i.ReleaseDate,
+			&i.LastBoughtDate,
+			&i.Description,
+			&i.TextFront,
+			&i.TextInside,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listProductsByType = `-- name: ListProductsByType :many
+SELECT id, created_at, updated_at, type, sku, upc, status, cost, price, envelope, artist, category, release_date, last_bought_date, description, text_front, text_inside FROM products WHERE type = $1 ORDER BY sku ASC
+`
+
+func (q *Queries) ListProductsByType(ctx context.Context, type_ string) ([]Product, error) {
+	rows, err := q.query(ctx, q.listProductsByTypeStmt, listProductsByType, type_)
 	if err != nil {
 		return nil, err
 	}

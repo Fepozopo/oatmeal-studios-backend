@@ -12,8 +12,17 @@ SELECT * FROM products WHERE id = $1;
 -- name: GetProductBySKU :one
 SELECT * FROM products WHERE sku = $1;
 
--- name: ListProducts :many
-SELECT * FROM products ORDER BY created_at DESC;
+-- name: ListProductsByType :many
+SELECT * FROM products WHERE type = $1 ORDER BY sku ASC;
+
+-- name: ListProductsByCategory :many
+SELECT * FROM products WHERE category = $1 ORDER BY sku ASC;
+
+-- name: ListProductsByArtist :many
+SELECT * FROM products WHERE artist = $1 ORDER BY sku ASC;
+
+-- name: ListProductsByStatus :many
+SELECT * FROM products WHERE status = $1 ORDER BY sku ASC;
 
 -- name: UpdateProduct :one
 UPDATE products SET
