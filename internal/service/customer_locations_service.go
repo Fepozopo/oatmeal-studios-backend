@@ -10,6 +10,28 @@ import (
 	"github.com/Fepozopo/oatmeal-studios-backend/internal/database"
 )
 
+type AddCustomerLocationInput struct {
+	CustomerID int32  `json:"customer_id"`
+	Address1   string `json:"address_1"`
+	Address2   string `json:"address_2,omitempty"`
+	City       string `json:"city"`
+	State      string `json:"state"`
+	ZipCode    string `json:"zip_code"`
+	Phone      string `json:"phone,omitempty"`
+	Notes      string `json:"notes,omitempty"`
+}
+
+type UpdateCustomerLocationInput struct {
+	ID       int32  `json:"id"`
+	Address1 string `json:"address_1"`
+	Address2 string `json:"address_2,omitempty"`
+	City     string `json:"city"`
+	State    string `json:"state"`
+	ZipCode  string `json:"zip_code"`
+	Phone    string `json:"phone,omitempty"`
+	Notes    string `json:"notes,omitempty"`
+}
+
 // AddCustomerLocation adds a new customer location and returns the created location.
 func AddCustomerLocation(ctx context.Context, db *database.Queries, input AddCustomerLocationInput) (*database.CustomerLocation, error) {
 	// Check if the input is valid
