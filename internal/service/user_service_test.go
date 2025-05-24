@@ -1,6 +1,7 @@
 package service
 
 import (
+	"errors"
 	"regexp"
 	"testing"
 	"time"
@@ -253,5 +254,93 @@ func TestUpdateUserPassword_InvalidOldPassword(t *testing.T) {
 	expectedError := "invalid old password: crypto/bcrypt: hashedPassword is not the hash of the given password"
 	if err != nil && err.Error() != expectedError {
 		t.Errorf("expected error '%s', got '%s'", expectedError, err.Error())
+	}
+}
+
+// --- DeleteUser ---
+func TestDeleteUser_Success(t *testing.T) {
+	dbQueries, mock := newTestDB(t)
+	ctx := newTestContext()
+	defer func() {
+		if err := mock.ExpectationsWereMet(); err != nil {
+			t.Errorf("there were unfulfilled expectations: %s", err)
+		}
+	}()
+
+	userID := uuid.New()
+	mock.ExpectExec(regexp.QuoteMeta(`DELETE FROM users WHERE id = $1`)).
+		WithArgs(userID).
+		WillReturnResult(sqlmock.NewResult(0, 1))
+
+	err := DeleteUser(ctx, dbQueries, userID)
+	if err != nil {
+		t.Errorf("DeleteUser returned an error: %v", err)
+	}
+}
+
+func TestDeleteUser_InvalidID(t *testing.T) {
+	dbQueries, _ := newTestDB(t)
+	ctx := newTestContext()
+
+	err := DeleteUser(ctx, dbQueries, uuid.Nil)
+	if err == nil {
+		t.Errorf("DeleteUser should have returned an error for missing user ID")
+	}
+}
+
+func TestDeleteUser_DBError(t *testing.T) {
+	dbQueries, mock := newTestDB(t)
+	ctx := newTestContext()
+	defer func() {
+		if err := mock.ExpectationsWereMet(); err != nil {
+			t.Errorf("there were unfulfilled expectations: %s", err)
+		}
+	}()
+
+	userID := uuid.New()
+	mock.ExpectExec(regexp.QuoteMeta(`DELETE FROM users WHERE id = $1`)).
+		WithArgs(userID).
+		WillReturnError(errors.New("db error"))
+
+	err := DeleteUser(ctx, dbQueries, userID)
+	if err == nil {
+		t.Errorf("DeleteUser should have returned an error on DB failure")
+	}
+}
+
+// --- DeleteAllUsers ---
+func TestDeleteAllUsers_Success(t *testing.T) {
+	dbQueries, mock := newTestDB(t)
+	ctx := newTestContext()
+	defer func() {
+		if err := mock.ExpectationsWereMet(); err != nil {
+			t.Errorf("there were unfulfilled expectations: %s", err)
+		}
+	}()
+
+	mock.ExpectExec(regexp.QuoteMeta(`DELETE FROM users`)).
+		WillReturnResult(sqlmock.NewResult(0, 1))
+
+	err := DeleteAllUsers(ctx, dbQueries)
+	if err != nil {
+		t.Errorf("DeleteAllUsers returned an error: %v", err)
+	}
+}
+
+func TestDeleteAllUsers_DBError(t *testing.T) {
+	dbQueries, mock := newTestDB(t)
+	ctx := newTestContext()
+	defer func() {
+		if err := mock.ExpectationsWereMet(); err != nil {
+			t.Errorf("there were unfulfilled expectations: %s", err)
+		}
+	}()
+
+	mock.ExpectExec(regexp.QuoteMeta(`DELETE FROM users`)).
+		WillReturnError(errors.New("db error"))
+
+	err := DeleteAllUsers(ctx, dbQueries)
+	if err == nil {
+		t.Errorf("DeleteAllUsers should have returned an error on DB failure")
 	}
 }

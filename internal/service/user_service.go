@@ -147,3 +147,22 @@ func UpdateUserPassword(ctx context.Context, db *database.Queries, input UpdateU
 
 	return nil
 }
+
+// DeleteUser deletes a user by their ID.
+func DeleteUser(ctx context.Context, db *database.Queries, userID uuid.UUID) error {
+	if userID == uuid.Nil {
+		return errors.New("user ID is required")
+	}
+	if err := db.DeleteUser(ctx, userID); err != nil {
+		return fmt.Errorf("failed to delete user: %w", err)
+	}
+	return nil
+}
+
+// DeleteAllUsers deletes all users from the database.
+func DeleteAllUsers(ctx context.Context, db *database.Queries) error {
+	if err := db.DeleteAllUsers(ctx); err != nil {
+		return fmt.Errorf("failed to delete all users: %w", err)
+	}
+	return nil
+}
