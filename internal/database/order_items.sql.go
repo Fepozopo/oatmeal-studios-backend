@@ -11,14 +11,14 @@ import (
 )
 
 const createOrderItem = `-- name: CreateOrderItem :one
-INSERT INTO order_items (order_id, item, quantity, price, discount, item_total, pocket_number)
+INSERT INTO order_items (order_id, sku, quantity, price, discount, item_total, pocket_number)
 VALUES ($1, $2, $3, $4, $5, $6, $7)
-RETURNING id, order_id, item, quantity, price, discount, item_total, pocket_number
+RETURNING id, order_id, sku, quantity, price, discount, item_total, pocket_number
 `
 
 type CreateOrderItemParams struct {
 	OrderID      int32         `json:"order_id"`
-	Item         string        `json:"item"`
+	Sku          string        `json:"sku"`
 	Quantity     int32         `json:"quantity"`
 	Price        float64       `json:"price"`
 	Discount     float64       `json:"discount"`
@@ -29,7 +29,7 @@ type CreateOrderItemParams struct {
 func (q *Queries) CreateOrderItem(ctx context.Context, arg CreateOrderItemParams) (OrderItem, error) {
 	row := q.queryRow(ctx, q.createOrderItemStmt, createOrderItem,
 		arg.OrderID,
-		arg.Item,
+		arg.Sku,
 		arg.Quantity,
 		arg.Price,
 		arg.Discount,
@@ -40,7 +40,7 @@ func (q *Queries) CreateOrderItem(ctx context.Context, arg CreateOrderItemParams
 	err := row.Scan(
 		&i.ID,
 		&i.OrderID,
-		&i.Item,
+		&i.Sku,
 		&i.Quantity,
 		&i.Price,
 		&i.Discount,
@@ -71,7 +71,7 @@ func (q *Queries) DeleteOrderItemsByOrderID(ctx context.Context, orderID int32) 
 }
 
 const getOrderItem = `-- name: GetOrderItem :one
-SELECT id, order_id, item, quantity, price, discount, item_total, pocket_number
+SELECT id, order_id, sku, quantity, price, discount, item_total, pocket_number
 FROM order_items
 WHERE id = $1
 `
@@ -82,7 +82,7 @@ func (q *Queries) GetOrderItem(ctx context.Context, id int32) (OrderItem, error)
 	err := row.Scan(
 		&i.ID,
 		&i.OrderID,
-		&i.Item,
+		&i.Sku,
 		&i.Quantity,
 		&i.Price,
 		&i.Discount,
@@ -92,14 +92,14 @@ func (q *Queries) GetOrderItem(ctx context.Context, id int32) (OrderItem, error)
 	return i, err
 }
 
-const listOrderItemsByOrderID = `-- name: ListOrderItemsByOrderID :many
-SELECT id, order_id, item, quantity, price, discount, item_total, pocket_number
+const listOrderItemsBySKU = `-- name: ListOrderItemsBySKU :many
+SELECT id, order_id, sku, quantity, price, discount, item_total, pocket_number
 FROM order_items
-WHERE order_id = $1
+WHERE sku = $1
 `
 
-func (q *Queries) ListOrderItemsByOrderID(ctx context.Context, orderID int32) ([]OrderItem, error) {
-	rows, err := q.query(ctx, q.listOrderItemsByOrderIDStmt, listOrderItemsByOrderID, orderID)
+func (q *Queries) ListOrderItemsBySKU(ctx context.Context, sku string) ([]OrderItem, error) {
+	rows, err := q.query(ctx, q.listOrderItemsBySKUStmt, listOrderItemsBySKU, sku)
 	if err != nil {
 		return nil, err
 	}
@@ -110,7 +110,7 @@ func (q *Queries) ListOrderItemsByOrderID(ctx context.Context, orderID int32) ([
 		if err := rows.Scan(
 			&i.ID,
 			&i.OrderID,
-			&i.Item,
+			&i.Sku,
 			&i.Quantity,
 			&i.Price,
 			&i.Discount,
@@ -132,19 +132,19 @@ func (q *Queries) ListOrderItemsByOrderID(ctx context.Context, orderID int32) ([
 
 const updateOrderItem = `-- name: UpdateOrderItem :one
 UPDATE order_items
-SET item = $2,
+SET sku = $2,
     quantity = $3,
     price = $4,
     discount = $5,
     item_total = $6,
     pocket_number = $7
 WHERE id = $1
-RETURNING id, order_id, item, quantity, price, discount, item_total, pocket_number
+RETURNING id, order_id, sku, quantity, price, discount, item_total, pocket_number
 `
 
 type UpdateOrderItemParams struct {
 	ID           int32         `json:"id"`
-	Item         string        `json:"item"`
+	Sku          string        `json:"sku"`
 	Quantity     int32         `json:"quantity"`
 	Price        float64       `json:"price"`
 	Discount     float64       `json:"discount"`
@@ -155,7 +155,7 @@ type UpdateOrderItemParams struct {
 func (q *Queries) UpdateOrderItem(ctx context.Context, arg UpdateOrderItemParams) (OrderItem, error) {
 	row := q.queryRow(ctx, q.updateOrderItemStmt, updateOrderItem,
 		arg.ID,
-		arg.Item,
+		arg.Sku,
 		arg.Quantity,
 		arg.Price,
 		arg.Discount,
@@ -166,7 +166,7 @@ func (q *Queries) UpdateOrderItem(ctx context.Context, arg UpdateOrderItemParams
 	err := row.Scan(
 		&i.ID,
 		&i.OrderID,
-		&i.Item,
+		&i.Sku,
 		&i.Quantity,
 		&i.Price,
 		&i.Discount,

@@ -3,19 +3,19 @@ SELECT *
 FROM order_items
 WHERE id = $1;
 
--- name: ListOrderItemsByOrderID :many
+-- name: ListOrderItemsBySKU :many
 SELECT *
 FROM order_items
-WHERE order_id = $1;
+WHERE sku = $1;
 
 -- name: CreateOrderItem :one
-INSERT INTO order_items (order_id, item, quantity, price, discount, item_total, pocket_number)
+INSERT INTO order_items (order_id, sku, quantity, price, discount, item_total, pocket_number)
 VALUES ($1, $2, $3, $4, $5, $6, $7)
 RETURNING *;
 
 -- name: UpdateOrderItem :one
 UPDATE order_items
-SET item = $2,
+SET sku = $2,
     quantity = $3,
     price = $4,
     discount = $5,

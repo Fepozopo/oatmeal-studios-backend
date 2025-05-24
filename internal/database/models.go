@@ -80,7 +80,7 @@ type Order struct {
 type OrderItem struct {
 	ID           int32         `json:"id"`
 	OrderID      int32         `json:"order_id"`
-	Item         string        `json:"item"`
+	Sku          string        `json:"sku"`
 	Quantity     int32         `json:"quantity"`
 	Price        float64       `json:"price"`
 	Discount     float64       `json:"discount"`

@@ -156,8 +156,8 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.listLocationsByPlanogramStmt, err = db.PrepareContext(ctx, listLocationsByPlanogram); err != nil {
 		return nil, fmt.Errorf("error preparing query ListLocationsByPlanogram: %w", err)
 	}
-	if q.listOrderItemsByOrderIDStmt, err = db.PrepareContext(ctx, listOrderItemsByOrderID); err != nil {
-		return nil, fmt.Errorf("error preparing query ListOrderItemsByOrderID: %w", err)
+	if q.listOrderItemsBySKUStmt, err = db.PrepareContext(ctx, listOrderItemsBySKU); err != nil {
+		return nil, fmt.Errorf("error preparing query ListOrderItemsBySKU: %w", err)
 	}
 	if q.listOrdersByCustomerStmt, err = db.PrepareContext(ctx, listOrdersByCustomer); err != nil {
 		return nil, fmt.Errorf("error preparing query ListOrdersByCustomer: %w", err)
@@ -456,9 +456,9 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing listLocationsByPlanogramStmt: %w", cerr)
 		}
 	}
-	if q.listOrderItemsByOrderIDStmt != nil {
-		if cerr := q.listOrderItemsByOrderIDStmt.Close(); cerr != nil {
-			err = fmt.Errorf("error closing listOrderItemsByOrderIDStmt: %w", cerr)
+	if q.listOrderItemsBySKUStmt != nil {
+		if cerr := q.listOrderItemsBySKUStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing listOrderItemsBySKUStmt: %w", cerr)
 		}
 	}
 	if q.listOrdersByCustomerStmt != nil {
@@ -664,7 +664,7 @@ type Queries struct {
 	listInvoicesByCustomerStmt          *sql.Stmt
 	listInvoicesByCustomerLocationStmt  *sql.Stmt
 	listLocationsByPlanogramStmt        *sql.Stmt
-	listOrderItemsByOrderIDStmt         *sql.Stmt
+	listOrderItemsBySKUStmt             *sql.Stmt
 	listOrdersByCustomerStmt            *sql.Stmt
 	listOrdersOpenStmt                  *sql.Stmt
 	listPlanogramsStmt                  *sql.Stmt
@@ -739,7 +739,7 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		listInvoicesByCustomerStmt:          q.listInvoicesByCustomerStmt,
 		listInvoicesByCustomerLocationStmt:  q.listInvoicesByCustomerLocationStmt,
 		listLocationsByPlanogramStmt:        q.listLocationsByPlanogramStmt,
-		listOrderItemsByOrderIDStmt:         q.listOrderItemsByOrderIDStmt,
+		listOrderItemsBySKUStmt:             q.listOrderItemsBySKUStmt,
 		listOrdersByCustomerStmt:            q.listOrdersByCustomerStmt,
 		listOrdersOpenStmt:                  q.listOrdersOpenStmt,
 		listPlanogramsStmt:                  q.listPlanogramsStmt,
