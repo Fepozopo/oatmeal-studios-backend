@@ -60,16 +60,6 @@ func (q *Queries) DeleteOrderItem(ctx context.Context, id int32) error {
 	return err
 }
 
-const deleteOrderItemsByOrderID = `-- name: DeleteOrderItemsByOrderID :exec
-DELETE FROM order_items
-WHERE order_id = $1
-`
-
-func (q *Queries) DeleteOrderItemsByOrderID(ctx context.Context, orderID int32) error {
-	_, err := q.exec(ctx, q.deleteOrderItemsByOrderIDStmt, deleteOrderItemsByOrderID, orderID)
-	return err
-}
-
 const getOrderItem = `-- name: GetOrderItem :one
 SELECT id, order_id, sku, quantity, price, discount, item_total, pocket_number
 FROM order_items

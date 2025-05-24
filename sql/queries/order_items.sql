@@ -27,7 +27,3 @@ RETURNING *;
 -- name: DeleteOrderItem :exec
 DELETE FROM order_items
 WHERE id = $1;
-
--- name: DeleteOrderItemsByOrderID :exec
-DELETE FROM order_items
-WHERE order_id = $1;

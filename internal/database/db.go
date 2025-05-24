@@ -78,9 +78,6 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.deleteOrderItemStmt, err = db.PrepareContext(ctx, deleteOrderItem); err != nil {
 		return nil, fmt.Errorf("error preparing query DeleteOrderItem: %w", err)
 	}
-	if q.deleteOrderItemsByOrderIDStmt, err = db.PrepareContext(ctx, deleteOrderItemsByOrderID); err != nil {
-		return nil, fmt.Errorf("error preparing query DeleteOrderItemsByOrderID: %w", err)
-	}
 	if q.deletePlanogramStmt, err = db.PrepareContext(ctx, deletePlanogram); err != nil {
 		return nil, fmt.Errorf("error preparing query DeletePlanogram: %w", err)
 	}
@@ -324,11 +321,6 @@ func (q *Queries) Close() error {
 	if q.deleteOrderItemStmt != nil {
 		if cerr := q.deleteOrderItemStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing deleteOrderItemStmt: %w", cerr)
-		}
-	}
-	if q.deleteOrderItemsByOrderIDStmt != nil {
-		if cerr := q.deleteOrderItemsByOrderIDStmt.Close(); cerr != nil {
-			err = fmt.Errorf("error closing deleteOrderItemsByOrderIDStmt: %w", cerr)
 		}
 	}
 	if q.deletePlanogramStmt != nil {
@@ -638,7 +630,6 @@ type Queries struct {
 	deleteInvoiceStmt                   *sql.Stmt
 	deleteOrderStmt                     *sql.Stmt
 	deleteOrderItemStmt                 *sql.Stmt
-	deleteOrderItemsByOrderIDStmt       *sql.Stmt
 	deletePlanogramStmt                 *sql.Stmt
 	deletePlanogramPocketStmt           *sql.Stmt
 	deleteProductStmt                   *sql.Stmt
@@ -713,7 +704,6 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		deleteInvoiceStmt:                   q.deleteInvoiceStmt,
 		deleteOrderStmt:                     q.deleteOrderStmt,
 		deleteOrderItemStmt:                 q.deleteOrderItemStmt,
-		deleteOrderItemsByOrderIDStmt:       q.deleteOrderItemsByOrderIDStmt,
 		deletePlanogramStmt:                 q.deletePlanogramStmt,
 		deletePlanogramPocketStmt:           q.deletePlanogramPocketStmt,
 		deleteProductStmt:                   q.deleteProductStmt,
