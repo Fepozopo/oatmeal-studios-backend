@@ -123,6 +123,9 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.getPlanogramPocketByNumberStmt, err = db.PrepareContext(ctx, getPlanogramPocketByNumber); err != nil {
 		return nil, fmt.Errorf("error preparing query GetPlanogramPocketByNumber: %w", err)
 	}
+	if q.getPlanogramsByLocationStmt, err = db.PrepareContext(ctx, getPlanogramsByLocation); err != nil {
+		return nil, fmt.Errorf("error preparing query GetPlanogramsByLocation: %w", err)
+	}
 	if q.getProductByIDStmt, err = db.PrepareContext(ctx, getProductByID); err != nil {
 		return nil, fmt.Errorf("error preparing query GetProductByID: %w", err)
 	}
@@ -167,9 +170,6 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	}
 	if q.listPlanogramsStmt, err = db.PrepareContext(ctx, listPlanograms); err != nil {
 		return nil, fmt.Errorf("error preparing query ListPlanograms: %w", err)
-	}
-	if q.listPlanogramsByLocationStmt, err = db.PrepareContext(ctx, listPlanogramsByLocation); err != nil {
-		return nil, fmt.Errorf("error preparing query ListPlanogramsByLocation: %w", err)
 	}
 	if q.listPocketsForPlanogramStmt, err = db.PrepareContext(ctx, listPocketsForPlanogram); err != nil {
 		return nil, fmt.Errorf("error preparing query ListPocketsForPlanogram: %w", err)
@@ -401,6 +401,11 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing getPlanogramPocketByNumberStmt: %w", cerr)
 		}
 	}
+	if q.getPlanogramsByLocationStmt != nil {
+		if cerr := q.getPlanogramsByLocationStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getPlanogramsByLocationStmt: %w", cerr)
+		}
+	}
 	if q.getProductByIDStmt != nil {
 		if cerr := q.getProductByIDStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing getProductByIDStmt: %w", cerr)
@@ -474,11 +479,6 @@ func (q *Queries) Close() error {
 	if q.listPlanogramsStmt != nil {
 		if cerr := q.listPlanogramsStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing listPlanogramsStmt: %w", cerr)
-		}
-	}
-	if q.listPlanogramsByLocationStmt != nil {
-		if cerr := q.listPlanogramsByLocationStmt.Close(); cerr != nil {
-			err = fmt.Errorf("error closing listPlanogramsByLocationStmt: %w", cerr)
 		}
 	}
 	if q.listPocketsForPlanogramStmt != nil {
@@ -653,6 +653,7 @@ type Queries struct {
 	getPlanogramStmt                    *sql.Stmt
 	getPlanogramPocketStmt              *sql.Stmt
 	getPlanogramPocketByNumberStmt      *sql.Stmt
+	getPlanogramsByLocationStmt         *sql.Stmt
 	getProductByIDStmt                  *sql.Stmt
 	getProductBySKUStmt                 *sql.Stmt
 	getRefreshTokenStmt                 *sql.Stmt
@@ -668,7 +669,6 @@ type Queries struct {
 	listOrdersByCustomerStmt            *sql.Stmt
 	listOrdersOpenStmt                  *sql.Stmt
 	listPlanogramsStmt                  *sql.Stmt
-	listPlanogramsByLocationStmt        *sql.Stmt
 	listPocketsForPlanogramStmt         *sql.Stmt
 	listProductsByArtistStmt            *sql.Stmt
 	listProductsByCategoryStmt          *sql.Stmt
@@ -728,6 +728,7 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		getPlanogramStmt:                    q.getPlanogramStmt,
 		getPlanogramPocketStmt:              q.getPlanogramPocketStmt,
 		getPlanogramPocketByNumberStmt:      q.getPlanogramPocketByNumberStmt,
+		getPlanogramsByLocationStmt:         q.getPlanogramsByLocationStmt,
 		getProductByIDStmt:                  q.getProductByIDStmt,
 		getProductBySKUStmt:                 q.getProductBySKUStmt,
 		getRefreshTokenStmt:                 q.getRefreshTokenStmt,
@@ -743,7 +744,6 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		listOrdersByCustomerStmt:            q.listOrdersByCustomerStmt,
 		listOrdersOpenStmt:                  q.listOrdersOpenStmt,
 		listPlanogramsStmt:                  q.listPlanogramsStmt,
-		listPlanogramsByLocationStmt:        q.listPlanogramsByLocationStmt,
 		listPocketsForPlanogramStmt:         q.listPocketsForPlanogramStmt,
 		listProductsByArtistStmt:            q.listProductsByArtistStmt,
 		listProductsByCategoryStmt:          q.listProductsByCategoryStmt,

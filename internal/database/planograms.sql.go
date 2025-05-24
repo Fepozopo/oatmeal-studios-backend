@@ -105,11 +105,9 @@ func (q *Queries) DeletePlanogramPocket(ctx context.Context, id int32) error {
 }
 
 const getPlanogram = `-- name: GetPlanogram :one
-
 SELECT id, name, num_pockets, notes, created_at, updated_at FROM planograms WHERE id = $1
 `
 
-// filepath: sql/queries/planograms.sql
 func (q *Queries) GetPlanogram(ctx context.Context, id int32) (Planogram, error) {
 	row := q.queryRow(ctx, q.getPlanogramStmt, getPlanogram, id)
 	var i Planogram
@@ -163,6 +161,27 @@ func (q *Queries) GetPlanogramPocketByNumber(ctx context.Context, arg GetPlanogr
 	return i, err
 }
 
+const getPlanogramsByLocation = `-- name: GetPlanogramsByLocation :one
+SELECT p.id, p.name, p.num_pockets, p.notes, p.created_at, p.updated_at
+FROM planograms p
+JOIN planogram_customer_locations pcl ON p.id = pcl.planogram_id
+WHERE pcl.customer_location_id = $1
+`
+
+func (q *Queries) GetPlanogramsByLocation(ctx context.Context, customerLocationID int32) (Planogram, error) {
+	row := q.queryRow(ctx, q.getPlanogramsByLocationStmt, getPlanogramsByLocation, customerLocationID)
+	var i Planogram
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.NumPockets,
+		&i.Notes,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
 const listLocationsByPlanogram = `-- name: ListLocationsByPlanogram :many
 SELECT cl.id, cl.customer_id, cl.address_1, cl.address_2, cl.city, cl.state, cl.zip_code, cl.phone, cl.notes, cl.created_at, cl.updated_at
 FROM customer_locations cl
@@ -212,44 +231,6 @@ SELECT id, name, num_pockets, notes, created_at, updated_at FROM planograms ORDE
 
 func (q *Queries) ListPlanograms(ctx context.Context) ([]Planogram, error) {
 	rows, err := q.query(ctx, q.listPlanogramsStmt, listPlanograms)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []Planogram
-	for rows.Next() {
-		var i Planogram
-		if err := rows.Scan(
-			&i.ID,
-			&i.Name,
-			&i.NumPockets,
-			&i.Notes,
-			&i.CreatedAt,
-			&i.UpdatedAt,
-		); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
-const listPlanogramsByLocation = `-- name: ListPlanogramsByLocation :many
-SELECT p.id, p.name, p.num_pockets, p.notes, p.created_at, p.updated_at
-FROM planograms p
-JOIN planogram_customer_locations pcl ON p.id = pcl.planogram_id
-WHERE pcl.customer_location_id = $1
-ORDER BY p.created_at DESC
-`
-
-func (q *Queries) ListPlanogramsByLocation(ctx context.Context, customerLocationID int32) ([]Planogram, error) {
-	rows, err := q.query(ctx, q.listPlanogramsByLocationStmt, listPlanogramsByLocation, customerLocationID)
 	if err != nil {
 		return nil, err
 	}

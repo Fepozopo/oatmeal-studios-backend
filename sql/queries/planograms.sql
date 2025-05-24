@@ -1,5 +1,3 @@
--- filepath: sql/queries/planograms.sql
-
 -- name: GetPlanogram :one
 SELECT * FROM planograms WHERE id = $1;
 
@@ -33,12 +31,11 @@ RETURNING *;
 DELETE FROM planogram_customer_locations
 WHERE planogram_id = $1 AND customer_location_id = $2;
 
--- name: ListPlanogramsByLocation :many
+-- name: GetPlanogramsByLocation :one
 SELECT p.*
 FROM planograms p
 JOIN planogram_customer_locations pcl ON p.id = pcl.planogram_id
-WHERE pcl.customer_location_id = $1
-ORDER BY p.created_at DESC;
+WHERE pcl.customer_location_id = $1;
 
 -- name: ListLocationsByPlanogram :many
 SELECT cl.*
