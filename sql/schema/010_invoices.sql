@@ -6,7 +6,7 @@ CREATE TABLE invoices (
     invoice_date TIMESTAMP NOT NULL DEFAULT NOW(),
     order_id INT NOT NULL,
     customer_id INT NOT NULL,
-    customer_location_id INT,
+    customer_location_id INT NOT NULL,
     due_date TIMESTAMP NOT NULL,
     status VARCHAR(50) NOT NULL,
     total FLOAT NOT NULL,

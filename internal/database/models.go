@@ -46,16 +46,16 @@ type CustomerLocation struct {
 }
 
 type Invoice struct {
-	ID                 int32         `json:"id"`
-	CreatedAt          time.Time     `json:"created_at"`
-	UpdatedAt          time.Time     `json:"updated_at"`
-	InvoiceDate        time.Time     `json:"invoice_date"`
-	OrderID            int32         `json:"order_id"`
-	CustomerID         int32         `json:"customer_id"`
-	CustomerLocationID sql.NullInt32 `json:"customer_location_id"`
-	DueDate            time.Time     `json:"due_date"`
-	Status             string        `json:"status"`
-	Total              float64       `json:"total"`
+	ID                 int32     `json:"id"`
+	CreatedAt          time.Time `json:"created_at"`
+	UpdatedAt          time.Time `json:"updated_at"`
+	InvoiceDate        time.Time `json:"invoice_date"`
+	OrderID            int32     `json:"order_id"`
+	CustomerID         int32     `json:"customer_id"`
+	CustomerLocationID int32     `json:"customer_location_id"`
+	DueDate            time.Time `json:"due_date"`
+	Status             string    `json:"status"`
+	Total              float64   `json:"total"`
 }
 
 type Order struct {

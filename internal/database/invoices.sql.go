@@ -7,7 +7,6 @@ package database
 
 import (
 	"context"
-	"database/sql"
 	"time"
 )
 
@@ -18,13 +17,13 @@ RETURNING id, created_at, updated_at, invoice_date, order_id, customer_id, custo
 `
 
 type CreateInvoiceParams struct {
-	InvoiceDate        time.Time     `json:"invoice_date"`
-	OrderID            int32         `json:"order_id"`
-	CustomerID         int32         `json:"customer_id"`
-	CustomerLocationID sql.NullInt32 `json:"customer_location_id"`
-	DueDate            time.Time     `json:"due_date"`
-	Status             string        `json:"status"`
-	Total              float64       `json:"total"`
+	InvoiceDate        time.Time `json:"invoice_date"`
+	OrderID            int32     `json:"order_id"`
+	CustomerID         int32     `json:"customer_id"`
+	CustomerLocationID int32     `json:"customer_location_id"`
+	DueDate            time.Time `json:"due_date"`
+	Status             string    `json:"status"`
+	Total              float64   `json:"total"`
 }
 
 func (q *Queries) CreateInvoice(ctx context.Context, arg CreateInvoiceParams) (Invoice, error) {
@@ -159,7 +158,7 @@ WHERE customer_location_id = $1
 ORDER BY invoice_date DESC
 `
 
-func (q *Queries) ListInvoicesByCustomerLocation(ctx context.Context, customerLocationID sql.NullInt32) ([]Invoice, error) {
+func (q *Queries) ListInvoicesByCustomerLocation(ctx context.Context, customerLocationID int32) ([]Invoice, error) {
 	rows, err := q.query(ctx, q.listInvoicesByCustomerLocationStmt, listInvoicesByCustomerLocation, customerLocationID)
 	if err != nil {
 		return nil, err
@@ -208,14 +207,14 @@ RETURNING id, created_at, updated_at, invoice_date, order_id, customer_id, custo
 `
 
 type UpdateInvoiceParams struct {
-	ID                 int32         `json:"id"`
-	InvoiceDate        time.Time     `json:"invoice_date"`
-	OrderID            int32         `json:"order_id"`
-	CustomerID         int32         `json:"customer_id"`
-	CustomerLocationID sql.NullInt32 `json:"customer_location_id"`
-	DueDate            time.Time     `json:"due_date"`
-	Status             string        `json:"status"`
-	Total              float64       `json:"total"`
+	ID                 int32     `json:"id"`
+	InvoiceDate        time.Time `json:"invoice_date"`
+	OrderID            int32     `json:"order_id"`
+	CustomerID         int32     `json:"customer_id"`
+	CustomerLocationID int32     `json:"customer_location_id"`
+	DueDate            time.Time `json:"due_date"`
+	Status             string    `json:"status"`
+	Total              float64   `json:"total"`
 }
 
 func (q *Queries) UpdateInvoice(ctx context.Context, arg UpdateInvoiceParams) (Invoice, error) {
