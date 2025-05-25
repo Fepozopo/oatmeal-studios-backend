@@ -101,7 +101,7 @@ func TestUpdateSalesRep_NotFound(t *testing.T) {
 	dbQueries, mock := newTestDBSalesRep(t)
 	ctx := newTestContextSalesRep()
 
-	mock.ExpectQuery(`-- name: UpdateSalesRep :one`).WithArgs(99, "active", "Jane", "Smith", "Beta LLC", sql.NullString{String: "", Valid: false}, sql.NullString{String: "", Valid: false}, sql.NullString{String: "", Valid: false}, sql.NullString{String: "", Valid: false}, sql.NullString{String: "", Valid: false}).
+	mock.ExpectQuery(`-- name: UpdateSalesRep :one`).WithArgs(99, "Active", "Jane", "Smith", "Beta LLC", sql.NullString{String: "", Valid: false}, sql.NullString{String: "", Valid: false}, sql.NullString{String: "", Valid: false}, sql.NullString{String: "", Valid: false}, sql.NullString{String: "", Valid: false}).
 		WillReturnError(sql.ErrNoRows)
 
 	input := CreateOrUpdateSalesRepInput{
