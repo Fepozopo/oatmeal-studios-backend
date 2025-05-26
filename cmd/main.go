@@ -1,12 +1,38 @@
 package main
 
 import (
+	"database/sql"
+	"log"
 	"net/http"
+	"os"
 
 	"github.com/Fepozopo/oatmeal-studios-backend/internal/api"
+	"github.com/Fepozopo/oatmeal-studios-backend/internal/database"
+	"github.com/joho/godotenv" // godotenv for loading environment variables
+	_ "github.com/lib/pq"      // PostgreSQL driver
 )
 
 func main() {
+	// Open a connection to the database and environment variables
+	godotenv.Load()
+	tokenSecret := os.Getenv("TOKEN_SECRET")
+	dbURL := os.Getenv("DB_URL")
+
+	// Open a connection to the PostgreSQL database
+	db, err := sql.Open("postgres", dbURL)
+	if err != nil {
+		log.Printf("Failed to open a connection to the database: %v\n", err)
+	}
+	defer db.Close()
+
+	// Create a new Queries instance and initialize the ApiConfig struct
+	dbQueries := database.New(db)
+	apiCfg := &api.ApiConfig{
+		DbQueries:   dbQueries,
+		TokenSecret: tokenSecret,
+	}
+
+	// Create a new HTTP ServeMux
 	mux := http.NewServeMux()
 
 	// Root route
@@ -16,10 +42,8 @@ func main() {
 		w.Write([]byte(`{"message": "Oatmeal Studios Backend API"}`))
 	})
 
-	// Register resource routes
-	api.RegisterUserRoutes(mux)
-	api.RegisterCustomerRoutes(mux)
-	api.RegisterOrderRoutes(mux)
+	// Register routes
+	mux.HandleFunc("POST /api/users", apiCfg.HandleRegisterUser)
 
 	// Run the server on port 8080
 	http.ListenAndServe(":8080", mux)

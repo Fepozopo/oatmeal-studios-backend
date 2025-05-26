@@ -3,43 +3,30 @@ package api
 import (
 	"encoding/json"
 	"net/http"
-	"strings"
+
+	"github.com/Fepozopo/oatmeal-studios-backend/internal/service"
 )
 
-func RegisterUserRoutes(mux *http.ServeMux) {
-	mux.HandleFunc("/users", usersHandler)
-	mux.HandleFunc("/users/", userHandler)
-}
-
-func usersHandler(w http.ResponseWriter, r *http.Request) {
-	switch r.Method {
-	case http.MethodGet:
-		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(map[string]string{"message": "List all users"})
-	case http.MethodPost:
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusCreated)
-		json.NewEncoder(w).Encode(map[string]string{"message": "Create a new user"})
-	default:
+func (cfg *ApiConfig) HandleRegisterUser(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
 		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
-	}
-}
-
-func userHandler(w http.ResponseWriter, r *http.Request) {
-	id := strings.TrimPrefix(r.URL.Path, "/users/")
-	if id == "" || strings.Contains(id, "/") {
-		http.NotFound(w, r)
 		return
 	}
-	w.Header().Set("Content-Type", "application/json")
-	switch r.Method {
-	case http.MethodGet:
-		json.NewEncoder(w).Encode(map[string]string{"message": "Get user by ID", "id": id})
-	case http.MethodPut:
-		json.NewEncoder(w).Encode(map[string]string{"message": "Update user by ID", "id": id})
-	case http.MethodDelete:
-		json.NewEncoder(w).Encode(map[string]string{"message": "Delete user by ID", "id": id})
-	default:
-		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+
+	var input service.RegisterUserInput
+	// Decode the JSON request body into the input struct
+	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
+		http.Error(w, "Bad Request: "+err.Error(), http.StatusBadRequest)
+		return
 	}
+
+	user, err := service.RegisterUser(r.Context(), cfg.DbQueries, input)
+	if err != nil {
+		http.Error(w, "Failed to register user: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(map[string]string{"message": "User created successfully", "user_id": user.ID.String()})
 }
