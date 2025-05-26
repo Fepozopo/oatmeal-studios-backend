@@ -6,6 +6,9 @@ import (
 	"net/mail"
 	"regexp"
 	"strings"
+
+	"github.com/golang-jwt/jwt/v5"
+	"github.com/google/uuid"
 )
 
 // IsValidEmail performs a more robust check for a valid email address.
@@ -83,4 +86,29 @@ func IsValidPhone(phone string) error {
 		return fmt.Errorf("invalid phone number format")
 	}
 	return nil
+}
+
+// ValidateJWT takes a JWT token as a string and a tokenSecret as a string,
+// validates the token with the given secret, and returns the UUID in the
+// Subject field of the token claims. If the token is invalid or the Subject
+// field is not a valid UUID, it returns an error.
+func ValidateJWT(tokenString, tokenSecret string) (uuid.UUID, error) {
+	token, err := jwt.ParseWithClaims(tokenString, &jwt.RegisteredClaims{}, func(token *jwt.Token) (interface{}, error) {
+		return []byte(tokenSecret), nil
+	})
+	if err != nil {
+		return uuid.UUID{}, fmt.Errorf("failed to parse token: %w", err)
+	}
+
+	claims, ok := token.Claims.(*jwt.RegisteredClaims)
+	if !ok {
+		return uuid.UUID{}, fmt.Errorf("expected *jwt.RegisteredClaims, got %T", token.Claims)
+	}
+
+	userID, err := uuid.Parse(claims.Subject)
+	if err != nil {
+		return uuid.UUID{}, fmt.Errorf("expected valid uuid in Subject field, got %q", claims.Subject)
+	}
+
+	return userID, nil
 }
