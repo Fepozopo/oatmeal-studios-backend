@@ -10,7 +10,7 @@ import (
 )
 
 // CreateSalesRep creates a new sales rep and returns the created sales rep.
-func (cfg *apiConfig) CreateSalesRep(ctx context.Context, input CreateSalesRepInput) (*database.SalesRep, error) {
+func CreateSalesRep(ctx context.Context, db *database.Queries, input CreateSalesRepInput) (*database.SalesRep, error) {
 	// Required fields
 	if input.Status == "" {
 		input.Status = "Active"
@@ -37,7 +37,7 @@ func (cfg *apiConfig) CreateSalesRep(ctx context.Context, input CreateSalesRepIn
 		ZipCode:   sql.NullString{String: input.ZipCode, Valid: input.ZipCode != ""},
 	}
 
-	rep, err := cfg.DbQueries.CreateSalesRep(ctx, params)
+	rep, err := db.CreateSalesRep(ctx, params)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create sales rep: %w", err)
 	}
@@ -45,8 +45,8 @@ func (cfg *apiConfig) CreateSalesRep(ctx context.Context, input CreateSalesRepIn
 }
 
 // GetSalesRepByID retrieves a sales rep by their ID.
-func (cfg *apiConfig) GetSalesRepByID(ctx context.Context, id int32) (*database.SalesRep, error) {
-	rep, err := cfg.DbQueries.GetSalesRep(ctx, id)
+func GetSalesRepByID(ctx context.Context, db *database.Queries, id int32) (*database.SalesRep, error) {
+	rep, err := db.GetSalesRep(ctx, id)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, errors.New("sales rep not found")
@@ -57,8 +57,8 @@ func (cfg *apiConfig) GetSalesRepByID(ctx context.Context, id int32) (*database.
 }
 
 // ListSalesReps retrieves all sales reps from the database.
-func (cfg *apiConfig) ListSalesReps(ctx context.Context) ([]database.SalesRep, error) {
-	reps, err := cfg.DbQueries.ListSalesReps(ctx)
+func ListSalesReps(ctx context.Context, db *database.Queries) ([]database.SalesRep, error) {
+	reps, err := db.ListSalesReps(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("failed to list sales reps: %w", err)
 	}
@@ -66,7 +66,7 @@ func (cfg *apiConfig) ListSalesReps(ctx context.Context) ([]database.SalesRep, e
 }
 
 // UpdateSalesRep updates an existing sales rep's details by ID.
-func (cfg *apiConfig) UpdateSalesRep(ctx context.Context, input UpdateSalesRepInput) (*database.SalesRep, error) {
+func UpdateSalesRep(ctx context.Context, db *database.Queries, input UpdateSalesRepInput) (*database.SalesRep, error) {
 	// Required fields
 	if input.Status == "" {
 		input.Status = "Active"
@@ -94,7 +94,7 @@ func (cfg *apiConfig) UpdateSalesRep(ctx context.Context, input UpdateSalesRepIn
 		ZipCode:   sql.NullString{String: input.ZipCode, Valid: input.ZipCode != ""},
 	}
 
-	rep, err := cfg.DbQueries.UpdateSalesRep(ctx, params)
+	rep, err := db.UpdateSalesRep(ctx, params)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, errors.New("sales rep not found")
@@ -105,8 +105,8 @@ func (cfg *apiConfig) UpdateSalesRep(ctx context.Context, input UpdateSalesRepIn
 }
 
 // DeleteSalesRep deletes a sales rep by their ID.
-func (cfg *apiConfig) DeleteSalesRep(ctx context.Context, id int32) error {
-	err := cfg.DbQueries.DeleteSalesRep(ctx, id)
+func DeleteSalesRep(ctx context.Context, db *database.Queries, id int32) error {
+	err := db.DeleteSalesRep(ctx, id)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return errors.New("sales rep not found")

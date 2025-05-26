@@ -3,13 +3,8 @@ package service
 import (
 	"time"
 
-	"github.com/Fepozopo/oatmeal-studios-backend/internal/api"
 	"github.com/google/uuid"
 )
-
-type apiConfig struct {
-	*api.ApiConfig
-}
 
 // ------------------ Customer Location Inputs ------------------
 type AddCustomerLocationInput struct {

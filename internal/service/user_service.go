@@ -11,7 +11,7 @@ import (
 )
 
 // RegisterUser registers a new user after validating input and hashing the password.
-func (cfg *apiConfig) RegisterUser(ctx context.Context, input RegisterUserInput) (*database.User, error) {
+func RegisterUser(ctx context.Context, db *database.Queries, input RegisterUserInput) (*database.User, error) {
 	// Validate input fields
 	if input.Email == "" || input.Password == "" || input.FirstName == "" || input.LastName == "" {
 		return nil, errors.New("all fields are required")
@@ -34,7 +34,7 @@ func (cfg *apiConfig) RegisterUser(ctx context.Context, input RegisterUserInput)
 		LastName:  input.LastName,
 	}
 
-	user, err := cfg.DbQueries.CreateUser(ctx, params)
+	user, err := db.CreateUser(ctx, params)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create user: %w", err)
 	}
@@ -43,14 +43,14 @@ func (cfg *apiConfig) RegisterUser(ctx context.Context, input RegisterUserInput)
 }
 
 // AuthenticateUser checks the user's credentials and returns the user if valid.
-func (cfg *apiConfig) AuthenticateUser(ctx context.Context, input AuthenticateUserInput) (*database.User, error) {
+func AuthenticateUser(ctx context.Context, db *database.Queries, input AuthenticateUserInput) (*database.User, error) {
 	// Validate input
 	if input.Email == "" || input.Password == "" {
 		return nil, errors.New("email and password are required")
 	}
 
 	// Fetch user by email
-	user, err := cfg.DbQueries.GetUserByEmail(ctx, input.Email)
+	user, err := db.GetUserByEmail(ctx, input.Email)
 	if err != nil {
 		return nil, fmt.Errorf("user not found: %w", err)
 	}
@@ -64,7 +64,7 @@ func (cfg *apiConfig) AuthenticateUser(ctx context.Context, input AuthenticateUs
 }
 
 // UpdateUser updates the user's profile information after validating input.
-func (cfg *apiConfig) UpdateUserName(ctx context.Context, input UpdateUserNameInput) (*database.User, error) {
+func UpdateUserName(ctx context.Context, db *database.Queries, input UpdateUserNameInput) (*database.User, error) {
 	// Validate input
 	if input.FirstName == "" || input.LastName == "" {
 		return nil, errors.New("first name and last name are required")
@@ -77,27 +77,27 @@ func (cfg *apiConfig) UpdateUserName(ctx context.Context, input UpdateUserNameIn
 		LastName:  input.LastName,
 	}
 
-	err := cfg.DbQueries.UpdateUserName(ctx, params)
+	err := db.UpdateUserName(ctx, params)
 	if err != nil {
 		return nil, fmt.Errorf("failed to update user profile: %w", err)
 	}
 
 	// Fetch updated user
-	user, err := cfg.DbQueries.GetUserByID(ctx, input.UserID)
+	user, err := db.GetUserByID(ctx, input.UserID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to fetch updated user: %w", err)
 	}
 	return &user, nil
 }
 
-func (cfg *apiConfig) UpdateUserPassword(ctx context.Context, input UpdateUserPasswordInput) error {
+func UpdateUserPassword(ctx context.Context, db *database.Queries, input UpdateUserPasswordInput) error {
 	// Validate input
 	if input.OldPassword == "" || input.NewPassword == "" {
 		return fmt.Errorf("old password and new password are required")
 	}
 
 	// Fetch user by ID
-	user, err := cfg.DbQueries.GetUserByID(ctx, input.UserID)
+	user, err := db.GetUserByID(ctx, input.UserID)
 	if err != nil {
 		return fmt.Errorf("user not found: %w", err)
 	}
@@ -119,7 +119,7 @@ func (cfg *apiConfig) UpdateUserPassword(ctx context.Context, input UpdateUserPa
 		Password: hashedNewPassword,
 	}
 
-	if err := cfg.DbQueries.UpdateUserPassword(ctx, params); err != nil {
+	if err := db.UpdateUserPassword(ctx, params); err != nil {
 		return fmt.Errorf("failed to update password: %w", err)
 	}
 
@@ -127,19 +127,19 @@ func (cfg *apiConfig) UpdateUserPassword(ctx context.Context, input UpdateUserPa
 }
 
 // DeleteUser deletes a user by their ID.
-func (cfg *apiConfig) DeleteUser(ctx context.Context, userID uuid.UUID) error {
+func DeleteUser(ctx context.Context, db *database.Queries, userID uuid.UUID) error {
 	if userID == uuid.Nil {
 		return errors.New("user ID is required")
 	}
-	if err := cfg.DbQueries.DeleteUser(ctx, userID); err != nil {
+	if err := db.DeleteUser(ctx, userID); err != nil {
 		return fmt.Errorf("failed to delete user: %w", err)
 	}
 	return nil
 }
 
 // DeleteAllUsers deletes all users from the database.
-func (cfg *apiConfig) DeleteAllUsers(ctx context.Context) error {
-	if err := cfg.DbQueries.DeleteAllUsers(ctx); err != nil {
+func DeleteAllUsers(ctx context.Context, db *database.Queries) error {
+	if err := db.DeleteAllUsers(ctx); err != nil {
 		return fmt.Errorf("failed to delete all users: %w", err)
 	}
 	return nil

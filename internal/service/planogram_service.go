@@ -8,8 +8,8 @@ import (
 	"github.com/Fepozopo/oatmeal-studios-backend/internal/database"
 )
 
-func (cfg *apiConfig) GetPlanogram(ctx context.Context, id int32) (*database.Planogram, error) {
-	planogram, err := cfg.DbQueries.GetPlanogram(ctx, id)
+func GetPlanogram(ctx context.Context, db *database.Queries, id int32) (*database.Planogram, error) {
+	planogram, err := db.GetPlanogram(ctx, id)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, fmt.Errorf("planogram not found")
@@ -20,8 +20,8 @@ func (cfg *apiConfig) GetPlanogram(ctx context.Context, id int32) (*database.Pla
 }
 
 // ListPlanograms retrieves all planograms.
-func (cfg *apiConfig) ListPlanograms(ctx context.Context) ([]database.Planogram, error) {
-	planograms, err := cfg.DbQueries.ListPlanograms(ctx)
+func ListPlanograms(ctx context.Context, db *database.Queries) ([]database.Planogram, error) {
+	planograms, err := db.ListPlanograms(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("failed to list planograms: %w", err)
 	}
@@ -29,14 +29,14 @@ func (cfg *apiConfig) ListPlanograms(ctx context.Context) ([]database.Planogram,
 }
 
 // CreatePlanogram creates a new planogram.
-func (cfg *apiConfig) CreatePlanogram(ctx context.Context, input CreatePlanogramInput) (*database.Planogram, error) {
+func CreatePlanogram(ctx context.Context, db *database.Queries, input CreatePlanogramInput) (*database.Planogram, error) {
 	if input.Name == "" {
 		return nil, fmt.Errorf("name is required")
 	}
 	if input.NumPockets <= 0 {
 		return nil, fmt.Errorf("num_pockets must be positive")
 	}
-	planogram, err := cfg.DbQueries.CreatePlanogram(ctx, database.CreatePlanogramParams{
+	planogram, err := db.CreatePlanogram(ctx, database.CreatePlanogramParams{
 		Name:       input.Name,
 		NumPockets: input.NumPockets,
 		Notes:      sql.NullString{String: input.Notes, Valid: input.Notes != ""},
@@ -48,14 +48,14 @@ func (cfg *apiConfig) CreatePlanogram(ctx context.Context, input CreatePlanogram
 }
 
 // UpdatePlanogram updates an existing planogram.
-func (cfg *apiConfig) UpdatePlanogram(ctx context.Context, input UpdatePlanogramInput) (*database.Planogram, error) {
+func UpdatePlanogram(ctx context.Context, db *database.Queries, input UpdatePlanogramInput) (*database.Planogram, error) {
 	if input.Name == "" {
 		return nil, fmt.Errorf("name is required")
 	}
 	if input.NumPockets <= 0 {
 		return nil, fmt.Errorf("num_pockets must be positive")
 	}
-	planogram, err := cfg.DbQueries.UpdatePlanogram(ctx, database.UpdatePlanogramParams{
+	planogram, err := db.UpdatePlanogram(ctx, database.UpdatePlanogramParams{
 		ID:         input.ID,
 		Name:       input.Name,
 		NumPockets: input.NumPockets,
@@ -71,8 +71,8 @@ func (cfg *apiConfig) UpdatePlanogram(ctx context.Context, input UpdatePlanogram
 }
 
 // DeletePlanogram deletes a planogram by its ID.
-func (cfg *apiConfig) DeletePlanogram(ctx context.Context, id int32) error {
-	err := cfg.DbQueries.DeletePlanogram(ctx, id)
+func DeletePlanogram(ctx context.Context, db *database.Queries, id int32) error {
+	err := db.DeletePlanogram(ctx, id)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return fmt.Errorf("planogram not found")
@@ -83,11 +83,11 @@ func (cfg *apiConfig) DeletePlanogram(ctx context.Context, id int32) error {
 }
 
 // AssignPlanogramToLocation assigns a planogram to a customer location.
-func (cfg *apiConfig) AssignPlanogramToLocation(ctx context.Context, input AssignPlanogramToLocationInput) (*database.PlanogramCustomerLocation, error) {
+func AssignPlanogramToLocation(ctx context.Context, db *database.Queries, input AssignPlanogramToLocationInput) (*database.PlanogramCustomerLocation, error) {
 	if input.PlanogramID <= 0 || input.CustomerLocationID <= 0 {
 		return nil, fmt.Errorf("invalid planogram_id or customer_location_id")
 	}
-	pcl, err := cfg.DbQueries.AssignPlanogramToLocation(ctx, database.AssignPlanogramToLocationParams{
+	pcl, err := db.AssignPlanogramToLocation(ctx, database.AssignPlanogramToLocationParams{
 		PlanogramID:        input.PlanogramID,
 		CustomerLocationID: input.CustomerLocationID,
 	})
@@ -98,11 +98,11 @@ func (cfg *apiConfig) AssignPlanogramToLocation(ctx context.Context, input Assig
 }
 
 // RemovePlanogramFromLocation removes a planogram from a customer location.
-func (cfg *apiConfig) RemovePlanogramFromLocation(ctx context.Context, input RemovePlanogramFromLocationInput) error {
+func RemovePlanogramFromLocation(ctx context.Context, db *database.Queries, input RemovePlanogramFromLocationInput) error {
 	if input.PlanogramID <= 0 || input.CustomerLocationID <= 0 {
 		return fmt.Errorf("invalid planogram_id or customer_location_id")
 	}
-	err := cfg.DbQueries.RemovePlanogramFromLocation(ctx, database.RemovePlanogramFromLocationParams{
+	err := db.RemovePlanogramFromLocation(ctx, database.RemovePlanogramFromLocationParams{
 		PlanogramID:        input.PlanogramID,
 		CustomerLocationID: input.CustomerLocationID,
 	})
@@ -113,11 +113,11 @@ func (cfg *apiConfig) RemovePlanogramFromLocation(ctx context.Context, input Rem
 }
 
 // GetPlanogramsByLocation retrieves a planogram by customer location ID.
-func (cfg *apiConfig) GetPlanogramsByLocation(ctx context.Context, customerLocationID int32) (*database.Planogram, error) {
+func GetPlanogramsByLocation(ctx context.Context, db *database.Queries, customerLocationID int32) (*database.Planogram, error) {
 	if customerLocationID <= 0 {
 		return nil, fmt.Errorf("invalid customer_location_id")
 	}
-	planogram, err := cfg.DbQueries.GetPlanogramsByLocation(ctx, customerLocationID)
+	planogram, err := db.GetPlanogramsByLocation(ctx, customerLocationID)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, fmt.Errorf("planogram not found for location")
@@ -128,11 +128,11 @@ func (cfg *apiConfig) GetPlanogramsByLocation(ctx context.Context, customerLocat
 }
 
 // ListLocationsByPlanogram lists all customer locations for a planogram.
-func (cfg *apiConfig) ListLocationsByPlanogram(ctx context.Context, planogramID int32) ([]database.CustomerLocation, error) {
+func ListLocationsByPlanogram(ctx context.Context, db *database.Queries, planogramID int32) ([]database.CustomerLocation, error) {
 	if planogramID <= 0 {
 		return nil, fmt.Errorf("invalid planogram_id")
 	}
-	locations, err := cfg.DbQueries.ListLocationsByPlanogram(ctx, planogramID)
+	locations, err := db.ListLocationsByPlanogram(ctx, planogramID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to list locations by planogram: %w", err)
 	}
@@ -140,11 +140,11 @@ func (cfg *apiConfig) ListLocationsByPlanogram(ctx context.Context, planogramID 
 }
 
 // ListPocketsForPlanogram lists all pockets for a planogram.
-func (cfg *apiConfig) ListPocketsForPlanogram(ctx context.Context, planogramID int32) ([]database.PlanogramPocket, error) {
+func ListPocketsForPlanogram(ctx context.Context, db *database.Queries, planogramID int32) ([]database.PlanogramPocket, error) {
 	if planogramID <= 0 {
 		return nil, fmt.Errorf("invalid planogram_id")
 	}
-	pockets, err := cfg.DbQueries.ListPocketsForPlanogram(ctx, planogramID)
+	pockets, err := db.ListPocketsForPlanogram(ctx, planogramID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to list pockets for planogram: %w", err)
 	}
@@ -152,8 +152,8 @@ func (cfg *apiConfig) ListPocketsForPlanogram(ctx context.Context, planogramID i
 }
 
 // GetPlanogramPocket retrieves a planogram pocket by its ID.
-func (cfg *apiConfig) GetPlanogramPocket(ctx context.Context, id int32) (*database.PlanogramPocket, error) {
-	pocket, err := cfg.DbQueries.GetPlanogramPocket(ctx, id)
+func GetPlanogramPocket(ctx context.Context, db *database.Queries, id int32) (*database.PlanogramPocket, error) {
+	pocket, err := db.GetPlanogramPocket(ctx, id)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, fmt.Errorf("planogram pocket not found")
@@ -164,11 +164,11 @@ func (cfg *apiConfig) GetPlanogramPocket(ctx context.Context, id int32) (*databa
 }
 
 // CreatePlanogramPocket creates a new planogram pocket.
-func (cfg *apiConfig) CreatePlanogramPocket(ctx context.Context, input CreatePlanogramPocketInput) (*database.PlanogramPocket, error) {
+func CreatePlanogramPocket(ctx context.Context, db *database.Queries, input CreatePlanogramPocketInput) (*database.PlanogramPocket, error) {
 	if input.PlanogramID <= 0 || input.PocketNumber <= 0 || input.Category == "" {
 		return nil, fmt.Errorf("invalid input for creating planogram pocket")
 	}
-	pocket, err := cfg.DbQueries.CreatePlanogramPocket(ctx, database.CreatePlanogramPocketParams{
+	pocket, err := db.CreatePlanogramPocket(ctx, database.CreatePlanogramPocketParams{
 		PlanogramID:  input.PlanogramID,
 		PocketNumber: input.PocketNumber,
 		Category:     input.Category,
@@ -181,11 +181,11 @@ func (cfg *apiConfig) CreatePlanogramPocket(ctx context.Context, input CreatePla
 }
 
 // UpdatePlanogramPocket updates a planogram pocket.
-func (cfg *apiConfig) UpdatePlanogramPocket(ctx context.Context, input UpdatePlanogramPocketInput) (*database.PlanogramPocket, error) {
+func UpdatePlanogramPocket(ctx context.Context, db *database.Queries, input UpdatePlanogramPocketInput) (*database.PlanogramPocket, error) {
 	if input.ID <= 0 || input.Category == "" {
 		return nil, fmt.Errorf("invalid input for updating planogram pocket")
 	}
-	pocket, err := cfg.DbQueries.UpdatePlanogramPocket(ctx, database.UpdatePlanogramPocketParams{
+	pocket, err := db.UpdatePlanogramPocket(ctx, database.UpdatePlanogramPocketParams{
 		ID:        input.ID,
 		Category:  input.Category,
 		ProductID: sql.NullInt32{Int32: input.ProductID, Valid: input.ProductID > 0},
@@ -200,8 +200,8 @@ func (cfg *apiConfig) UpdatePlanogramPocket(ctx context.Context, input UpdatePla
 }
 
 // DeletePlanogramPocket deletes a planogram pocket by its ID.
-func (cfg *apiConfig) DeletePlanogramPocket(ctx context.Context, id int32) error {
-	err := cfg.DbQueries.DeletePlanogramPocket(ctx, id)
+func DeletePlanogramPocket(ctx context.Context, db *database.Queries, id int32) error {
+	err := db.DeletePlanogramPocket(ctx, id)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return fmt.Errorf("planogram pocket not found")
@@ -212,11 +212,11 @@ func (cfg *apiConfig) DeletePlanogramPocket(ctx context.Context, id int32) error
 }
 
 // GetPlanogramPocketByNumber retrieves a planogram pocket by planogram ID and pocket number.
-func (cfg *apiConfig) GetPlanogramPocketByNumber(ctx context.Context, input GetPlanogramPocketByNumberInput) (*database.PlanogramPocket, error) {
+func GetPlanogramPocketByNumber(ctx context.Context, db *database.Queries, input GetPlanogramPocketByNumberInput) (*database.PlanogramPocket, error) {
 	if input.PlanogramID <= 0 || input.PocketNumber <= 0 {
 		return nil, fmt.Errorf("invalid planogram_id or pocket_number")
 	}
-	pocket, err := cfg.DbQueries.GetPlanogramPocketByNumber(ctx, database.GetPlanogramPocketByNumberParams{
+	pocket, err := db.GetPlanogramPocketByNumber(ctx, database.GetPlanogramPocketByNumberParams{
 		PlanogramID:  input.PlanogramID,
 		PocketNumber: input.PocketNumber,
 	})

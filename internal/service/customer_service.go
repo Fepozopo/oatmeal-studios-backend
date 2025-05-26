@@ -11,7 +11,7 @@ import (
 )
 
 // CreateCustomer creates a new customer and returns the created customer.
-func (cfg *apiConfig) CreateCustomer(ctx context.Context, input CreateCustomerInput) (*database.Customer, error) {
+func CreateCustomer(ctx context.Context, db *database.Queries, input CreateCustomerInput) (*database.Customer, error) {
 	// Check for required fields
 	if input.BusinessName == "" {
 		return nil, errors.New("business name is required")
@@ -66,7 +66,7 @@ func (cfg *apiConfig) CreateCustomer(ctx context.Context, input CreateCustomerIn
 		Notes:        sql.NullString{String: input.Notes, Valid: input.Notes != ""},
 	}
 
-	customer, err := cfg.DbQueries.CreateCustomer(ctx, params)
+	customer, err := db.CreateCustomer(ctx, params)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create customer: %w", err)
 	}
@@ -75,8 +75,8 @@ func (cfg *apiConfig) CreateCustomer(ctx context.Context, input CreateCustomerIn
 }
 
 // GetCustomerByID retrieves a customer by their ID using the GetCustomer query.
-func (cfg *apiConfig) GetCustomerByID(ctx context.Context, id int32) (*database.Customer, error) {
-	customer, err := cfg.DbQueries.GetCustomer(ctx, id)
+func GetCustomerByID(ctx context.Context, db *database.Queries, id int32) (*database.Customer, error) {
+	customer, err := db.GetCustomer(ctx, id)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, errors.New("customer not found")
@@ -87,8 +87,8 @@ func (cfg *apiConfig) GetCustomerByID(ctx context.Context, id int32) (*database.
 }
 
 // GetAllCustomers retrieves all customers from the database.
-func (cfg *apiConfig) ListCustomers(ctx context.Context) ([]database.Customer, error) {
-	customers, err := cfg.DbQueries.ListCustomers(ctx)
+func ListCustomers(ctx context.Context, db *database.Queries) ([]database.Customer, error) {
+	customers, err := db.ListCustomers(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get customers: %w", err)
 	}
@@ -96,7 +96,7 @@ func (cfg *apiConfig) ListCustomers(ctx context.Context) ([]database.Customer, e
 }
 
 // UpdateCustomer updates an existing customer's details by ID.
-func (cfg *apiConfig) UpdateCustomer(ctx context.Context, input UpdateCustomerInput) (*database.Customer, error) {
+func UpdateCustomer(ctx context.Context, db *database.Queries, input UpdateCustomerInput) (*database.Customer, error) {
 	// Check for required fields
 	if input.BusinessName == "" {
 		return nil, errors.New("business name is required")
@@ -151,7 +151,7 @@ func (cfg *apiConfig) UpdateCustomer(ctx context.Context, input UpdateCustomerIn
 		Notes:        sql.NullString{String: input.Notes, Valid: input.Notes != ""},
 	}
 
-	customer, err := cfg.DbQueries.UpdateCustomer(ctx, params)
+	customer, err := db.UpdateCustomer(ctx, params)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, errors.New("customer not found")
@@ -162,8 +162,8 @@ func (cfg *apiConfig) UpdateCustomer(ctx context.Context, input UpdateCustomerIn
 }
 
 // DeleteCustomer deletes a customer by their ID.
-func (cfg *apiConfig) DeleteCustomer(ctx context.Context, id int32) error {
-	err := cfg.DbQueries.DeleteCustomer(ctx, id)
+func DeleteCustomer(ctx context.Context, db *database.Queries, id int32) error {
+	err := db.DeleteCustomer(ctx, id)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return errors.New("customer not found")
