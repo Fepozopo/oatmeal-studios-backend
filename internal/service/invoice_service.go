@@ -20,7 +20,7 @@ type CreateOrUpdateInvoiceInput struct {
 	Total              float64   `json:"total"`
 }
 
-func CreateInvoice(ctx context.Context, db *database.Queries, input CreateOrUpdateInvoiceInput) (*database.Invoice, error) {
+func (cfg *apiConfig) CreateInvoice(ctx context.Context, input CreateOrUpdateInvoiceInput) (*database.Invoice, error) {
 	if input.OrderID == 0 {
 		return nil, errors.New("order_id is required")
 	}
@@ -39,15 +39,15 @@ func CreateInvoice(ctx context.Context, db *database.Queries, input CreateOrUpda
 		Status:             input.Status,
 		Total:              input.Total,
 	}
-	invoice, err := db.CreateInvoice(ctx, params)
+	invoice, err := cfg.DbQueries.CreateInvoice(ctx, params)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create invoice: %w", err)
 	}
 	return &invoice, nil
 }
 
-func GetInvoice(ctx context.Context, db *database.Queries, id int32) (*database.Invoice, error) {
-	invoice, err := db.GetInvoice(ctx, id)
+func (cfg *apiConfig) GetInvoice(ctx context.Context, id int32) (*database.Invoice, error) {
+	invoice, err := cfg.DbQueries.GetInvoice(ctx, id)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, errors.New("invoice not found")
@@ -57,8 +57,8 @@ func GetInvoice(ctx context.Context, db *database.Queries, id int32) (*database.
 	return &invoice, nil
 }
 
-func GetInvoicesByOrder(ctx context.Context, db *database.Queries, orderID int32) (*database.Invoice, error) {
-	invoice, err := db.GetInvoicesByOrder(ctx, orderID)
+func (cfg *apiConfig) GetInvoicesByOrder(ctx context.Context, orderID int32) (*database.Invoice, error) {
+	invoice, err := cfg.DbQueries.GetInvoicesByOrder(ctx, orderID)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, errors.New("invoice not found for order")
@@ -68,29 +68,29 @@ func GetInvoicesByOrder(ctx context.Context, db *database.Queries, orderID int32
 	return &invoice, nil
 }
 
-func ListInvoicesByCustomer(ctx context.Context, db *database.Queries, customerID int32) ([]database.Invoice, error) {
+func (cfg *apiConfig) ListInvoicesByCustomer(ctx context.Context, customerID int32) ([]database.Invoice, error) {
 	if customerID == 0 {
 		return nil, errors.New("customer_id is required")
 	}
-	invoices, err := db.ListInvoicesByCustomer(ctx, customerID)
+	invoices, err := cfg.DbQueries.ListInvoicesByCustomer(ctx, customerID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to list invoices by customer: %w", err)
 	}
 	return invoices, nil
 }
 
-func ListInvoicesByCustomerLocation(ctx context.Context, db *database.Queries, customerLocationID int32) ([]database.Invoice, error) {
+func (cfg *apiConfig) ListInvoicesByCustomerLocation(ctx context.Context, customerLocationID int32) ([]database.Invoice, error) {
 	if customerLocationID == 0 {
 		return nil, errors.New("customer_location_id is required")
 	}
-	invoices, err := db.ListInvoicesByCustomerLocation(ctx, customerLocationID)
+	invoices, err := cfg.DbQueries.ListInvoicesByCustomerLocation(ctx, customerLocationID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to list invoices by customer location: %w", err)
 	}
 	return invoices, nil
 }
 
-func UpdateInvoice(ctx context.Context, db *database.Queries, id int32, input CreateOrUpdateInvoiceInput) (*database.Invoice, error) {
+func (cfg *apiConfig) UpdateInvoice(ctx context.Context, id int32, input CreateOrUpdateInvoiceInput) (*database.Invoice, error) {
 	if id == 0 {
 		return nil, errors.New("id is required")
 	}
@@ -113,7 +113,7 @@ func UpdateInvoice(ctx context.Context, db *database.Queries, id int32, input Cr
 		Status:             input.Status,
 		Total:              input.Total,
 	}
-	invoice, err := db.UpdateInvoice(ctx, params)
+	invoice, err := cfg.DbQueries.UpdateInvoice(ctx, params)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, errors.New("invoice not found")
@@ -123,8 +123,8 @@ func UpdateInvoice(ctx context.Context, db *database.Queries, id int32, input Cr
 	return &invoice, nil
 }
 
-func DeleteInvoice(ctx context.Context, db *database.Queries, id int32) error {
-	err := db.DeleteInvoice(ctx, id)
+func (cfg *apiConfig) DeleteInvoice(ctx context.Context, id int32) error {
+	err := cfg.DbQueries.DeleteInvoice(ctx, id)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return errors.New("invoice not found")

@@ -28,7 +28,7 @@ type CreateOrUpdateProductInput struct {
 	TextInside     string    `json:"text_inside,omitempty"`
 }
 
-func CreateProduct(ctx context.Context, db *database.Queries, input CreateOrUpdateProductInput) (*database.Product, error) {
+func (cfg *apiConfig) CreateProduct(ctx context.Context, input CreateOrUpdateProductInput) (*database.Product, error) {
 	if input.Type == "" || input.Sku == "" || input.Upc == "" || input.Status == "" {
 		return nil, errors.New("type, sku, upc, and status are required")
 	}
@@ -49,62 +49,62 @@ func CreateProduct(ctx context.Context, db *database.Queries, input CreateOrUpda
 		TextInside:     sql.NullString{String: input.TextInside, Valid: input.TextInside != ""},
 	}
 
-	prod, err := db.CreateProduct(ctx, params)
+	prod, err := cfg.DbQueries.CreateProduct(ctx, params)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create product: %w", err)
 	}
 	return &prod, nil
 }
 
-func GetProductByID(ctx context.Context, db *database.Queries, id uuid.UUID) (*database.Product, error) {
-	prod, err := db.GetProductByID(ctx, id)
+func (cfg *apiConfig) GetProductByID(ctx context.Context, id uuid.UUID) (*database.Product, error) {
+	prod, err := cfg.DbQueries.GetProductByID(ctx, id)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get product by ID: %w", err)
 	}
 	return &prod, nil
 }
 
-func GetProductBySKU(ctx context.Context, db *database.Queries, sku string) (*database.Product, error) {
-	prod, err := db.GetProductBySKU(ctx, sku)
+func (cfg *apiConfig) GetProductBySKU(ctx context.Context, sku string) (*database.Product, error) {
+	prod, err := cfg.DbQueries.GetProductBySKU(ctx, sku)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get product by SKU: %w", err)
 	}
 	return &prod, nil
 }
 
-func ListProductsByType(ctx context.Context, db *database.Queries, typ string) ([]database.Product, error) {
-	prod, err := db.ListProductsByType(ctx, typ)
+func (cfg *apiConfig) ListProductsByType(ctx context.Context, typ string) ([]database.Product, error) {
+	prod, err := cfg.DbQueries.ListProductsByType(ctx, typ)
 	if err != nil {
 		return nil, fmt.Errorf("failed to list products by type: %w", err)
 	}
 	return prod, nil
 }
 
-func ListProductsByCategory(ctx context.Context, db *database.Queries, category string) ([]database.Product, error) {
-	prod, err := db.ListProductsByCategory(ctx, sql.NullString{String: category, Valid: category != ""})
+func (cfg *apiConfig) ListProductsByCategory(ctx context.Context, category string) ([]database.Product, error) {
+	prod, err := cfg.DbQueries.ListProductsByCategory(ctx, sql.NullString{String: category, Valid: category != ""})
 	if err != nil {
 		return nil, fmt.Errorf("failed to list products by category: %w", err)
 	}
 	return prod, nil
 }
 
-func ListProductsByArtist(ctx context.Context, db *database.Queries, artist string) ([]database.Product, error) {
-	prod, err := db.ListProductsByArtist(ctx, sql.NullString{String: artist, Valid: artist != ""})
+func (cfg *apiConfig) ListProductsByArtist(ctx context.Context, artist string) ([]database.Product, error) {
+	prod, err := cfg.DbQueries.ListProductsByArtist(ctx, sql.NullString{String: artist, Valid: artist != ""})
 	if err != nil {
 		return nil, fmt.Errorf("failed to list products by artist: %w", err)
 	}
 	return prod, nil
 }
 
-func ListProductsByStatus(ctx context.Context, db *database.Queries, status string) ([]database.Product, error) {
-	prod, err := db.ListProductsByStatus(ctx, status)
+func (cfg *apiConfig) ListProductsByStatus(ctx context.Context, status string) ([]database.Product, error) {
+	prod, err := cfg.DbQueries.ListProductsByStatus(ctx, status)
 	if err != nil {
 		return nil, fmt.Errorf("failed to list products by status: %w", err)
 	}
 	return prod, nil
 }
 
-func UpdateProduct(ctx context.Context, db *database.Queries, id uuid.UUID, input CreateOrUpdateProductInput) (*database.Product, error) {
+func (cfg *apiConfig) UpdateProduct(ctx context.Context, id uuid.UUID, input CreateOrUpdateProductInput) (*database.Product, error) {
 	params := database.UpdateProductParams{
 		ID:             id,
 		Type:           input.Type,
@@ -122,13 +122,13 @@ func UpdateProduct(ctx context.Context, db *database.Queries, id uuid.UUID, inpu
 		TextFront:      sql.NullString{String: input.TextFront, Valid: input.TextFront != ""},
 		TextInside:     sql.NullString{String: input.TextInside, Valid: input.TextInside != ""},
 	}
-	prod, err := db.UpdateProduct(ctx, params)
+	prod, err := cfg.DbQueries.UpdateProduct(ctx, params)
 	if err != nil {
 		return nil, fmt.Errorf("failed to update product: %w", err)
 	}
 	return &prod, nil
 }
 
-func DeleteProduct(ctx context.Context, db *database.Queries, id uuid.UUID) error {
-	return db.DeleteProduct(ctx, id)
+func (cfg *apiConfig) DeleteProduct(ctx context.Context, id uuid.UUID) error {
+	return cfg.DbQueries.DeleteProduct(ctx, id)
 }

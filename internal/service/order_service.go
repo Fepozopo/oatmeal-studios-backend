@@ -26,7 +26,7 @@ type CreateOrUpdateOrderInput struct {
 	Notes              string    `json:"notes"`
 }
 
-func CreateOrder(ctx context.Context, db *database.Queries, input CreateOrUpdateOrderInput) (*database.Order, error) {
+func (cfg *apiConfig) CreateOrder(ctx context.Context, input CreateOrUpdateOrderInput) (*database.Order, error) {
 	if input.CustomerID == 0 {
 		return nil, errors.New("customer_id is required")
 	}
@@ -51,15 +51,15 @@ func CreateOrder(ctx context.Context, db *database.Queries, input CreateOrUpdate
 		SalesRep:           sql.NullString{String: input.SalesRep, Valid: input.SalesRep != ""},
 		Notes:              sql.NullString{String: input.Notes, Valid: input.Notes != ""},
 	}
-	order, err := db.CreateOrder(ctx, params)
+	order, err := cfg.DbQueries.CreateOrder(ctx, params)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create order: %w", err)
 	}
 	return &order, nil
 }
 
-func GetOrder(ctx context.Context, db *database.Queries, id int32) (*database.Order, error) {
-	order, err := db.GetOrder(ctx, id)
+func (cfg *apiConfig) GetOrder(ctx context.Context, id int32) (*database.Order, error) {
+	order, err := cfg.DbQueries.GetOrder(ctx, id)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, errors.New("order not found")
@@ -69,7 +69,7 @@ func GetOrder(ctx context.Context, db *database.Queries, id int32) (*database.Or
 	return &order, nil
 }
 
-func UpdateOrder(ctx context.Context, db *database.Queries, id int32, input CreateOrUpdateOrderInput) (*database.Order, error) {
+func (cfg *apiConfig) UpdateOrder(ctx context.Context, id int32, input CreateOrUpdateOrderInput) (*database.Order, error) {
 	if input.CustomerID == 0 {
 		return nil, errors.New("customer_id is required")
 	}
@@ -95,7 +95,7 @@ func UpdateOrder(ctx context.Context, db *database.Queries, id int32, input Crea
 		SalesRep:           sql.NullString{String: input.SalesRep, Valid: input.SalesRep != ""},
 		Notes:              sql.NullString{String: input.Notes, Valid: input.Notes != ""},
 	}
-	order, err := db.UpdateOrder(ctx, params)
+	order, err := cfg.DbQueries.UpdateOrder(ctx, params)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, errors.New("order not found")
@@ -105,8 +105,8 @@ func UpdateOrder(ctx context.Context, db *database.Queries, id int32, input Crea
 	return &order, nil
 }
 
-func DeleteOrder(ctx context.Context, db *database.Queries, id int32) error {
-	err := db.DeleteOrder(ctx, id)
+func (cfg *apiConfig) DeleteOrder(ctx context.Context, id int32) error {
+	err := cfg.DbQueries.DeleteOrder(ctx, id)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return errors.New("order not found")
@@ -116,19 +116,19 @@ func DeleteOrder(ctx context.Context, db *database.Queries, id int32) error {
 	return nil
 }
 
-func ListOrdersOpen(ctx context.Context, db *database.Queries) ([]database.Order, error) {
-	orders, err := db.ListOrdersOpen(ctx)
+func (cfg *apiConfig) ListOrdersOpen(ctx context.Context) ([]database.Order, error) {
+	orders, err := cfg.DbQueries.ListOrdersOpen(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("failed to list open orders: %w", err)
 	}
 	return orders, nil
 }
 
-func ListOrdersByCustomer(ctx context.Context, db *database.Queries, customerID int32) ([]database.Order, error) {
+func (cfg *apiConfig) ListOrdersByCustomer(ctx context.Context, customerID int32) ([]database.Order, error) {
 	if customerID == 0 {
 		return nil, errors.New("customer_id is required")
 	}
-	orders, err := db.ListOrdersByCustomer(ctx, customerID)
+	orders, err := cfg.DbQueries.ListOrdersByCustomer(ctx, customerID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to list orders by customer: %w", err)
 	}

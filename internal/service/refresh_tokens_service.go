@@ -9,7 +9,7 @@ import (
 )
 
 // CreateRefreshToken creates a new refresh token.
-func CreateRefreshToken(ctx context.Context, db *database.Queries, token string, id uuid.UUID) error {
+func (cfg *apiConfig) CreateRefreshToken(ctx context.Context, token string, id uuid.UUID) error {
 	if token == "" || id == uuid.Nil {
 		return fmt.Errorf("invalid parameters: token and user ID must not be empty")
 	}
@@ -18,7 +18,7 @@ func CreateRefreshToken(ctx context.Context, db *database.Queries, token string,
 		UserID: id,
 	}
 
-	err := db.CreateRefreshToken(ctx, params)
+	err := cfg.DbQueries.CreateRefreshToken(ctx, params)
 	if err != nil {
 		return fmt.Errorf("failed to create refresh token: %w", err)
 	}
@@ -26,12 +26,12 @@ func CreateRefreshToken(ctx context.Context, db *database.Queries, token string,
 }
 
 // RevokeRefreshToken revokes a refresh token by its token string.
-func RevokeRefreshToken(ctx context.Context, db *database.Queries, token string) error {
+func (cfg *apiConfig) RevokeRefreshToken(ctx context.Context, token string) error {
 	if token == "" {
 		return fmt.Errorf("token must not be empty")
 	}
 
-	err := db.RevokeRefreshToken(ctx, token)
+	err := cfg.DbQueries.RevokeRefreshToken(ctx, token)
 	if err != nil {
 		return fmt.Errorf("failed to revoke refresh token: %w", err)
 	}
@@ -39,13 +39,13 @@ func RevokeRefreshToken(ctx context.Context, db *database.Queries, token string)
 }
 
 // GetRefreshToken retrieves a refresh token by its token string.
-func GetRefreshToken(ctx context.Context, db *database.Queries, token string) (*database.RefreshToken, error) {
+func (cfg *apiConfig) GetRefreshToken(ctx context.Context, token string) (*database.RefreshToken, error) {
 	if token == "" {
 		return nil, fmt.Errorf("token must not be empty")
 	}
 
 	// Retrieve the refresh token from the database
-	rt, err := db.GetRefreshToken(ctx, token)
+	rt, err := cfg.DbQueries.GetRefreshToken(ctx, token)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get refresh token: %w", err)
 	}

@@ -28,8 +28,8 @@ type UpdateOrderItemInput struct {
 	PocketNumber int32   `json:"pocket_number"`
 }
 
-func GetOrderItem(ctx context.Context, db *database.Queries, id int32) (*database.OrderItem, error) {
-	item, err := db.GetOrderItem(ctx, id)
+func (cfg *apiConfig) GetOrderItem(ctx context.Context, id int32) (*database.OrderItem, error) {
+	item, err := cfg.DbQueries.GetOrderItem(ctx, id)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, errors.New("order item not found")
@@ -39,18 +39,18 @@ func GetOrderItem(ctx context.Context, db *database.Queries, id int32) (*databas
 	return &item, nil
 }
 
-func ListOrderItemsBySKU(ctx context.Context, db *database.Queries, sku string) ([]database.OrderItem, error) {
+func (cfg *apiConfig) ListOrderItemsBySKU(ctx context.Context, sku string) ([]database.OrderItem, error) {
 	if sku == "" {
 		return nil, errors.New("sku is required")
 	}
-	items, err := db.ListOrderItemsBySKU(ctx, sku)
+	items, err := cfg.DbQueries.ListOrderItemsBySKU(ctx, sku)
 	if err != nil {
 		return nil, fmt.Errorf("failed to list order items by sku: %w", err)
 	}
 	return items, nil
 }
 
-func CreateOrderItem(ctx context.Context, db *database.Queries, input CreateOrderItemInput) (*database.OrderItem, error) {
+func (cfg *apiConfig) CreateOrderItem(ctx context.Context, input CreateOrderItemInput) (*database.OrderItem, error) {
 	if input.OrderID == 0 {
 		return nil, errors.New("order_id is required")
 	}
@@ -66,14 +66,14 @@ func CreateOrderItem(ctx context.Context, db *database.Queries, input CreateOrde
 		ItemTotal:    input.ItemTotal,
 		PocketNumber: sql.NullInt32{Int32: input.PocketNumber, Valid: input.PocketNumber != 0},
 	}
-	item, err := db.CreateOrderItem(ctx, params)
+	item, err := cfg.DbQueries.CreateOrderItem(ctx, params)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create order item: %w", err)
 	}
 	return &item, nil
 }
 
-func UpdateOrderItem(ctx context.Context, db *database.Queries, id int32, input UpdateOrderItemInput) (*database.OrderItem, error) {
+func (cfg *apiConfig) UpdateOrderItem(ctx context.Context, id int32, input UpdateOrderItemInput) (*database.OrderItem, error) {
 	if id == 0 {
 		return nil, errors.New("id is required")
 	}
@@ -89,7 +89,7 @@ func UpdateOrderItem(ctx context.Context, db *database.Queries, id int32, input 
 		ItemTotal:    input.ItemTotal,
 		PocketNumber: sql.NullInt32{Int32: input.PocketNumber, Valid: input.PocketNumber != 0},
 	}
-	item, err := db.UpdateOrderItem(ctx, params)
+	item, err := cfg.DbQueries.UpdateOrderItem(ctx, params)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, errors.New("order item not found")
@@ -99,11 +99,11 @@ func UpdateOrderItem(ctx context.Context, db *database.Queries, id int32, input 
 	return &item, nil
 }
 
-func DeleteOrderItem(ctx context.Context, db *database.Queries, id int32) error {
+func (cfg *apiConfig) DeleteOrderItem(ctx context.Context, id int32) error {
 	if id == 0 {
 		return errors.New("id is required")
 	}
-	err := db.DeleteOrderItem(ctx, id)
+	err := cfg.DbQueries.DeleteOrderItem(ctx, id)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return errors.New("order item not found")

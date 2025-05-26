@@ -33,7 +33,7 @@ type UpdateCustomerLocationInput struct {
 }
 
 // AddCustomerLocation adds a new customer location and returns the created location.
-func AddCustomerLocation(ctx context.Context, db *database.Queries, input AddCustomerLocationInput) (*database.CustomerLocation, error) {
+func (cfg *apiConfig) AddCustomerLocation(ctx context.Context, input AddCustomerLocationInput) (*database.CustomerLocation, error) {
 	// Check if the input is valid
 	if input.CustomerID == 0 {
 		return nil, errors.New("customer_id is required")
@@ -69,7 +69,7 @@ func AddCustomerLocation(ctx context.Context, db *database.Queries, input AddCus
 		Notes:      sql.NullString{String: input.Notes, Valid: input.Notes != ""},
 	}
 
-	location, err := db.CreateCustomerLocation(ctx, params)
+	location, err := cfg.DbQueries.CreateCustomerLocation(ctx, params)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create customer location: %w", err)
 	}
@@ -78,11 +78,11 @@ func AddCustomerLocation(ctx context.Context, db *database.Queries, input AddCus
 
 // DeleteCustomerLocation deletes a customer location by its ID.
 // It returns nil if successful, or an error if not.
-func DeleteCustomerLocation(ctx context.Context, db *database.Queries, id int32) error {
+func (cfg *apiConfig) DeleteCustomerLocation(ctx context.Context, id int32) error {
 	if id == 0 {
 		return errors.New("id is required")
 	}
-	err := db.DeleteCustomerLocation(ctx, id)
+	err := cfg.DbQueries.DeleteCustomerLocation(ctx, id)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return errors.New("customer location not found")
@@ -93,7 +93,7 @@ func DeleteCustomerLocation(ctx context.Context, db *database.Queries, id int32)
 }
 
 // UpdateCustomerLocation updates an existing customer location and returns the updated location.
-func UpdateCustomerLocation(ctx context.Context, db *database.Queries, input UpdateCustomerLocationInput) (*database.CustomerLocation, error) {
+func (cfg *apiConfig) UpdateCustomerLocation(ctx context.Context, input UpdateCustomerLocationInput) (*database.CustomerLocation, error) {
 	// Check if the input is valid
 	if input.ID == 0 {
 		return nil, errors.New("id is required")
@@ -128,7 +128,7 @@ func UpdateCustomerLocation(ctx context.Context, db *database.Queries, input Upd
 		Notes:    sql.NullString{String: input.Notes, Valid: input.Notes != ""},
 	}
 
-	location, err := db.UpdateCustomerLocation(ctx, params)
+	location, err := cfg.DbQueries.UpdateCustomerLocation(ctx, params)
 	if err != nil {
 		return nil, fmt.Errorf("failed to update customer location: %w", err)
 	}
@@ -137,8 +137,8 @@ func UpdateCustomerLocation(ctx context.Context, db *database.Queries, input Upd
 
 // GetCustomerLocationByID retrieves a customer location by its ID.
 // It returns the location if found, or an error if not.
-func GetCustomerLocationByID(ctx context.Context, db *database.Queries, id int32) (*database.CustomerLocation, error) {
-	location, err := db.GetCustomerLocationByID(ctx, id)
+func (cfg *apiConfig) GetCustomerLocationByID(ctx context.Context, id int32) (*database.CustomerLocation, error) {
+	location, err := cfg.DbQueries.GetCustomerLocationByID(ctx, id)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, errors.New("customer location not found")
@@ -150,11 +150,11 @@ func GetCustomerLocationByID(ctx context.Context, db *database.Queries, id int32
 
 // ListCustomerLocations retrieves all locations for a given customer ID.
 // It returns a slice of locations if found, or an error if not.
-func ListCustomerLocations(ctx context.Context, db *database.Queries, customerID int32) ([]database.CustomerLocation, error) {
+func (cfg *apiConfig) ListCustomerLocations(ctx context.Context, customerID int32) ([]database.CustomerLocation, error) {
 	if customerID == 0 {
 		return nil, errors.New("customer_id is required")
 	}
-	locations, err := db.ListCustomerLocationsByCustomer(ctx, customerID)
+	locations, err := cfg.DbQueries.ListCustomerLocationsByCustomer(ctx, customerID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to list customer locations: %w", err)
 	}
