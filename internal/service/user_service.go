@@ -63,6 +63,19 @@ func AuthenticateUser(ctx context.Context, db *database.Queries, input Authentic
 	return &user, nil
 }
 
+func GetUserByID(ctx context.Context, db *database.Queries, userID uuid.UUID) (*database.User, error) {
+	if userID == uuid.Nil {
+		return nil, errors.New("user ID is required")
+	}
+
+	user, err := db.GetUserByID(ctx, userID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch user: %w", err)
+	}
+
+	return &user, nil
+}
+
 // UpdateUser updates the user's profile information after validating input.
 func UpdateUserName(ctx context.Context, db *database.Queries, input UpdateUserNameInput) (*database.User, error) {
 	// Validate input
