@@ -44,6 +44,10 @@ func main() {
 
 	// Register routes
 	mux.HandleFunc("POST /api/users", apiCfg.HandleRegisterUser)
+	mux.HandleFunc("POST /api/authenticate", apiCfg.HandleAuthenticateUser)
+	mux.HandleFunc("GET /api/users/{id}", apiCfg.HandleGetUser)
+	mux.HandleFunc("PUT /api/users/{id}", apiCfg.HandleUpdateUserName)
+	mux.HandleFunc("PUT /api/users/{id}/password", apiCfg.HandleUpdateUserPassword)
 
 	// Run the server on port 8080
 	http.ListenAndServe(":8080", mux)
