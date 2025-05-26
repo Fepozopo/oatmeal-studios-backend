@@ -5,22 +5,11 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"time"
 
 	"github.com/Fepozopo/oatmeal-studios-backend/internal/database"
 )
 
-type CreateOrUpdateInvoiceInput struct {
-	InvoiceDate        time.Time `json:"invoice_date"`
-	OrderID            int32     `json:"order_id"`
-	CustomerID         int32     `json:"customer_id"`
-	CustomerLocationID int32     `json:"customer_location_id,omitempty"`
-	DueDate            time.Time `json:"due_date"`
-	Status             string    `json:"status"`
-	Total              float64   `json:"total"`
-}
-
-func (cfg *apiConfig) CreateInvoice(ctx context.Context, input CreateOrUpdateInvoiceInput) (*database.Invoice, error) {
+func (cfg *apiConfig) CreateInvoice(ctx context.Context, input CreateInvoiceInput) (*database.Invoice, error) {
 	if input.OrderID == 0 {
 		return nil, errors.New("order_id is required")
 	}
@@ -90,8 +79,8 @@ func (cfg *apiConfig) ListInvoicesByCustomerLocation(ctx context.Context, custom
 	return invoices, nil
 }
 
-func (cfg *apiConfig) UpdateInvoice(ctx context.Context, id int32, input CreateOrUpdateInvoiceInput) (*database.Invoice, error) {
-	if id == 0 {
+func (cfg *apiConfig) UpdateInvoice(ctx context.Context, input UpdateInvoiceInput) (*database.Invoice, error) {
+	if input.ID == 0 {
 		return nil, errors.New("id is required")
 	}
 	if input.OrderID == 0 {
@@ -104,7 +93,7 @@ func (cfg *apiConfig) UpdateInvoice(ctx context.Context, id int32, input CreateO
 		return nil, errors.New("status is required")
 	}
 	params := database.UpdateInvoiceParams{
-		ID:                 id,
+		ID:                 input.ID,
 		InvoiceDate:        input.InvoiceDate,
 		OrderID:            input.OrderID,
 		CustomerID:         input.CustomerID,

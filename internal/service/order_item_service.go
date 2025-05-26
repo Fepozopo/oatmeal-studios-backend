@@ -9,25 +9,6 @@ import (
 	"github.com/Fepozopo/oatmeal-studios-backend/internal/database"
 )
 
-type CreateOrderItemInput struct {
-	OrderID      int32   `json:"order_id"`
-	Sku          string  `json:"sku"`
-	Quantity     int32   `json:"quantity"`
-	Price        float64 `json:"price"`
-	Discount     float64 `json:"discount"`
-	ItemTotal    float64 `json:"item_total"`
-	PocketNumber int32   `json:"pocket_number"`
-}
-
-type UpdateOrderItemInput struct {
-	Sku          string  `json:"sku"`
-	Quantity     int32   `json:"quantity"`
-	Price        float64 `json:"price"`
-	Discount     float64 `json:"discount"`
-	ItemTotal    float64 `json:"item_total"`
-	PocketNumber int32   `json:"pocket_number"`
-}
-
 func (cfg *apiConfig) GetOrderItem(ctx context.Context, id int32) (*database.OrderItem, error) {
 	item, err := cfg.DbQueries.GetOrderItem(ctx, id)
 	if err != nil {
@@ -73,15 +54,15 @@ func (cfg *apiConfig) CreateOrderItem(ctx context.Context, input CreateOrderItem
 	return &item, nil
 }
 
-func (cfg *apiConfig) UpdateOrderItem(ctx context.Context, id int32, input UpdateOrderItemInput) (*database.OrderItem, error) {
-	if id == 0 {
+func (cfg *apiConfig) UpdateOrderItem(ctx context.Context, input UpdateOrderItemInput) (*database.OrderItem, error) {
+	if input.ID == 0 {
 		return nil, errors.New("id is required")
 	}
 	if input.Sku == "" {
 		return nil, errors.New("sku is required")
 	}
 	params := database.UpdateOrderItemParams{
-		ID:           id,
+		ID:           input.ID,
 		Sku:          input.Sku,
 		Quantity:     input.Quantity,
 		Price:        input.Price,

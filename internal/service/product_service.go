@@ -5,30 +5,12 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"time"
 
 	"github.com/Fepozopo/oatmeal-studios-backend/internal/database"
 	"github.com/google/uuid"
 )
 
-type CreateOrUpdateProductInput struct {
-	Type           string    `json:"type"`
-	Sku            string    `json:"sku"`
-	Upc            string    `json:"upc"`
-	Status         string    `json:"status"`
-	Cost           float64   `json:"cost"`
-	Price          float64   `json:"price"`
-	Envelope       string    `json:"envelope,omitempty"`
-	Artist         string    `json:"artist,omitempty"`
-	Category       string    `json:"category,omitempty"`
-	ReleaseDate    time.Time `json:"release_date,omitempty"`
-	LastBoughtDate time.Time `json:"last_bought_date,omitempty"`
-	Description    string    `json:"description,omitempty"`
-	TextFront      string    `json:"text_front,omitempty"`
-	TextInside     string    `json:"text_inside,omitempty"`
-}
-
-func (cfg *apiConfig) CreateProduct(ctx context.Context, input CreateOrUpdateProductInput) (*database.Product, error) {
+func (cfg *apiConfig) CreateProduct(ctx context.Context, input CreateProductInput) (*database.Product, error) {
 	if input.Type == "" || input.Sku == "" || input.Upc == "" || input.Status == "" {
 		return nil, errors.New("type, sku, upc, and status are required")
 	}
@@ -104,9 +86,9 @@ func (cfg *apiConfig) ListProductsByStatus(ctx context.Context, status string) (
 	return prod, nil
 }
 
-func (cfg *apiConfig) UpdateProduct(ctx context.Context, id uuid.UUID, input CreateOrUpdateProductInput) (*database.Product, error) {
+func (cfg *apiConfig) UpdateProduct(ctx context.Context, input UpdateProductInput) (*database.Product, error) {
 	params := database.UpdateProductParams{
-		ID:             id,
+		ID:             input.ID,
 		Type:           input.Type,
 		Sku:            input.Sku,
 		Upc:            input.Upc,

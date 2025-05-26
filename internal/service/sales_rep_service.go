@@ -9,20 +9,8 @@ import (
 	"github.com/Fepozopo/oatmeal-studios-backend/internal/database"
 )
 
-type CreateOrUpdateSalesRepInput struct {
-	Status    string `json:"status"`
-	FirstName string `json:"first_name"`
-	LastName  string `json:"last_name"`
-	Company   string `json:"company"`
-	Address1  string `json:"address1,omitempty"`
-	Address2  string `json:"address2,omitempty"`
-	City      string `json:"city,omitempty"`
-	State     string `json:"state,omitempty"`
-	ZipCode   string `json:"zip_code,omitempty"`
-}
-
 // CreateSalesRep creates a new sales rep and returns the created sales rep.
-func (cfg *apiConfig) CreateSalesRep(ctx context.Context, input CreateOrUpdateSalesRepInput) (*database.SalesRep, error) {
+func (cfg *apiConfig) CreateSalesRep(ctx context.Context, input CreateSalesRepInput) (*database.SalesRep, error) {
 	// Required fields
 	if input.Status == "" {
 		input.Status = "Active"
@@ -78,7 +66,7 @@ func (cfg *apiConfig) ListSalesReps(ctx context.Context) ([]database.SalesRep, e
 }
 
 // UpdateSalesRep updates an existing sales rep's details by ID.
-func (cfg *apiConfig) UpdateSalesRep(ctx context.Context, id int32, input CreateOrUpdateSalesRepInput) (*database.SalesRep, error) {
+func (cfg *apiConfig) UpdateSalesRep(ctx context.Context, input UpdateSalesRepInput) (*database.SalesRep, error) {
 	// Required fields
 	if input.Status == "" {
 		input.Status = "Active"
@@ -94,7 +82,7 @@ func (cfg *apiConfig) UpdateSalesRep(ctx context.Context, id int32, input Create
 	}
 
 	params := database.UpdateSalesRepParams{
-		ID:        id,
+		ID:        input.ID,
 		Status:    input.Status,
 		FirstName: input.FirstName,
 		LastName:  input.LastName,

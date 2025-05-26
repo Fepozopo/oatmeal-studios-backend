@@ -9,13 +9,13 @@ import (
 )
 
 // CreateRefreshToken creates a new refresh token.
-func (cfg *apiConfig) CreateRefreshToken(ctx context.Context, token string, id uuid.UUID) error {
-	if token == "" || id == uuid.Nil {
+func (cfg *apiConfig) CreateRefreshToken(ctx context.Context, input CreateRefreshTokenInput) error {
+	if input.Token == "" || input.UserID == uuid.Nil {
 		return fmt.Errorf("invalid parameters: token and user ID must not be empty")
 	}
 	params := database.CreateRefreshTokenParams{
-		Token:  token,
-		UserID: id,
+		Token:  input.Token,
+		UserID: input.UserID,
 	}
 
 	err := cfg.DbQueries.CreateRefreshToken(ctx, params)

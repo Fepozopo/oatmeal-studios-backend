@@ -10,28 +10,6 @@ import (
 	"github.com/google/uuid"
 )
 
-// RegisterUserInput holds the registration details for a new user.
-type RegisterUserInput struct {
-	Email     string `json:"email"`
-	Password  string `json:"password"`
-	FirstName string `json:"first_name"`
-	LastName  string `json:"last_name"`
-}
-
-// UpdateUserNameInput holds the details for updating a user's name.
-type UpdateUserNameInput struct {
-	UserID    uuid.UUID `json:"user_id"`
-	FirstName string    `json:"first_name"`
-	LastName  string    `json:"last_name"`
-}
-
-// UpdateUserPasswordInput holds the details for changing a user's password.
-type UpdateUserPasswordInput struct {
-	UserID      uuid.UUID `json:"user_id"`
-	OldPassword string    `json:"old_password"`
-	NewPassword string    `json:"new_password"`
-}
-
 // RegisterUser registers a new user after validating input and hashing the password.
 func (cfg *apiConfig) RegisterUser(ctx context.Context, input RegisterUserInput) (*database.User, error) {
 	// Validate input fields
@@ -65,20 +43,20 @@ func (cfg *apiConfig) RegisterUser(ctx context.Context, input RegisterUserInput)
 }
 
 // AuthenticateUser checks the user's credentials and returns the user if valid.
-func (cfg *apiConfig) AuthenticateUser(ctx context.Context, email, password string) (*database.User, error) {
+func (cfg *apiConfig) AuthenticateUser(ctx context.Context, input AuthenticateUserInput) (*database.User, error) {
 	// Validate input
-	if email == "" || password == "" {
+	if input.Email == "" || input.Password == "" {
 		return nil, errors.New("email and password are required")
 	}
 
 	// Fetch user by email
-	user, err := cfg.DbQueries.GetUserByEmail(ctx, email)
+	user, err := cfg.DbQueries.GetUserByEmail(ctx, input.Email)
 	if err != nil {
 		return nil, fmt.Errorf("user not found: %w", err)
 	}
 
 	// Verify password
-	if err := auth.CheckPasswordHash(password, user.Password); err != nil {
+	if err := auth.CheckPasswordHash(input.Password, user.Password); err != nil {
 		return nil, fmt.Errorf("invalid password: %w", err)
 	}
 

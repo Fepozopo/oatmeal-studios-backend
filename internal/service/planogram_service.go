@@ -8,32 +8,6 @@ import (
 	"github.com/Fepozopo/oatmeal-studios-backend/internal/database"
 )
 
-type CreatePlanogramInput struct {
-	Name       string `json:"name"`
-	NumPockets int32  `json:"num_pockets"`
-	Notes      string `json:"notes"`
-}
-
-type UpdatePlanogramInput struct {
-	ID         int32  `json:"id"`
-	Name       string `json:"name"`
-	NumPockets int32  `json:"num_pockets"`
-	Notes      string `json:"notes"`
-}
-
-type CreatePlanogramPocketInput struct {
-	PlanogramID  int32  `json:"planogram_id"`
-	PocketNumber int32  `json:"pocket_number"`
-	Category     string `json:"category"`
-	ProductID    int32  `json:"product_id"`
-}
-
-type UpdatePlanogramPocketInput struct {
-	ID        int32  `json:"id"`
-	Category  string `json:"category"`
-	ProductID int32  `json:"product_id"`
-}
-
 func (cfg *apiConfig) GetPlanogram(ctx context.Context, id int32) (*database.Planogram, error) {
 	planogram, err := cfg.DbQueries.GetPlanogram(ctx, id)
 	if err != nil {
@@ -109,13 +83,13 @@ func (cfg *apiConfig) DeletePlanogram(ctx context.Context, id int32) error {
 }
 
 // AssignPlanogramToLocation assigns a planogram to a customer location.
-func (cfg *apiConfig) AssignPlanogramToLocation(ctx context.Context, planogramID, customerID int32) (*database.PlanogramCustomerLocation, error) {
-	if planogramID <= 0 || customerID <= 0 {
-		return nil, fmt.Errorf("invalid planogram_id or customer_id")
+func (cfg *apiConfig) AssignPlanogramToLocation(ctx context.Context, input AssignPlanogramToLocationInput) (*database.PlanogramCustomerLocation, error) {
+	if input.PlanogramID <= 0 || input.CustomerLocationID <= 0 {
+		return nil, fmt.Errorf("invalid planogram_id or customer_location_id")
 	}
 	pcl, err := cfg.DbQueries.AssignPlanogramToLocation(ctx, database.AssignPlanogramToLocationParams{
-		PlanogramID:        planogramID,
-		CustomerLocationID: customerID,
+		PlanogramID:        input.PlanogramID,
+		CustomerLocationID: input.CustomerLocationID,
 	})
 	if err != nil {
 		return nil, fmt.Errorf("failed to assign planogram to location: %w", err)
@@ -124,13 +98,13 @@ func (cfg *apiConfig) AssignPlanogramToLocation(ctx context.Context, planogramID
 }
 
 // RemovePlanogramFromLocation removes a planogram from a customer location.
-func (cfg *apiConfig) RemovePlanogramFromLocation(ctx context.Context, planogramID, customerID int32) error {
-	if planogramID <= 0 || customerID <= 0 {
-		return fmt.Errorf("invalid planogram_id or customer_id")
+func (cfg *apiConfig) RemovePlanogramFromLocation(ctx context.Context, input RemovePlanogramFromLocationInput) error {
+	if input.PlanogramID <= 0 || input.CustomerLocationID <= 0 {
+		return fmt.Errorf("invalid planogram_id or customer_location_id")
 	}
 	err := cfg.DbQueries.RemovePlanogramFromLocation(ctx, database.RemovePlanogramFromLocationParams{
-		PlanogramID:        planogramID,
-		CustomerLocationID: customerID,
+		PlanogramID:        input.PlanogramID,
+		CustomerLocationID: input.CustomerLocationID,
 	})
 	if err != nil {
 		return fmt.Errorf("failed to remove planogram from location: %w", err)
@@ -238,13 +212,13 @@ func (cfg *apiConfig) DeletePlanogramPocket(ctx context.Context, id int32) error
 }
 
 // GetPlanogramPocketByNumber retrieves a planogram pocket by planogram ID and pocket number.
-func (cfg *apiConfig) GetPlanogramPocketByNumber(ctx context.Context, planogramID, pocketNumber int32) (*database.PlanogramPocket, error) {
-	if planogramID <= 0 || pocketNumber <= 0 {
+func (cfg *apiConfig) GetPlanogramPocketByNumber(ctx context.Context, input GetPlanogramPocketByNumberInput) (*database.PlanogramPocket, error) {
+	if input.PlanogramID <= 0 || input.PocketNumber <= 0 {
 		return nil, fmt.Errorf("invalid planogram_id or pocket_number")
 	}
 	pocket, err := cfg.DbQueries.GetPlanogramPocketByNumber(ctx, database.GetPlanogramPocketByNumberParams{
-		PlanogramID:  planogramID,
-		PocketNumber: pocketNumber,
+		PlanogramID:  input.PlanogramID,
+		PocketNumber: input.PocketNumber,
 	})
 	if err != nil {
 		if err == sql.ErrNoRows {
