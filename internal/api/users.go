@@ -142,3 +142,48 @@ func (cfg *ApiConfig) HandleUpdateUserPassword(w http.ResponseWriter, r *http.Re
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(map[string]string{"message": "Password updated successfully"})
 }
+
+func (cfg *ApiConfig) HandleListUsers(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	users, err := service.ListUsers(r.Context(), cfg.DbQueries)
+	if err != nil {
+		http.Error(w, "Failed to list users: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(users)
+}
+
+func (cfg *ApiConfig) HandleDeleteUser(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodDelete {
+		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	userID := r.URL.Query().Get("id")
+	if userID == "" {
+		http.Error(w, "Bad Request: User ID is required", http.StatusBadRequest)
+		return
+	}
+
+	// Validate the UUID format
+	uid, err := uuid.Parse(userID)
+	if err != nil {
+		http.Error(w, "Bad Request: Invalid User ID format", http.StatusBadRequest)
+		return
+	}
+
+	err = service.DeleteUser(r.Context(), cfg.DbQueries, uid)
+	if err != nil {
+		http.Error(w, "Failed to delete user: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
+}

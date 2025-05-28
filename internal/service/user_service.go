@@ -139,6 +139,16 @@ func UpdateUserPassword(ctx context.Context, db *database.Queries, input UpdateU
 	return nil
 }
 
+func ListUsers(ctx context.Context, db *database.Queries) ([]database.ListUsersRow, error) {
+	// Fetch all users from the database
+	users, err := db.ListUsers(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("failed to list users: %w", err)
+	}
+
+	return users, nil
+}
+
 // DeleteUser deletes a user by their ID.
 func DeleteUser(ctx context.Context, db *database.Queries, userID uuid.UUID) error {
 	if userID == uuid.Nil {
