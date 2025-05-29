@@ -46,13 +46,13 @@ func (cfg *ApiConfig) HandleGetCustomer(w http.ResponseWriter, r *http.Request) 
 	}
 
 	// Convert the customerID from string to an int32
-	cid, err := strconv.ParseInt(customerID, 10, 32)
+	customerIDInt, err := strconv.ParseInt(customerID, 10, 32)
 	if err != nil {
 		http.Error(w, "Invalid Customer ID format: "+err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	customer, err := service.GetCustomerByID(r.Context(), cfg.DbQueries, int32(cid))
+	customer, err := service.GetCustomerByID(r.Context(), cfg.DbQueries, int32(customerIDInt))
 	if err != nil {
 		http.Error(w, "Failed to get customer: "+err.Error(), http.StatusInternalServerError)
 		return
@@ -114,13 +114,13 @@ func (cfg *ApiConfig) HandleDeleteCustomer(w http.ResponseWriter, r *http.Reques
 	}
 
 	// Convert the customerID from string to an int32
-	cid, err := strconv.ParseInt(customerID, 10, 32)
+	customerIDInt, err := strconv.ParseInt(customerID, 10, 32)
 	if err != nil {
 		http.Error(w, "Invalid Customer ID format: "+err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	err = service.DeleteCustomer(r.Context(), cfg.DbQueries, int32(cid))
+	err = service.DeleteCustomer(r.Context(), cfg.DbQueries, int32(customerIDInt))
 	if err != nil {
 		http.Error(w, "Failed to delete customer: "+err.Error(), http.StatusInternalServerError)
 		return
