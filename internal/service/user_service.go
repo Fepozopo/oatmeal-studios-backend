@@ -167,3 +167,23 @@ func DeleteAllUsers(ctx context.Context, db *database.Queries) error {
 	}
 	return nil
 }
+
+func GetUserByRefreshToken(ctx context.Context, db *database.Queries, token string) (*database.User, error) {
+	if token == "" {
+		return nil, errors.New("token is required")
+	}
+
+	// Fetch the refresh token
+	rt, err := db.GetRefreshToken(ctx, token)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get refresh token: %w", err)
+	}
+
+	// Fetch the user associated with the refresh token
+	user, err := db.GetUserByID(ctx, rt.UserID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get user by refresh token: %w", err)
+	}
+
+	return &user, nil
+}

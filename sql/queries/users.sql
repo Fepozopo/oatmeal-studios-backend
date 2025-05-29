@@ -39,6 +39,12 @@ SET password = $2,
     updated_at = NOW()
 WHERE id = $1;
 
+-- name: GetUserFromRefreshToken :one
+SELECT *
+FROM users
+    INNER JOIN refresh_tokens ON users.id = refresh_tokens.user_id
+WHERE refresh_tokens.token = $1;
+
 -- name: DeleteUser :exec
 DELETE FROM users
 WHERE id = $1;

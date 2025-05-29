@@ -141,6 +141,9 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.getUserByIDStmt, err = db.PrepareContext(ctx, getUserByID); err != nil {
 		return nil, fmt.Errorf("error preparing query GetUserByID: %w", err)
 	}
+	if q.getUserFromRefreshTokenStmt, err = db.PrepareContext(ctx, getUserFromRefreshToken); err != nil {
+		return nil, fmt.Errorf("error preparing query GetUserFromRefreshToken: %w", err)
+	}
 	if q.listCustomerLocationsByCustomerStmt, err = db.PrepareContext(ctx, listCustomerLocationsByCustomer); err != nil {
 		return nil, fmt.Errorf("error preparing query ListCustomerLocationsByCustomer: %w", err)
 	}
@@ -431,6 +434,11 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing getUserByIDStmt: %w", cerr)
 		}
 	}
+	if q.getUserFromRefreshTokenStmt != nil {
+		if cerr := q.getUserFromRefreshTokenStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getUserFromRefreshTokenStmt: %w", cerr)
+		}
+	}
 	if q.listCustomerLocationsByCustomerStmt != nil {
 		if cerr := q.listCustomerLocationsByCustomerStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing listCustomerLocationsByCustomerStmt: %w", cerr)
@@ -659,6 +667,7 @@ type Queries struct {
 	getSalesRepStmt                     *sql.Stmt
 	getUserByEmailStmt                  *sql.Stmt
 	getUserByIDStmt                     *sql.Stmt
+	getUserFromRefreshTokenStmt         *sql.Stmt
 	listCustomerLocationsByCustomerStmt *sql.Stmt
 	listCustomersStmt                   *sql.Stmt
 	listInvoicesByCustomerStmt          *sql.Stmt
@@ -734,6 +743,7 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		getSalesRepStmt:                     q.getSalesRepStmt,
 		getUserByEmailStmt:                  q.getUserByEmailStmt,
 		getUserByIDStmt:                     q.getUserByIDStmt,
+		getUserFromRefreshTokenStmt:         q.getUserFromRefreshTokenStmt,
 		listCustomerLocationsByCustomerStmt: q.listCustomerLocationsByCustomerStmt,
 		listCustomersStmt:                   q.listCustomersStmt,
 		listInvoicesByCustomerStmt:          q.listInvoicesByCustomerStmt,
