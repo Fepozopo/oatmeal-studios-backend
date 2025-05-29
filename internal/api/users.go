@@ -3,7 +3,9 @@ package api
 import (
 	"encoding/json"
 	"net/http"
+	"time"
 
+	"github.com/Fepozopo/oatmeal-studios-backend/internal/auth"
 	"github.com/Fepozopo/oatmeal-studios-backend/internal/service"
 	"github.com/google/uuid"
 )
@@ -51,9 +53,46 @@ func (cfg *ApiConfig) HandleAuthenticateUser(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
+	// Set the expires time for the JWT token
+	tokenTime := 7200 * time.Second // 2 hours
+	token, err := auth.MakeJWT(user.ID, cfg.TokenSecret, tokenTime)
+	if err != nil {
+		http.Error(w, "Failed to generate access token: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Authorization", "Bearer "+token)
+
+	// Generate a refresh token and store it in the database
+	refreshToken, err := auth.MakeRefreshToken()
+	if err != nil {
+		http.Error(w, "Failed to generate refresh token: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+	refreshTokenInput := service.CreateRefreshTokenInput{
+		Token:  refreshToken,
+		UserID: user.ID,
+	}
+	err = service.CreateRefreshToken(r.Context(), cfg.DbQueries, refreshTokenInput)
+	if err != nil {
+		http.Error(w, "Failed to store refresh token: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	userResponse := UserResponse{
+		ID:           user.ID,
+		CreatedAt:    user.CreatedAt,
+		UpdatedAt:    user.UpdatedAt,
+		Email:        user.Email,
+		FirstName:    user.FirstName,
+		LastName:     user.LastName,
+		Token:        token,
+		RefreshToken: refreshToken,
+	}
+
+	// Return the user response with the token
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(map[string]string{"message": "User authenticated successfully", "user_id": user.ID.String()})
+	json.NewEncoder(w).Encode(userResponse)
 }
 
 func (cfg *ApiConfig) HandleGetUser(w http.ResponseWriter, r *http.Request) {
@@ -62,20 +101,13 @@ func (cfg *ApiConfig) HandleGetUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userID := r.URL.Query().Get("id")
-	if userID == "" {
-		http.Error(w, "Bad Request: User ID is required", http.StatusBadRequest)
+	userID, err := idFromURLAsUUID(r)
+	if userID == uuid.Nil {
+		http.Error(w, "Invalid User ID", http.StatusBadRequest)
 		return
 	}
 
-	// Validate the UUID format
-	uid, err := uuid.Parse(userID)
-	if err != nil {
-		http.Error(w, "Bad Request: Invalid User ID format", http.StatusBadRequest)
-		return
-	}
-
-	user, err := service.GetUserByID(r.Context(), cfg.DbQueries, uid)
+	user, err := service.GetUserByID(r.Context(), cfg.DbQueries, userID)
 	if err != nil {
 		http.Error(w, "Failed to get user: "+err.Error(), http.StatusInternalServerError)
 		return
@@ -175,6 +207,73 @@ func (cfg *ApiConfig) HandleDeleteUser(w http.ResponseWriter, r *http.Request) {
 	err = service.DeleteUser(r.Context(), cfg.DbQueries, userID)
 	if err != nil {
 		http.Error(w, "Failed to delete user: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
+}
+
+// HandleRefreshToken processes a request to refresh a user's access token using
+// their refresh token. It expects the refresh token to be provided in the
+// Authorization header of the request. If the token is missing or invalid,
+// it returns an appropriate error response. If the token is valid, it
+// generates a new access token and returns it in the response body. If there
+// is an error generating the new token, it responds with a 500 status and an
+// error message.
+func (cfg *ApiConfig) HandleRefreshToken(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	refreshToken, err := auth.GetBearerToken(r.Header)
+	if err != nil {
+		http.Error(w, "Unauthorized: "+err.Error(), http.StatusUnauthorized)
+		return
+	}
+
+	user, err := service.GetUserFromRefreshToken(r.Context(), cfg.DbQueries, refreshToken)
+	if err != nil {
+		http.Error(w, "Failed to get user from refresh token: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	tokenTime := 7200 * time.Second // 2 hours
+	token, err := auth.MakeJWT(user.ID, cfg.TokenSecret, tokenTime)
+	if err != nil {
+		http.Error(w, "Failed to generate access token: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	response := NewJWT{
+		Token:     token,
+		ExpiresIn: int64(tokenTime / time.Second),
+	}
+	json.NewEncoder(w).Encode(response)
+}
+
+// HandleRevokeRefresh processes a request to revoke a user's refresh token.
+// It extracts the refresh token from the Authorization header, validates it,
+// and marks the associated refresh token as revoked in the database. If the
+// refresh token is missing or invalid, or if there is an error storing the
+// revocation, it responds with an appropriate error status and error message.
+func (cfg *ApiConfig) HandleRevokeRefresh(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	refreshToken, err := auth.GetBearerToken(r.Header)
+	if err != nil {
+		http.Error(w, "Unauthorized: "+err.Error(), http.StatusUnauthorized)
+		return
+	}
+
+	err = service.RevokeRefreshToken(r.Context(), cfg.DbQueries, refreshToken)
+	if err != nil {
+		http.Error(w, "Failed to revoke refresh token: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 

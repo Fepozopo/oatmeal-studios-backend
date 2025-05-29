@@ -178,5 +178,9 @@ func GetUserFromRefreshToken(ctx context.Context, db *database.Queries, token st
 		return nil, fmt.Errorf("failed to get user from refresh token: %w", err)
 	}
 
+	if user.RevokedAt.Valid {
+		return nil, errors.New("refresh token has been revoked")
+	}
+
 	return &user, nil
 }
