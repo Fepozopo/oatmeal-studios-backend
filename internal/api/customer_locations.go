@@ -2,7 +2,6 @@ package api
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"github.com/Fepozopo/oatmeal-studios-backend/internal/service"
@@ -36,20 +35,13 @@ func (cfg *ApiConfig) HandleDeleteCustomerLocation(w http.ResponseWriter, r *htt
 		return
 	}
 
-	locationID := r.URL.Query().Get("id")
-	if locationID == "" {
-		http.Error(w, "Location ID is required", http.StatusBadRequest)
-		return
-	}
-
-	var locationIDInt int32
-	_, err := fmt.Sscanf(locationID, "%d", &locationIDInt)
+	locationID, err := idFromURLAsInt32(r)
 	if err != nil {
-		http.Error(w, "Invalid Location ID format", http.StatusBadRequest)
+		http.Error(w, "Invalid Location ID: "+err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	if err := service.DeleteCustomerLocation(r.Context(), cfg.DbQueries, locationIDInt); err != nil {
+	if err := service.DeleteCustomerLocation(r.Context(), cfg.DbQueries, locationID); err != nil {
 		http.Error(w, "Failed to delete customer location: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -85,20 +77,13 @@ func (cfg *ApiConfig) HandleGetCustomerLocation(w http.ResponseWriter, r *http.R
 		return
 	}
 
-	locationID := r.URL.Query().Get("id")
-	if locationID == "" {
-		http.Error(w, "Location ID is required", http.StatusBadRequest)
-		return
-	}
-
-	var locationIDInt int32
-	_, err := fmt.Sscanf(locationID, "%d", &locationIDInt)
+	locationID, err := idFromURLAsInt32(r)
 	if err != nil {
-		http.Error(w, "Invalid Location ID format", http.StatusBadRequest)
+		http.Error(w, "Invalid Location ID: "+err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	location, err := service.GetCustomerLocationByID(r.Context(), cfg.DbQueries, locationIDInt)
+	location, err := service.GetCustomerLocationByID(r.Context(), cfg.DbQueries, locationID)
 	if err != nil {
 		http.Error(w, "Failed to get customer location: "+err.Error(), http.StatusInternalServerError)
 		return
@@ -114,20 +99,13 @@ func (cfg *ApiConfig) HandleListCustomerLocations(w http.ResponseWriter, r *http
 		return
 	}
 
-	userID := r.URL.Query().Get("user_id")
-	if userID == "" {
-		http.Error(w, "User ID is required", http.StatusBadRequest)
-		return
-	}
-
-	var userIDInt int32
-	_, err := fmt.Sscanf(userID, "%d", &userIDInt)
+	userID, err := idFromURLAsInt32(r)
 	if err != nil {
-		http.Error(w, "Invalid User ID format", http.StatusBadRequest)
+		http.Error(w, "Invalid User ID: "+err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	locations, err := service.ListCustomerLocations(r.Context(), cfg.DbQueries, userIDInt)
+	locations, err := service.ListCustomerLocations(r.Context(), cfg.DbQueries, userID)
 	if err != nil {
 		http.Error(w, "Failed to list customer locations: "+err.Error(), http.StatusInternalServerError)
 		return

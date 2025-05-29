@@ -3,7 +3,6 @@ package api
 import (
 	"encoding/json"
 	"net/http"
-	"strconv"
 
 	"github.com/Fepozopo/oatmeal-studios-backend/internal/service"
 )
@@ -39,20 +38,13 @@ func (cfg *ApiConfig) HandleGetCustomer(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	customerID := r.URL.Query().Get("id")
-	if customerID == "" {
-		http.Error(w, "Customer ID is required", http.StatusBadRequest)
-		return
-	}
-
-	// Convert the customerID from string to an int32
-	customerIDInt, err := strconv.ParseInt(customerID, 10, 32)
+	customerID, err := idFromURLAsInt32(r)
 	if err != nil {
-		http.Error(w, "Invalid Customer ID format: "+err.Error(), http.StatusBadRequest)
+		http.Error(w, "Invalid Customer ID: "+err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	customer, err := service.GetCustomerByID(r.Context(), cfg.DbQueries, int32(customerIDInt))
+	customer, err := service.GetCustomerByID(r.Context(), cfg.DbQueries, customerID)
 	if err != nil {
 		http.Error(w, "Failed to get customer: "+err.Error(), http.StatusInternalServerError)
 		return
@@ -107,20 +99,13 @@ func (cfg *ApiConfig) HandleDeleteCustomer(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	customerID := r.URL.Query().Get("id")
-	if customerID == "" {
-		http.Error(w, "Customer ID is required", http.StatusBadRequest)
-		return
-	}
-
-	// Convert the customerID from string to an int32
-	customerIDInt, err := strconv.ParseInt(customerID, 10, 32)
+	customerID, err := idFromURLAsInt32(r)
 	if err != nil {
-		http.Error(w, "Invalid Customer ID format: "+err.Error(), http.StatusBadRequest)
+		http.Error(w, "Invalid Customer ID: "+err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	err = service.DeleteCustomer(r.Context(), cfg.DbQueries, int32(customerIDInt))
+	err = service.DeleteCustomer(r.Context(), cfg.DbQueries, customerID)
 	if err != nil {
 		http.Error(w, "Failed to delete customer: "+err.Error(), http.StatusInternalServerError)
 		return

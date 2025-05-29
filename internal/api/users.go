@@ -166,20 +166,13 @@ func (cfg *ApiConfig) HandleDeleteUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userID := r.URL.Query().Get("id")
-	if userID == "" {
-		http.Error(w, "Bad Request: User ID is required", http.StatusBadRequest)
-		return
-	}
-
-	// Validate the UUID format
-	uid, err := uuid.Parse(userID)
+	userID, err := idFromURLAsUUID(r)
 	if err != nil {
-		http.Error(w, "Bad Request: Invalid User ID format", http.StatusBadRequest)
+		http.Error(w, "Invalid User ID: "+err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	err = service.DeleteUser(r.Context(), cfg.DbQueries, uid)
+	err = service.DeleteUser(r.Context(), cfg.DbQueries, userID)
 	if err != nil {
 		http.Error(w, "Failed to delete user: "+err.Error(), http.StatusInternalServerError)
 		return

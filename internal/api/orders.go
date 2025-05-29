@@ -2,7 +2,6 @@ package api
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"github.com/Fepozopo/oatmeal-studios-backend/internal/service"
@@ -14,21 +13,13 @@ func (cfg *ApiConfig) HandleGetOrder(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	orderID := r.URL.Query().Get("id")
-	if orderID == "" {
-		http.Error(w, "Order ID is required", http.StatusBadRequest)
-		return
-	}
-
-	// Convert orderID to int32
-	var orderIDInt int32
-	_, err := fmt.Sscanf(orderID, "%d", &orderIDInt)
+	orderID, err := idFromURLAsInt32(r)
 	if err != nil {
-		http.Error(w, "Invalid Order ID format", http.StatusBadRequest)
+		http.Error(w, "Invalid Order ID: "+err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	order, err := service.GetOrder(r.Context(), cfg.DbQueries, int32(orderIDInt))
+	order, err := service.GetOrder(r.Context(), cfg.DbQueries, orderID)
 	if err != nil {
 		http.Error(w, "Failed to get order: "+err.Error(), http.StatusInternalServerError)
 		return
@@ -105,20 +96,13 @@ func (cfg *ApiConfig) HandleListOrdersByCustomer(w http.ResponseWriter, r *http.
 		return
 	}
 
-	customerID := r.URL.Query().Get("customer_id")
-	if customerID == "" {
-		http.Error(w, "Customer ID is required", http.StatusBadRequest)
-		return
-	}
-
-	var customerIDInt int32
-	_, err := fmt.Sscanf(customerID, "%d", &customerIDInt)
+	customerID, err := idFromURLAsInt32(r)
 	if err != nil {
-		http.Error(w, "Invalid Customer ID format", http.StatusBadRequest)
+		http.Error(w, "Invalid Customer ID: "+err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	orders, err := service.ListOrdersByCustomer(r.Context(), cfg.DbQueries, customerIDInt)
+	orders, err := service.ListOrdersByCustomer(r.Context(), cfg.DbQueries, customerID)
 	if err != nil {
 		http.Error(w, "Failed to list orders: "+err.Error(), http.StatusInternalServerError)
 		return
@@ -134,20 +118,13 @@ func (cfg *ApiConfig) HandleDeleteOrder(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	orderID := r.URL.Query().Get("id")
-	if orderID == "" {
-		http.Error(w, "Order ID is required", http.StatusBadRequest)
-		return
-	}
-
-	var orderIDInt int32
-	_, err := fmt.Sscanf(orderID, "%d", &orderIDInt)
+	orderID, err := idFromURLAsInt32(r)
 	if err != nil {
-		http.Error(w, "Invalid Order ID format", http.StatusBadRequest)
+		http.Error(w, "Invalid Order ID: "+err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	err = service.DeleteOrder(r.Context(), cfg.DbQueries, orderIDInt)
+	err = service.DeleteOrder(r.Context(), cfg.DbQueries, orderID)
 	if err != nil {
 		http.Error(w, "Failed to delete order: "+err.Error(), http.StatusInternalServerError)
 		return
