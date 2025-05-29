@@ -93,3 +93,14 @@ func DeleteOrderItem(ctx context.Context, db *database.Queries, id int32) error 
 	}
 	return nil
 }
+
+func ListOrderItemsByOrderID(ctx context.Context, db *database.Queries, orderID int32) ([]database.OrderItem, error) {
+	if orderID == 0 {
+		return nil, errors.New("order_id is required")
+	}
+	items, err := db.ListOrderItemsByOrderID(ctx, orderID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to list order items by order: %w", err)
+	}
+	return items, nil
+}

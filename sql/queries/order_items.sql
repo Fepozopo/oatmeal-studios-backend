@@ -8,6 +8,11 @@ SELECT *
 FROM order_items
 WHERE sku = $1;
 
+-- name: ListOrderItemsByOrderID :many
+SELECT *
+FROM order_items
+WHERE order_id = $1;
+
 -- name: CreateOrderItem :one
 INSERT INTO order_items (order_id, sku, quantity, price, discount, item_total, pocket_number)
 VALUES ($1, $2, $3, $4, $5, $6, $7)
