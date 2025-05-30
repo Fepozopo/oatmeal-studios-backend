@@ -11,8 +11,9 @@ import (
 type ApiConfig struct {
 	FileserverHits atomic.Int32
 	DbQueries      *database.Queries
-	Platform       string `env:"PLATFORM"`
-	TokenSecret    string `env:"TOKEN_SECRET"`
+	Platform       string        `env:"PLATFORM"`
+	TokenSecret    string        `env:"TOKEN_SECRET"`
+	TokenExpiry    time.Duration `env:"TOKEN_EXPIRY"` // Duration for which the JWT token is valid
 }
 
 type UserResponse struct {

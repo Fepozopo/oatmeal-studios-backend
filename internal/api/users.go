@@ -238,8 +238,7 @@ func (cfg *ApiConfig) HandleRefreshToken(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	tokenTime := 7200 * time.Second // 2 hours
-	token, err := auth.MakeJWT(user.ID, cfg.TokenSecret, tokenTime)
+	token, err := auth.MakeJWT(user.ID, cfg.TokenSecret, cfg.TokenExpiry)
 	if err != nil {
 		http.Error(w, "Failed to generate access token: "+err.Error(), http.StatusInternalServerError)
 		return
@@ -249,7 +248,7 @@ func (cfg *ApiConfig) HandleRefreshToken(w http.ResponseWriter, r *http.Request)
 	w.WriteHeader(http.StatusOK)
 	response := NewJWT{
 		Token:     token,
-		ExpiresIn: int64(tokenTime / time.Second),
+		ExpiresIn: int64(cfg.TokenExpiry / time.Second),
 	}
 	json.NewEncoder(w).Encode(response)
 }
