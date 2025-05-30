@@ -12,6 +12,7 @@ func (cfg *ApiConfig) HandleGetPlanogram(w http.ResponseWriter, r *http.Request)
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
+	defer r.Body.Close()
 
 	id, err := idFromURLAsInt32(r)
 	if err != nil {
@@ -37,6 +38,7 @@ func (cfg *ApiConfig) HandleListPlanograms(w http.ResponseWriter, r *http.Reques
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
+	defer r.Body.Close()
 
 	planograms, err := service.ListPlanograms(r.Context(), cfg.DbQueries)
 	if err != nil {
@@ -56,6 +58,7 @@ func (cfg *ApiConfig) HandleCreatePlanogram(w http.ResponseWriter, r *http.Reque
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
+	defer r.Body.Close()
 
 	var input service.CreatePlanogramInput
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
@@ -82,6 +85,7 @@ func (cfg *ApiConfig) HandleUpdatePlanogram(w http.ResponseWriter, r *http.Reque
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
+	defer r.Body.Close()
 
 	var input service.UpdatePlanogramInput
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
@@ -107,6 +111,7 @@ func (cfg *ApiConfig) HandleDeletePlanogram(w http.ResponseWriter, r *http.Reque
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
+	defer r.Body.Close()
 
 	id, err := idFromURLAsInt32(r)
 	if err != nil {
@@ -128,6 +133,7 @@ func (cfg *ApiConfig) HandleAssignPlanogramToLocation(w http.ResponseWriter, r *
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
+	defer r.Body.Close()
 
 	var input service.AssignPlanogramToLocationInput
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
@@ -153,6 +159,7 @@ func (cfg *ApiConfig) HandleRemovePlanogramFromLocation(w http.ResponseWriter, r
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
+	defer r.Body.Close()
 
 	var input service.RemovePlanogramFromLocationInput
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
@@ -174,6 +181,7 @@ func (cfg *ApiConfig) HandleGetPlanogramsByLocation(w http.ResponseWriter, r *ht
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
+	defer r.Body.Close()
 
 	customerLocationID, err := idFromURLAsInt32(r)
 	if err != nil {
@@ -199,6 +207,7 @@ func (cfg *ApiConfig) HandleListLocationsByPlanogram(w http.ResponseWriter, r *h
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
+	defer r.Body.Close()
 
 	planogramID, err := idFromURLAsInt32(r)
 	if err != nil {
@@ -224,6 +233,7 @@ func (cfg *ApiConfig) HandleListPocketsForPlanogram(w http.ResponseWriter, r *ht
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
+	defer r.Body.Close()
 
 	planogramID, err := idFromURLAsInt32(r)
 	if err != nil {
@@ -249,6 +259,7 @@ func (cfg *ApiConfig) HandleGetPlanogramPocket(w http.ResponseWriter, r *http.Re
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
+	defer r.Body.Close()
 
 	id, err := idFromURLAsInt32(r)
 	if err != nil {
@@ -274,6 +285,7 @@ func (cfg *ApiConfig) HandleCreatePlanogramPocket(w http.ResponseWriter, r *http
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
+	defer r.Body.Close()
 
 	var input service.CreatePlanogramPocketInput
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
@@ -300,6 +312,7 @@ func (cfg *ApiConfig) HandleUpdatePlanogramPocket(w http.ResponseWriter, r *http
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
+	defer r.Body.Close()
 
 	var input service.UpdatePlanogramPocketInput
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
@@ -325,6 +338,7 @@ func (cfg *ApiConfig) HandleDeletePlanogramPocket(w http.ResponseWriter, r *http
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
+	defer r.Body.Close()
 
 	id, err := idFromURLAsInt32(r)
 	if err != nil {
@@ -346,6 +360,7 @@ func (cfg *ApiConfig) HandleGetPlanogramPocketByNumber(w http.ResponseWriter, r 
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
+	defer r.Body.Close()
 
 	var input service.GetPlanogramPocketByNumberInput
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {

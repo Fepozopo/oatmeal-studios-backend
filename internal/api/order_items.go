@@ -12,6 +12,7 @@ func (cfg *ApiConfig) HandleGetOrderItem(w http.ResponseWriter, r *http.Request)
 		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return
 	}
+	defer r.Body.Close()
 
 	orderID, err := idFromURLAsInt32(r)
 	if err != nil {
@@ -34,6 +35,7 @@ func (cfg *ApiConfig) HandleListOrderItemsBySKU(w http.ResponseWriter, r *http.R
 		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return
 	}
+	defer r.Body.Close()
 
 	sku := r.URL.Query().Get("sku")
 	if sku == "" {
@@ -56,6 +58,7 @@ func (cfg *ApiConfig) HandleCreateOrderItem(w http.ResponseWriter, r *http.Reque
 		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return
 	}
+	defer r.Body.Close()
 
 	var input service.CreateOrderItemInput
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
@@ -79,6 +82,7 @@ func (cfg *ApiConfig) HandleUpdateOrderItem(w http.ResponseWriter, r *http.Reque
 		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return
 	}
+	defer r.Body.Close()
 
 	var input service.UpdateOrderItemInput
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
@@ -101,6 +105,7 @@ func (cfg *ApiConfig) HandleDeleteOrderItem(w http.ResponseWriter, r *http.Reque
 		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return
 	}
+	defer r.Body.Close()
 
 	id, err := idFromURLAsInt32(r)
 	if err != nil {
@@ -122,6 +127,7 @@ func (cfg *ApiConfig) HandleListOrderItemsByOrderID(w http.ResponseWriter, r *ht
 		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return
 	}
+	defer r.Body.Close()
 
 	orderID, err := idFromURLAsInt32(r)
 	if err != nil {

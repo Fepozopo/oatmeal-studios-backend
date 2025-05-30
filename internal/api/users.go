@@ -15,6 +15,7 @@ func (cfg *ApiConfig) HandleRegisterUser(w http.ResponseWriter, r *http.Request)
 		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return
 	}
+	defer r.Body.Close()
 
 	var input service.RegisterUserInput
 	// Decode the JSON request body into the input struct
@@ -39,6 +40,7 @@ func (cfg *ApiConfig) HandleAuthenticateUser(w http.ResponseWriter, r *http.Requ
 		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return
 	}
+	defer r.Body.Close()
 
 	var input service.AuthenticateUserInput
 	// Decode the JSON request body into the input struct
@@ -100,6 +102,7 @@ func (cfg *ApiConfig) HandleGetUser(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return
 	}
+	defer r.Body.Close()
 
 	userID, err := idFromURLAsUUID(r)
 	if userID == uuid.Nil {
@@ -132,6 +135,7 @@ func (cfg *ApiConfig) HandleUpdateUserName(w http.ResponseWriter, r *http.Reques
 		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return
 	}
+	defer r.Body.Close()
 
 	var input service.UpdateUserNameInput
 	// Decode the JSON request body into the input struct
@@ -156,6 +160,7 @@ func (cfg *ApiConfig) HandleUpdateUserPassword(w http.ResponseWriter, r *http.Re
 		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return
 	}
+	defer r.Body.Close()
 
 	var input service.UpdateUserPasswordInput
 	// Decode the JSON request body into the input struct
@@ -197,6 +202,7 @@ func (cfg *ApiConfig) HandleDeleteUser(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return
 	}
+	defer r.Body.Close()
 
 	userID, err := idFromURLAsUUID(r)
 	if err != nil {
@@ -225,6 +231,7 @@ func (cfg *ApiConfig) HandleRefreshToken(w http.ResponseWriter, r *http.Request)
 		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return
 	}
+	defer r.Body.Close()
 
 	refreshToken, err := auth.GetBearerToken(r.Header)
 	if err != nil {
@@ -263,6 +270,7 @@ func (cfg *ApiConfig) HandleRevokeRefresh(w http.ResponseWriter, r *http.Request
 		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return
 	}
+	defer r.Body.Close()
 
 	refreshToken, err := auth.GetBearerToken(r.Header)
 	if err != nil {

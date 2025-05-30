@@ -12,6 +12,7 @@ func (cfg *ApiConfig) HandleCreateSalesRep(w http.ResponseWriter, r *http.Reques
 		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return
 	}
+	defer r.Body.Close()
 
 	var input service.CreateSalesRepInput
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
@@ -35,6 +36,7 @@ func (cfg *ApiConfig) HandleGetSalesRepByID(w http.ResponseWriter, r *http.Reque
 		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return
 	}
+	defer r.Body.Close()
 
 	id, err := idFromURLAsInt32(r)
 	if err != nil {
@@ -58,6 +60,7 @@ func (cfg *ApiConfig) HandleListSalesReps(w http.ResponseWriter, r *http.Request
 		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return
 	}
+	defer r.Body.Close()
 
 	salesReps, err := service.ListSalesReps(r.Context(), cfg.DbQueries)
 	if err != nil {
@@ -75,6 +78,7 @@ func (cfg *ApiConfig) HandleUpdateSalesRep(w http.ResponseWriter, r *http.Reques
 		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return
 	}
+	defer r.Body.Close()
 
 	id, err := idFromURLAsInt32(r)
 	if err != nil {
@@ -105,6 +109,7 @@ func (cfg *ApiConfig) HandleDeleteSalesRep(w http.ResponseWriter, r *http.Reques
 		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return
 	}
+	defer r.Body.Close()
 
 	id, err := idFromURLAsInt32(r)
 	if err != nil {

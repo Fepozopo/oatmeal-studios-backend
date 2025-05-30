@@ -12,6 +12,7 @@ func (cfg *ApiConfig) HandleCreateProduct(w http.ResponseWriter, r *http.Request
 		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return
 	}
+	defer r.Body.Close()
 
 	var input service.CreateProductInput
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
@@ -35,6 +36,7 @@ func (cfg *ApiConfig) HandleGetProductByID(w http.ResponseWriter, r *http.Reques
 		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return
 	}
+	defer r.Body.Close()
 
 	id, err := idFromURLAsUUID(r)
 	if err != nil {
@@ -58,6 +60,7 @@ func (cfg *ApiConfig) HandleGetProductBySKU(w http.ResponseWriter, r *http.Reque
 		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return
 	}
+	defer r.Body.Close()
 
 	sku := r.URL.Query().Get("sku")
 	if sku == "" {
@@ -81,6 +84,7 @@ func (cfg *ApiConfig) HandleListProductsByType(w http.ResponseWriter, r *http.Re
 		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return
 	}
+	defer r.Body.Close()
 
 	typ := r.URL.Query().Get("type")
 	if typ == "" {
@@ -104,6 +108,7 @@ func (cfg *ApiConfig) HandleListProductsByCategory(w http.ResponseWriter, r *htt
 		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return
 	}
+	defer r.Body.Close()
 
 	category := r.URL.Query().Get("category")
 	if category == "" {
@@ -127,6 +132,7 @@ func (cfg *ApiConfig) HandleListProductsByArtist(w http.ResponseWriter, r *http.
 		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return
 	}
+	defer r.Body.Close()
 
 	artist := r.URL.Query().Get("artist")
 	if artist == "" {
@@ -150,6 +156,7 @@ func (cfg *ApiConfig) HandleListProductsByStatus(w http.ResponseWriter, r *http.
 		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return
 	}
+	defer r.Body.Close()
 
 	status := r.URL.Query().Get("status")
 	if status == "" {
@@ -173,6 +180,7 @@ func (cfg *ApiConfig) HandleUpdateProduct(w http.ResponseWriter, r *http.Request
 		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return
 	}
+	defer r.Body.Close()
 
 	var input service.UpdateProductInput
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
@@ -196,6 +204,7 @@ func (cfg *ApiConfig) HandleDeleteProduct(w http.ResponseWriter, r *http.Request
 		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return
 	}
+	defer r.Body.Close()
 
 	id, err := idFromURLAsUUID(r)
 	if err != nil {

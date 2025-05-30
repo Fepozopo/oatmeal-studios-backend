@@ -12,6 +12,7 @@ func (cfg *ApiConfig) HandleCreateCustomer(w http.ResponseWriter, r *http.Reques
 		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return
 	}
+	defer r.Body.Close()
 
 	var input service.CreateCustomerInput
 	// Decode the JSON request body into the input struct
@@ -37,6 +38,7 @@ func (cfg *ApiConfig) HandleGetCustomer(w http.ResponseWriter, r *http.Request) 
 		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return
 	}
+	defer r.Body.Close()
 
 	customerID, err := idFromURLAsInt32(r)
 	if err != nil {
@@ -59,6 +61,7 @@ func (cfg *ApiConfig) HandleUpdateCustomer(w http.ResponseWriter, r *http.Reques
 		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return
 	}
+	defer r.Body.Close()
 
 	var input service.UpdateCustomerInput
 	// Decode the JSON request body into the input struct
@@ -82,6 +85,7 @@ func (cfg *ApiConfig) HandleListCustomers(w http.ResponseWriter, r *http.Request
 		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return
 	}
+	defer r.Body.Close()
 
 	customers, err := service.ListCustomers(r.Context(), cfg.DbQueries)
 	if err != nil {
@@ -98,6 +102,7 @@ func (cfg *ApiConfig) HandleDeleteCustomer(w http.ResponseWriter, r *http.Reques
 		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return
 	}
+	defer r.Body.Close()
 
 	customerID, err := idFromURLAsInt32(r)
 	if err != nil {

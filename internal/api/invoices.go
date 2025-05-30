@@ -12,6 +12,7 @@ func (cfg *ApiConfig) HandleCreateInvoice(w http.ResponseWriter, r *http.Request
 		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return
 	}
+	defer r.Body.Close()
 
 	var input service.CreateInvoiceInput
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
@@ -34,6 +35,7 @@ func (cfg *ApiConfig) HandleGetInvoice(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return
 	}
+	defer r.Body.Close()
 
 	id, err := idFromURLAsInt32(r)
 	if err != nil {
@@ -56,6 +58,7 @@ func (cfg *ApiConfig) HandleGetInvoicesByOrder(w http.ResponseWriter, r *http.Re
 		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return
 	}
+	defer r.Body.Close()
 
 	orderID, err := idFromURLAsInt32(r)
 	if err != nil {
@@ -78,6 +81,7 @@ func (cfg *ApiConfig) HandleListInvoicesByCustomer(w http.ResponseWriter, r *htt
 		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return
 	}
+	defer r.Body.Close()
 
 	customerID, err := idFromURLAsInt32(r)
 	if err != nil {
@@ -100,6 +104,7 @@ func (cfg *ApiConfig) HandleListInvoicesByCustomerLocation(w http.ResponseWriter
 		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return
 	}
+	defer r.Body.Close()
 
 	customerLocationID, err := idFromURLAsInt32(r)
 	if err != nil {
@@ -122,6 +127,7 @@ func (cfg *ApiConfig) HandleUpdateInvoice(w http.ResponseWriter, r *http.Request
 		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return
 	}
+	defer r.Body.Close()
 
 	var input service.UpdateInvoiceInput
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
@@ -144,6 +150,7 @@ func (cfg *ApiConfig) HandleDeleteInvoice(w http.ResponseWriter, r *http.Request
 		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return
 	}
+	defer r.Body.Close()
 
 	id, err := idFromURLAsInt32(r)
 	if err != nil {

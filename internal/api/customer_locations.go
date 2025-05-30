@@ -12,6 +12,7 @@ func (cfg *ApiConfig) HandleAddCustomerLocation(w http.ResponseWriter, r *http.R
 		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return
 	}
+	defer r.Body.Close()
 
 	var input service.AddCustomerLocationInput
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
@@ -34,6 +35,7 @@ func (cfg *ApiConfig) HandleDeleteCustomerLocation(w http.ResponseWriter, r *htt
 		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return
 	}
+	defer r.Body.Close()
 
 	locationID, err := idFromURLAsInt32(r)
 	if err != nil {
@@ -54,6 +56,7 @@ func (cfg *ApiConfig) HandleUpdateCustomerLocation(w http.ResponseWriter, r *htt
 		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return
 	}
+	defer r.Body.Close()
 
 	var input service.UpdateCustomerLocationInput
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
@@ -76,6 +79,7 @@ func (cfg *ApiConfig) HandleGetCustomerLocation(w http.ResponseWriter, r *http.R
 		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return
 	}
+	defer r.Body.Close()
 
 	locationID, err := idFromURLAsInt32(r)
 	if err != nil {
@@ -98,6 +102,7 @@ func (cfg *ApiConfig) HandleListCustomerLocations(w http.ResponseWriter, r *http
 		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return
 	}
+	defer r.Body.Close()
 
 	userID, err := idFromURLAsInt32(r)
 	if err != nil {

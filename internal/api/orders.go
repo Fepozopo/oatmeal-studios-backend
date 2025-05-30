@@ -12,6 +12,7 @@ func (cfg *ApiConfig) HandleGetOrder(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return
 	}
+	defer r.Body.Close()
 
 	orderID, err := idFromURLAsInt32(r)
 	if err != nil {
@@ -34,6 +35,7 @@ func (cfg *ApiConfig) HandleCreateOrder(w http.ResponseWriter, r *http.Request) 
 		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return
 	}
+	defer r.Body.Close()
 
 	var input service.CreateOrderInput
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
@@ -57,6 +59,7 @@ func (cfg *ApiConfig) HandleUpdateOrder(w http.ResponseWriter, r *http.Request) 
 		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return
 	}
+	defer r.Body.Close()
 
 	var input service.UpdateOrderInput
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
@@ -79,6 +82,7 @@ func (cfg *ApiConfig) HandleListOrdersOpen(w http.ResponseWriter, r *http.Reques
 		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return
 	}
+	defer r.Body.Close()
 
 	orders, err := service.ListOrdersOpen(r.Context(), cfg.DbQueries)
 	if err != nil {
@@ -95,6 +99,7 @@ func (cfg *ApiConfig) HandleListOrdersByCustomer(w http.ResponseWriter, r *http.
 		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return
 	}
+	defer r.Body.Close()
 
 	customerID, err := idFromURLAsInt32(r)
 	if err != nil {
@@ -117,6 +122,7 @@ func (cfg *ApiConfig) HandleDeleteOrder(w http.ResponseWriter, r *http.Request) 
 		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return
 	}
+	defer r.Body.Close()
 
 	orderID, err := idFromURLAsInt32(r)
 	if err != nil {
