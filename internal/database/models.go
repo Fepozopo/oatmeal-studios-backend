@@ -45,6 +45,15 @@ type CustomerLocation struct {
 	UpdatedAt  time.Time      `json:"updated_at"`
 }
 
+type InventoryTransaction struct {
+	ID        int32          `json:"id"`
+	ProductID uuid.UUID      `json:"product_id"`
+	Change    int32          `json:"change"`
+	Reason    string         `json:"reason"`
+	CreatedAt time.Time      `json:"created_at"`
+	Notes     sql.NullString `json:"notes"`
+}
+
 type Invoice struct {
 	ID                 int32     `json:"id"`
 	CreatedAt          time.Time `json:"created_at"`

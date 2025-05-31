@@ -93,11 +93,20 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.deleteUserStmt, err = db.PrepareContext(ctx, deleteUser); err != nil {
 		return nil, fmt.Errorf("error preparing query DeleteUser: %w", err)
 	}
+	if q.getAllCurrentInventoryStmt, err = db.PrepareContext(ctx, getAllCurrentInventory); err != nil {
+		return nil, fmt.Errorf("error preparing query GetAllCurrentInventory: %w", err)
+	}
+	if q.getCurrentInventoryStmt, err = db.PrepareContext(ctx, getCurrentInventory); err != nil {
+		return nil, fmt.Errorf("error preparing query GetCurrentInventory: %w", err)
+	}
 	if q.getCustomerStmt, err = db.PrepareContext(ctx, getCustomer); err != nil {
 		return nil, fmt.Errorf("error preparing query GetCustomer: %w", err)
 	}
 	if q.getCustomerLocationByIDStmt, err = db.PrepareContext(ctx, getCustomerLocationByID); err != nil {
 		return nil, fmt.Errorf("error preparing query GetCustomerLocationByID: %w", err)
+	}
+	if q.getInventoryChangesByDayStmt, err = db.PrepareContext(ctx, getInventoryChangesByDay); err != nil {
+		return nil, fmt.Errorf("error preparing query GetInventoryChangesByDay: %w", err)
 	}
 	if q.getInvoiceStmt, err = db.PrepareContext(ctx, getInvoice); err != nil {
 		return nil, fmt.Errorf("error preparing query GetInvoice: %w", err)
@@ -144,11 +153,17 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.getUserFromRefreshTokenStmt, err = db.PrepareContext(ctx, getUserFromRefreshToken); err != nil {
 		return nil, fmt.Errorf("error preparing query GetUserFromRefreshToken: %w", err)
 	}
+	if q.insertInventoryTransactionStmt, err = db.PrepareContext(ctx, insertInventoryTransaction); err != nil {
+		return nil, fmt.Errorf("error preparing query InsertInventoryTransaction: %w", err)
+	}
 	if q.listCustomerLocationsByCustomerStmt, err = db.PrepareContext(ctx, listCustomerLocationsByCustomer); err != nil {
 		return nil, fmt.Errorf("error preparing query ListCustomerLocationsByCustomer: %w", err)
 	}
 	if q.listCustomersStmt, err = db.PrepareContext(ctx, listCustomers); err != nil {
 		return nil, fmt.Errorf("error preparing query ListCustomers: %w", err)
+	}
+	if q.listInventoryTransactionsStmt, err = db.PrepareContext(ctx, listInventoryTransactions); err != nil {
+		return nil, fmt.Errorf("error preparing query ListInventoryTransactions: %w", err)
 	}
 	if q.listInvoicesByCustomerStmt, err = db.PrepareContext(ctx, listInvoicesByCustomer); err != nil {
 		return nil, fmt.Errorf("error preparing query ListInvoicesByCustomer: %w", err)
@@ -354,6 +369,16 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing deleteUserStmt: %w", cerr)
 		}
 	}
+	if q.getAllCurrentInventoryStmt != nil {
+		if cerr := q.getAllCurrentInventoryStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getAllCurrentInventoryStmt: %w", cerr)
+		}
+	}
+	if q.getCurrentInventoryStmt != nil {
+		if cerr := q.getCurrentInventoryStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getCurrentInventoryStmt: %w", cerr)
+		}
+	}
 	if q.getCustomerStmt != nil {
 		if cerr := q.getCustomerStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing getCustomerStmt: %w", cerr)
@@ -362,6 +387,11 @@ func (q *Queries) Close() error {
 	if q.getCustomerLocationByIDStmt != nil {
 		if cerr := q.getCustomerLocationByIDStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing getCustomerLocationByIDStmt: %w", cerr)
+		}
+	}
+	if q.getInventoryChangesByDayStmt != nil {
+		if cerr := q.getInventoryChangesByDayStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getInventoryChangesByDayStmt: %w", cerr)
 		}
 	}
 	if q.getInvoiceStmt != nil {
@@ -439,6 +469,11 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing getUserFromRefreshTokenStmt: %w", cerr)
 		}
 	}
+	if q.insertInventoryTransactionStmt != nil {
+		if cerr := q.insertInventoryTransactionStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing insertInventoryTransactionStmt: %w", cerr)
+		}
+	}
 	if q.listCustomerLocationsByCustomerStmt != nil {
 		if cerr := q.listCustomerLocationsByCustomerStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing listCustomerLocationsByCustomerStmt: %w", cerr)
@@ -447,6 +482,11 @@ func (q *Queries) Close() error {
 	if q.listCustomersStmt != nil {
 		if cerr := q.listCustomersStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing listCustomersStmt: %w", cerr)
+		}
+	}
+	if q.listInventoryTransactionsStmt != nil {
+		if cerr := q.listInventoryTransactionsStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing listInventoryTransactionsStmt: %w", cerr)
 		}
 	}
 	if q.listInvoicesByCustomerStmt != nil {
@@ -651,8 +691,11 @@ type Queries struct {
 	deleteProductStmt                   *sql.Stmt
 	deleteSalesRepStmt                  *sql.Stmt
 	deleteUserStmt                      *sql.Stmt
+	getAllCurrentInventoryStmt          *sql.Stmt
+	getCurrentInventoryStmt             *sql.Stmt
 	getCustomerStmt                     *sql.Stmt
 	getCustomerLocationByIDStmt         *sql.Stmt
+	getInventoryChangesByDayStmt        *sql.Stmt
 	getInvoiceStmt                      *sql.Stmt
 	getInvoicesByOrderStmt              *sql.Stmt
 	getOrderStmt                        *sql.Stmt
@@ -668,8 +711,10 @@ type Queries struct {
 	getUserByEmailStmt                  *sql.Stmt
 	getUserByIDStmt                     *sql.Stmt
 	getUserFromRefreshTokenStmt         *sql.Stmt
+	insertInventoryTransactionStmt      *sql.Stmt
 	listCustomerLocationsByCustomerStmt *sql.Stmt
 	listCustomersStmt                   *sql.Stmt
+	listInventoryTransactionsStmt       *sql.Stmt
 	listInvoicesByCustomerStmt          *sql.Stmt
 	listInvoicesByCustomerLocationStmt  *sql.Stmt
 	listLocationsByPlanogramStmt        *sql.Stmt
@@ -727,8 +772,11 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		deleteProductStmt:                   q.deleteProductStmt,
 		deleteSalesRepStmt:                  q.deleteSalesRepStmt,
 		deleteUserStmt:                      q.deleteUserStmt,
+		getAllCurrentInventoryStmt:          q.getAllCurrentInventoryStmt,
+		getCurrentInventoryStmt:             q.getCurrentInventoryStmt,
 		getCustomerStmt:                     q.getCustomerStmt,
 		getCustomerLocationByIDStmt:         q.getCustomerLocationByIDStmt,
+		getInventoryChangesByDayStmt:        q.getInventoryChangesByDayStmt,
 		getInvoiceStmt:                      q.getInvoiceStmt,
 		getInvoicesByOrderStmt:              q.getInvoicesByOrderStmt,
 		getOrderStmt:                        q.getOrderStmt,
@@ -744,8 +792,10 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		getUserByEmailStmt:                  q.getUserByEmailStmt,
 		getUserByIDStmt:                     q.getUserByIDStmt,
 		getUserFromRefreshTokenStmt:         q.getUserFromRefreshTokenStmt,
+		insertInventoryTransactionStmt:      q.insertInventoryTransactionStmt,
 		listCustomerLocationsByCustomerStmt: q.listCustomerLocationsByCustomerStmt,
 		listCustomersStmt:                   q.listCustomersStmt,
+		listInventoryTransactionsStmt:       q.listInventoryTransactionsStmt,
 		listInvoicesByCustomerStmt:          q.listInvoicesByCustomerStmt,
 		listInvoicesByCustomerLocationStmt:  q.listInvoicesByCustomerLocationStmt,
 		listLocationsByPlanogramStmt:        q.listLocationsByPlanogramStmt,
