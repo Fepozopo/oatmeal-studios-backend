@@ -276,3 +276,11 @@ type AuthenticateUserInput struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
 }
+
+// ------------------- Inventory Transaction Inputs ------------------
+type InsertInventoryTransactionInput struct {
+	ProductID uuid.UUID `json:"product_id"`
+	Change    int32     `json:"change"`
+	Reason    string    `json:"reason"`
+	Notes     string    `json:"notes,omitempty"`
+}

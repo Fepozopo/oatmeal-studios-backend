@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 
 	"github.com/Fepozopo/oatmeal-studios-backend/internal/database"
@@ -45,11 +46,29 @@ func ListInventoryTransactions(ctx context.Context, db *database.Queries, produc
 }
 
 // InsertInventoryTransaction inserts a new inventory transaction
-func InsertInventoryTransaction(ctx context.Context, db *database.Queries, arg database.InsertInventoryTransactionParams) (*database.InventoryTransaction, error) {
-	transaction, err := db.InsertInventoryTransaction(ctx, arg)
+func InsertInventoryTransaction(ctx context.Context, db *database.Queries, input InsertInventoryTransactionInput) (*database.InventoryTransaction, error) {
+	if input.ProductID == uuid.Nil {
+		return nil, fmt.Errorf("product ID cannot be empty")
+	}
+	if input.Change == 0 {
+		return nil, fmt.Errorf("change cannot be zero")
+	}
+	if input.Reason == "" {
+		return nil, fmt.Errorf("reason cannot be empty")
+	}
+
+	params := database.InsertInventoryTransactionParams{
+		ProductID: input.ProductID,
+		Change:    input.Change,
+		Reason:    input.Reason,
+		Notes:     sql.NullString{String: input.Notes, Valid: input.Notes != ""},
+	}
+
+	transaction, err := db.InsertInventoryTransaction(ctx, params)
 	if err != nil {
 		return nil, fmt.Errorf("failed to insert inventory transaction: %w", err)
 	}
+
 	return &transaction, nil
 }
 
