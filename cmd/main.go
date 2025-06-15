@@ -13,6 +13,8 @@ import (
 )
 
 func main() {
+	port := ":8080" // Default port for the API
+
 	// Open a connection to the database and environment variables
 	godotenv.Load()
 	tokenSecret := os.Getenv("TOKEN_SECRET")
@@ -49,6 +51,6 @@ func main() {
 	mux.HandleFunc("PUT /api/users/{id}/name", apiCfg.HandleUpdateUserName)
 	mux.HandleFunc("PUT /api/users/{id}/password", apiCfg.HandleUpdateUserPassword)
 
-	// Run the server on port 8080
-	http.ListenAndServe(":8080", mux)
+	// Run the server on the specified port
+	http.ListenAndServe(port, mux)
 }
