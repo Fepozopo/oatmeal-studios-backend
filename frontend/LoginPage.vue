@@ -112,7 +112,7 @@ label {
 
 input[type="text"],
 input[type="password"] {
-    width: 100px;
+    width: 150px;
     padding: 2px 4px;
     font-size: 1rem;
     border: 1px solid #aaa;
