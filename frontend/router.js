@@ -1,13 +1,16 @@
 import { createRouter, createWebHistory } from 'vue-router';
+
 import HomePage from './HomePage.vue';
 import LoginPage from './LoginPage.vue';
 import UserMaintenance from './UserMaintenance.vue';
+import OrderEntryPage from './OrderEntryPage.vue';
 
 
 const routes = [
     { path: '/login', component: LoginPage },
     { path: '/home', component: HomePage, meta: { requiresAuth: true } },
     { path: '/users', component: UserMaintenance, meta: { requiresAuth: true } },
+    { path: '/order-entry', component: OrderEntryPage, meta: { requiresAuth: true } },
     { path: '/', redirect: '/home' },
 ];
 

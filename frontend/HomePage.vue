@@ -27,7 +27,7 @@
                 </div>
                 <div class="menu-col">
                     <div class="menu-col-title">ORDERS</div>
-                    <button class="menu-btn">Enter New Orders</button>
+                    <button class="menu-btn" @click="goToOrderEntry">Enter New Orders</button>
                     <button class="menu-btn">Change Orders</button>
                     <button class="menu-btn">Release Orders</button>
                     <button class="menu-btn">Print Pick Lists And Packing Slips</button>
@@ -105,6 +105,9 @@ const goHome = () => {
 };
 const goToUsers = () => {
     router.push('/users');
+};
+const goToOrderEntry = () => {
+    router.push('/order-entry');
 };
 </script>
 
