@@ -1,5 +1,8 @@
 import { createApp } from 'vue';
-import LoginPage from './LoginPage.vue';
+import App from './App.vue';
+import router from './router';
 import './main.css';
 
-createApp(LoginPage).mount('#app');
+createApp(App)
+    .use(router)
+    .mount('#app');

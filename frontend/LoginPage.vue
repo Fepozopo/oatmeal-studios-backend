@@ -24,8 +24,13 @@
 
 <script setup>
 import { ref } from 'vue';
+import { useRouter } from 'vue-router';
+const router = useRouter();
+
 const email = ref('');
 const password = ref('');
+const error = ref('');
+
 const onLogin = async () => {
     error.value = '';
     try {
@@ -45,10 +50,10 @@ const onLogin = async () => {
         }
 
         const data = await response.json();
-        // Store token (and refresh token if needed)
+        // Store token
         localStorage.setItem('token', data.token);
         // Redirect to admin/dashboard page
-        window.location.href = '/admin'; // Change as needed
+        router.push('/home');
     } catch (err) {
         error.value = 'Network error';
     }

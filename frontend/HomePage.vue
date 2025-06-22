@@ -97,8 +97,10 @@
 </template>
 
 <script setup>
+import { useRouter } from 'vue-router';
+const router = useRouter();
 const goHome = () => {
-    window.location.href = '/home';
+    router.push('/home');
 };
 </script>
 
