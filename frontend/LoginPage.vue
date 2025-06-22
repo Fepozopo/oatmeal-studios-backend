@@ -8,8 +8,8 @@
             <div class="login-title">ADMIN LOGIN</div>
             <form class="login-form" @submit.prevent="onLogin">
                 <div class="form-row">
-                    <label for="username">Username:</label>
-                    <input id="username" v-model="username" type="text" />
+                    <label for="email">Email:</label>
+                    <input id="email" v-model="email" type="text" />
                 </div>
                 <div class="form-row">
                     <label for="password">Password:</label>
@@ -23,11 +23,11 @@
 
 <script setup>
 import { ref } from 'vue';
-const username = ref('');
+const email = ref('');
 const password = ref('');
 const onLogin = () => {
     // TODO: Implement login logic
-    alert(`Username: ${username.value}\nPassword: ${password.value}`);
+    alert(`Email: ${email.value}\nPassword: ${password.value}`);
 };
 </script>
 
