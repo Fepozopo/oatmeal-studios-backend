@@ -7,11 +7,7 @@
         <div class="user-maint-content">
             <div class="user-maint-title">USER MAINTENANCE</div>
             <button class="user-btn">CREATE NEW USER</button>
-            <div class="user-edit-label">OR EDIT EXISTING USER</div>
-            <select class="user-select">
-                <option>Existing users</option>
-            </select>
-            <button class="user-btn">CONTINUE</button>
+            <button class="user-btn">EDIT CURRENT USER</button>
         </div>
     </div>
 </template>
