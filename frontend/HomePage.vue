@@ -9,6 +9,7 @@
                 <div class="menu-col">
                     <div class="menu-col-title">MAINTENANCE</div>
                     <button class="menu-btn" @click="goToUsers">Users</button>
+                    <button class="menu-btn">Sales Reps</button>
                     <button class="menu-btn">Customers</button>
                     <button class="menu-btn">Rep Groups</button>
                     <button class="menu-btn">Items</button>
