@@ -8,7 +8,7 @@
             <div class="menu-row">
                 <div class="menu-col">
                     <div class="menu-col-title">MAINTENANCE</div>
-                    <button class="menu-btn">Users</button>
+                    <button class="menu-btn" @click="goToUsers">Users</button>
                     <button class="menu-btn">Customers</button>
                     <button class="menu-btn">Rep Groups</button>
                     <button class="menu-btn">Items</button>
@@ -101,6 +101,9 @@ import { useRouter } from 'vue-router';
 const router = useRouter();
 const goHome = () => {
     router.push('/home');
+};
+const goToUsers = () => {
+    router.push('/users');
 };
 </script>
 
