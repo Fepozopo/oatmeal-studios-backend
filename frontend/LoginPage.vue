@@ -15,6 +15,7 @@
                     <label for="password">Password:</label>
                     <input id="password" v-model="password" type="password" />
                 </div>
+                <div v-if="error" style="color: red;">{{ error }}</div>
                 <button type="submit">Login</button>
             </form>
         </div>
@@ -25,9 +26,33 @@
 import { ref } from 'vue';
 const email = ref('');
 const password = ref('');
-const onLogin = () => {
-    // TODO: Implement login logic
-    alert(`Email: ${email.value}\nPassword: ${password.value}`);
+const onLogin = async () => {
+    error.value = '';
+    try {
+        const response = await fetch('/api/users/authenticate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                email: email.value,
+                password: password.value,
+            }),
+        });
+
+        if (!response.ok) {
+            const data = await response.json();
+            error.value = data.error || 'Login failed';
+            return;
+        }
+
+        const data = await response.json();
+        // Store token (and refresh token if needed)
+        localStorage.setItem('token', data.token);
+        // Redirect to admin/dashboard page
+        window.location.href = '/admin'; // Change as needed
+    } catch (err) {
+        error.value = 'Network error';
+    }
+    // alert(`Email: ${email.value}\nPassword: ${password.value}`);
 };
 </script>
 
