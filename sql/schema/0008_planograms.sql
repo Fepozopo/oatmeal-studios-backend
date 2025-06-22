@@ -20,7 +20,7 @@ CREATE TABLE planogram_pockets (
     planogram_id INTEGER NOT NULL REFERENCES planograms(id) ON DELETE CASCADE,
     pocket_number INTEGER NOT NULL,
     category TEXT NOT NULL,
-    product_id INTEGER REFERENCES products(id),
+    product_id UUID REFERENCES products(id),
     UNIQUE(planogram_id, pocket_number)
 );
 
