@@ -50,6 +50,11 @@ func main() {
 	mux.HandleFunc("GET /api/users/{id}", apiCfg.HandleGetUser)
 	mux.HandleFunc("PUT /api/users/{id}/name", apiCfg.HandleUpdateUserName)
 	mux.HandleFunc("PUT /api/users/{id}/password", apiCfg.HandleUpdateUserPassword)
+	mux.HandleFunc("GET /api/customers", apiCfg.HandleListCustomers)
+	mux.HandleFunc("POST /api/customers", apiCfg.HandleCreateCustomer)
+	mux.HandleFunc("GET /api/customers/{id}", apiCfg.HandleGetCustomer)
+	mux.HandleFunc("PUT /api/customers/{id}", apiCfg.HandleUpdateCustomer)
+	mux.HandleFunc("DELETE /api/customers/{id}", apiCfg.HandleDeleteCustomer)
 
 	// Run the server on the specified port
 	log.Printf("Server is running on port %s\n", port)

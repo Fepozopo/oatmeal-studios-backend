@@ -12,6 +12,9 @@
                     <input id="customer-number" type="text" class="customer-input" />
                     <select class="customer-select">
                         <option>Select by name</option>
+                        <option v-for="customer in customers" :key="customer.id" :value="customer.id">
+                            {{ customer.business_name }}
+                        </option>
                     </select>
                 </div>
                 <button class="create-order-btn">CREATE NEW ORDER</button>
@@ -21,11 +24,24 @@
 </template>
 
 <script setup>
+import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
+
 const router = useRouter();
 const goHome = () => {
     router.push('/home');
 };
+
+// 1. Reactive variable for customers
+const customers = ref([]);
+
+// 2. Fetch customers on mount
+onMounted(async () => {
+    const res = await fetch('/api/customers');
+    if (res.ok) {
+        customers.value = await res.json();
+    }
+});
 </script>
 
 <style scoped>
