@@ -232,8 +232,8 @@ type CreateSalesRepInput struct {
 	FirstName string `json:"first_name"`
 	LastName  string `json:"last_name"`
 	Company   string `json:"company"`
-	Address1  string `json:"address1,omitempty"`
-	Address2  string `json:"address2,omitempty"`
+	Address1  string `json:"address_1,omitempty"`
+	Address2  string `json:"address_2,omitempty"`
 	City      string `json:"city,omitempty"`
 	State     string `json:"state,omitempty"`
 	ZipCode   string `json:"zip_code,omitempty"`
@@ -245,8 +245,8 @@ type UpdateSalesRepInput struct {
 	FirstName string `json:"first_name"`
 	LastName  string `json:"last_name"`
 	Company   string `json:"company"`
-	Address1  string `json:"address1,omitempty"`
-	Address2  string `json:"address2,omitempty"`
+	Address1  string `json:"address_1,omitempty"`
+	Address2  string `json:"address_2,omitempty"`
 	City      string `json:"city,omitempty"`
 	State     string `json:"state,omitempty"`
 	ZipCode   string `json:"zip_code,omitempty"`
