@@ -3,6 +3,8 @@ package api
 import (
 	"encoding/json"
 	"net/http"
+	"strconv"
+	"strings"
 
 	"github.com/Fepozopo/oatmeal-studios-backend/internal/service"
 )
@@ -104,18 +106,47 @@ func (cfg *ApiConfig) HandleListCustomerLocations(w http.ResponseWriter, r *http
 	}
 	defer r.Body.Close()
 
-	userID, err := idFromURLAsInt32(r)
+	customerID, err := idFromURLAsInt32(r)
 	if err != nil {
-		http.Error(w, "Invalid User ID: "+err.Error(), http.StatusBadRequest)
+		http.Error(w, "Invalid customer ID: "+err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	locations, err := service.ListCustomerLocations(r.Context(), cfg.DbQueries, userID)
+	locations, err := service.ListCustomerLocations(r.Context(), cfg.DbQueries, customerID)
 	if err != nil {
 		http.Error(w, "Failed to list customer locations: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(locations)
+}
+
+// HandleListLocationsForCustomer handles GET /api/customers/{customerId}/locations
+func (cfg *ApiConfig) HandleListLocationsForCustomer(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+		return
+	}
+	// Extract customerId from URL: /api/customers/{customerId}/locations
+	parts := strings.Split(r.URL.Path, "/")
+	var customerIdStr string
+	for i, part := range parts {
+		if part == "customers" && i+1 < len(parts) {
+			customerIdStr = parts[i+1]
+			break
+		}
+	}
+	customerId, err := strconv.Atoi(customerIdStr)
+	if err != nil || customerId <= 0 {
+		http.Error(w, "Invalid customer ID", http.StatusBadRequest)
+		return
+	}
+	locations, err := service.ListCustomerLocations(r.Context(), cfg.DbQueries, int32(customerId))
+	if err != nil {
+		http.Error(w, "Failed to list customer locations: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(locations)
 }

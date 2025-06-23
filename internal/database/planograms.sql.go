@@ -8,6 +8,8 @@ package database
 import (
 	"context"
 	"database/sql"
+
+	"github.com/google/uuid"
 )
 
 const assignPlanogramToLocation = `-- name: AssignPlanogramToLocation :one
@@ -65,7 +67,7 @@ type CreatePlanogramPocketParams struct {
 	PlanogramID  int32         `json:"planogram_id"`
 	PocketNumber int32         `json:"pocket_number"`
 	Category     string        `json:"category"`
-	ProductID    sql.NullInt32 `json:"product_id"`
+	ProductID    uuid.NullUUID `json:"product_id"`
 }
 
 func (q *Queries) CreatePlanogramPocket(ctx context.Context, arg CreatePlanogramPocketParams) (PlanogramPocket, error) {
@@ -183,7 +185,7 @@ func (q *Queries) GetPlanogramsByLocation(ctx context.Context, customerLocationI
 }
 
 const listLocationsByPlanogram = `-- name: ListLocationsByPlanogram :many
-SELECT cl.id, cl.customer_id, cl.address_1, cl.address_2, cl.city, cl.state, cl.zip_code, cl.phone, cl.notes, cl.created_at, cl.updated_at
+SELECT cl.id, cl.customer_id, cl.address_1, cl.address_2, cl.city, cl.state, cl.zip_code, cl.phone, cl.notes, cl.created_at, cl.updated_at, cl.business_name, cl.contact_name
 FROM customer_locations cl
 JOIN planogram_customer_locations pcl ON cl.id = pcl.customer_location_id
 WHERE pcl.planogram_id = $1
@@ -211,6 +213,8 @@ func (q *Queries) ListLocationsByPlanogram(ctx context.Context, planogramID int3
 			&i.Notes,
 			&i.CreatedAt,
 			&i.UpdatedAt,
+			&i.BusinessName,
+			&i.ContactName,
 		); err != nil {
 			return nil, err
 		}
@@ -354,7 +358,7 @@ RETURNING id, planogram_id, pocket_number, category, product_id
 type UpdatePlanogramPocketParams struct {
 	ID        int32         `json:"id"`
 	Category  string        `json:"category"`
-	ProductID sql.NullInt32 `json:"product_id"`
+	ProductID uuid.NullUUID `json:"product_id"`
 }
 
 func (q *Queries) UpdatePlanogramPocket(ctx context.Context, arg UpdatePlanogramPocketParams) (PlanogramPocket, error) {

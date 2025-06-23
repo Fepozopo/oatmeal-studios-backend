@@ -16,6 +16,9 @@ func AddCustomerLocation(ctx context.Context, db *database.Queries, input AddCus
 	if input.CustomerID == 0 {
 		return nil, errors.New("customer_id is required")
 	}
+	if input.BusinessName == "" {
+		return nil, errors.New("business_name is required")
+	}
 	// Check for required fields
 	if input.Address1 == "" {
 		return nil, errors.New("address_1 is required")
@@ -37,14 +40,16 @@ func AddCustomerLocation(ctx context.Context, db *database.Queries, input AddCus
 	}
 
 	params := database.CreateCustomerLocationParams{
-		CustomerID: input.CustomerID,
-		Address1:   input.Address1,
-		Address2:   sql.NullString{String: input.Address2, Valid: input.Address2 != ""},
-		City:       input.City,
-		State:      input.State,
-		ZipCode:    input.ZipCode,
-		Phone:      sql.NullString{String: input.Phone, Valid: input.Phone != ""},
-		Notes:      sql.NullString{String: input.Notes, Valid: input.Notes != ""},
+		CustomerID:   input.CustomerID,
+		BusinessName: input.BusinessName,
+		ContactName:  sql.NullString{String: input.ContactName, Valid: input.ContactName != ""},
+		Address1:     input.Address1,
+		Address2:     sql.NullString{String: input.Address2, Valid: input.Address2 != ""},
+		City:         input.City,
+		State:        input.State,
+		ZipCode:      input.ZipCode,
+		Phone:        sql.NullString{String: input.Phone, Valid: input.Phone != ""},
+		Notes:        sql.NullString{String: input.Notes, Valid: input.Notes != ""},
 	}
 
 	location, err := db.CreateCustomerLocation(ctx, params)
@@ -76,6 +81,9 @@ func UpdateCustomerLocation(ctx context.Context, db *database.Queries, input Upd
 	if input.ID == 0 {
 		return nil, errors.New("id is required")
 	}
+	if input.BusinessName == "" {
+		return nil, errors.New("business_name is required")
+	}
 	// Check for required fields
 	if input.Address1 == "" {
 		return nil, errors.New("address_1 is required")
@@ -96,14 +104,16 @@ func UpdateCustomerLocation(ctx context.Context, db *database.Queries, input Upd
 	}
 
 	params := database.UpdateCustomerLocationParams{
-		ID:       input.ID,
-		Address1: input.Address1,
-		Address2: sql.NullString{String: input.Address2, Valid: input.Address2 != ""},
-		City:     input.City,
-		State:    input.State,
-		ZipCode:  input.ZipCode,
-		Phone:    sql.NullString{String: input.Phone, Valid: input.Phone != ""},
-		Notes:    sql.NullString{String: input.Notes, Valid: input.Notes != ""},
+		ID:           input.ID,
+		BusinessName: input.BusinessName,
+		ContactName:  sql.NullString{String: input.ContactName, Valid: input.ContactName != ""},
+		Address1:     input.Address1,
+		Address2:     sql.NullString{String: input.Address2, Valid: input.Address2 != ""},
+		City:         input.City,
+		State:        input.State,
+		ZipCode:      input.ZipCode,
+		Phone:        sql.NullString{String: input.Phone, Valid: input.Phone != ""},
+		Notes:        sql.NullString{String: input.Notes, Valid: input.Notes != ""},
 	}
 
 	location, err := db.UpdateCustomerLocation(ctx, params)

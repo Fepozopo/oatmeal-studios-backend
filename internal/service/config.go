@@ -8,25 +8,29 @@ import (
 
 // ------------------ Customer Location Inputs ------------------
 type AddCustomerLocationInput struct {
-	CustomerID int32  `json:"customer_id"`
-	Address1   string `json:"address_1"`
-	Address2   string `json:"address_2,omitempty"`
-	City       string `json:"city"`
-	State      string `json:"state"`
-	ZipCode    string `json:"zip_code"`
-	Phone      string `json:"phone,omitempty"`
-	Notes      string `json:"notes,omitempty"`
+	CustomerID   int32  `json:"customer_id"`
+	BusinessName string `json:"business_name"`
+	ContactName  string `json:"contact_name,omitempty"`
+	Address1     string `json:"address_1"`
+	Address2     string `json:"address_2,omitempty"`
+	City         string `json:"city"`
+	State        string `json:"state"`
+	ZipCode      string `json:"zip_code"`
+	Phone        string `json:"phone,omitempty"`
+	Notes        string `json:"notes,omitempty"`
 }
 
 type UpdateCustomerLocationInput struct {
-	ID       int32  `json:"id"`
-	Address1 string `json:"address_1"`
-	Address2 string `json:"address_2,omitempty"`
-	City     string `json:"city"`
-	State    string `json:"state"`
-	ZipCode  string `json:"zip_code"`
-	Phone    string `json:"phone,omitempty"`
-	Notes    string `json:"notes,omitempty"`
+	ID           int32  `json:"id"`
+	BusinessName string `json:"business_name"`
+	ContactName  string `json:"contact_name,omitempty"`
+	Address1     string `json:"address_1"`
+	Address2     string `json:"address_2,omitempty"`
+	City         string `json:"city"`
+	State        string `json:"state"`
+	ZipCode      string `json:"zip_code"`
+	Phone        string `json:"phone,omitempty"`
+	Notes        string `json:"notes,omitempty"`
 }
 
 // ------------------ Customer Inputs ------------------
@@ -157,16 +161,16 @@ type UpdatePlanogramInput struct {
 }
 
 type CreatePlanogramPocketInput struct {
-	PlanogramID  int32  `json:"planogram_id"`
-	PocketNumber int32  `json:"pocket_number"`
-	Category     string `json:"category"`
-	ProductID    int32  `json:"product_id"`
+	PlanogramID  int32     `json:"planogram_id"`
+	PocketNumber int32     `json:"pocket_number"`
+	Category     string    `json:"category"`
+	ProductID    uuid.UUID `json:"product_id"`
 }
 
 type UpdatePlanogramPocketInput struct {
-	ID        int32  `json:"id"`
-	Category  string `json:"category"`
-	ProductID int32  `json:"product_id"`
+	ID        int32     `json:"id"`
+	Category  string    `json:"category"`
+	ProductID uuid.UUID `json:"product_id"`
 }
 
 type AssignPlanogramToLocationInput struct {

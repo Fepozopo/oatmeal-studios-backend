@@ -32,17 +32,19 @@ type Customer struct {
 }
 
 type CustomerLocation struct {
-	ID         int32          `json:"id"`
-	CustomerID int32          `json:"customer_id"`
-	Address1   string         `json:"address_1"`
-	Address2   sql.NullString `json:"address_2"`
-	City       string         `json:"city"`
-	State      string         `json:"state"`
-	ZipCode    string         `json:"zip_code"`
-	Phone      sql.NullString `json:"phone"`
-	Notes      sql.NullString `json:"notes"`
-	CreatedAt  time.Time      `json:"created_at"`
-	UpdatedAt  time.Time      `json:"updated_at"`
+	ID           int32          `json:"id"`
+	CustomerID   int32          `json:"customer_id"`
+	Address1     string         `json:"address_1"`
+	Address2     sql.NullString `json:"address_2"`
+	City         string         `json:"city"`
+	State        string         `json:"state"`
+	ZipCode      string         `json:"zip_code"`
+	Phone        sql.NullString `json:"phone"`
+	Notes        sql.NullString `json:"notes"`
+	CreatedAt    time.Time      `json:"created_at"`
+	UpdatedAt    time.Time      `json:"updated_at"`
+	BusinessName string         `json:"business_name"`
+	ContactName  sql.NullString `json:"contact_name"`
 }
 
 type InventoryTransaction struct {
@@ -117,7 +119,7 @@ type PlanogramPocket struct {
 	PlanogramID  int32         `json:"planogram_id"`
 	PocketNumber int32         `json:"pocket_number"`
 	Category     string        `json:"category"`
-	ProductID    sql.NullInt32 `json:"product_id"`
+	ProductID    uuid.NullUUID `json:"product_id"`
 }
 
 type Product struct {
