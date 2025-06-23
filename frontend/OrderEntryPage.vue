@@ -10,10 +10,19 @@
                 <div class="customer-row">
                     <label for="customer-number">Customer #:</label>
                     <input id="customer-number" type="text" class="customer-input" />
-                    <select class="customer-select">
-                        <option>Select by name</option>
+                    <select class="customer-select" v-model="selectedCustomerId">
+                        <option value="">Select by name</option>
                         <option v-for="customer in customers" :key="customer.id" :value="customer.id">
                             {{ customer.business_name }}
+                        </option>
+                    </select>
+                </div>
+                <div class="customer-row" v-if="selectedCustomerId && locations.length">
+                    <label for="location-select">Location:</label>
+                    <select id="location-select" class="customer-select" v-model="selectedLocationId">
+                        <option value="">Select location</option>
+                        <option v-for="location in locations" :key="location.id" :value="location.id">
+                            {{ location.business_name }}
                         </option>
                     </select>
                 </div>
@@ -32,14 +41,34 @@ const goHome = () => {
     router.push('/home');
 };
 
-// 1. Reactive variable for customers
+// 1. Reactive variables
 const customers = ref([]);
+const selectedCustomerId = ref("");
+const locations = ref([]);
+const selectedLocationId = ref("");
 
 // 2. Fetch customers on mount
 onMounted(async () => {
     const res = await fetch('/api/customers');
     if (res.ok) {
         customers.value = await res.json();
+    }
+});
+
+// 3. Watch for customer selection and fetch locations
+import { watch } from 'vue';
+watch(selectedCustomerId, async (newId) => {
+    if (newId) {
+        const res = await fetch(`/api/customers/${newId}/locations`);
+        if (res.ok) {
+            locations.value = await res.json();
+        } else {
+            locations.value = [];
+        }
+        selectedLocationId.value = "";
+    } else {
+        locations.value = [];
+        selectedLocationId.value = "";
     }
 });
 </script>
