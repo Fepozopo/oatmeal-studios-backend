@@ -99,36 +99,13 @@ func (cfg *ApiConfig) HandleGetCustomerLocation(w http.ResponseWriter, r *http.R
 	json.NewEncoder(w).Encode(location)
 }
 
+// HandleListLocationsForCustomer handles GET /api/customers/{id}/locations
 func (cfg *ApiConfig) HandleListCustomerLocations(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return
 	}
-	defer r.Body.Close()
-
-	customerID, err := idFromURLAsInt32(r)
-	if err != nil {
-		http.Error(w, "Invalid customer ID: "+err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	locations, err := service.ListCustomerLocations(r.Context(), cfg.DbQueries, customerID)
-	if err != nil {
-		http.Error(w, "Failed to list customer locations: "+err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(locations)
-}
-
-// HandleListLocationsForCustomer handles GET /api/customers/{customerId}/locations
-func (cfg *ApiConfig) HandleListLocationsForCustomer(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
-		return
-	}
-	// Extract customerId from URL: /api/customers/{customerId}/locations
+	// Extract customerId from URL: /api/customers/{id}/locations
 	parts := strings.Split(r.URL.Path, "/")
 	var customerIdStr string
 	for i, part := range parts {
