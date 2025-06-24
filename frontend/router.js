@@ -4,6 +4,7 @@ import HomePage from './HomePage.vue';
 import LoginPage from './LoginPage.vue';
 import UserMaintenance from './UserMaintenance.vue';
 import OrderEntryPage from './OrderEntryPage.vue';
+import OrderDetailsPage from './OrderDetailsPage.vue';
 
 
 const routes = [
@@ -11,6 +12,7 @@ const routes = [
     { path: '/home', component: HomePage, meta: { requiresAuth: true } },
     { path: '/users', component: UserMaintenance, meta: { requiresAuth: true } },
     { path: '/order-entry', component: OrderEntryPage, meta: { requiresAuth: true } },
+    { path: '/order-details', component: OrderDetailsPage, meta: { requiresAuth: true } },
     { path: '/', redirect: '/home' },
 ];
 

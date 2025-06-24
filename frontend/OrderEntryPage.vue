@@ -26,7 +26,8 @@
                         </option>
                     </select>
                 </div>
-                <button class="create-order-btn">CREATE NEW ORDER</button>
+                <button class="create-order-btn" @click="handleCreateOrder">CREATE NEW ORDER</button>
+                <div v-if="errorMessage" class="error-message">{{ errorMessage }}</div>
             </div>
         </div>
     </div>
@@ -46,6 +47,23 @@ const customers = ref([]);
 const selectedCustomerId = ref("");
 const locations = ref([]);
 const selectedLocationId = ref("");
+const errorMessage = ref("");
+// 4. Handle create order button click
+const handleCreateOrder = () => {
+    if (!selectedCustomerId.value || !selectedLocationId.value) {
+        errorMessage.value = "The customer and location are both required";
+        return;
+    }
+    errorMessage.value = "";
+    // Navigate to the order details page
+    router.push({
+        path: '/order-details',
+        query: {
+            customerId: selectedCustomerId.value,
+            locationId: selectedLocationId.value
+        }
+    });
+};
 
 // 2. Fetch customers on mount
 onMounted(async () => {
@@ -70,6 +88,7 @@ watch(selectedCustomerId, async (newId) => {
         locations.value = [];
         selectedLocationId.value = "";
     }
+    errorMessage.value = "";
 });
 </script>
 
@@ -171,5 +190,12 @@ watch(selectedCustomerId, async (newId) => {
     cursor: pointer;
     font-family: sans-serif;
     font-weight: normal;
+}
+
+.error-message {
+    color: #d32f2f;
+    font-size: 1rem;
+    margin-top: 0.5rem;
+    font-family: sans-serif;
 }
 </style>
