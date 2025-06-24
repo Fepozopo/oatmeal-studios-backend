@@ -51,14 +51,16 @@
                     <span class="order-label" style="margin-left:2rem;">Type:</span>
                     <select class="order-input" v-model="type">
                         <option></option>
-                        <option>Type 1</option>
-                        <option>Type 2</option>
+                        <option>NEW</option>
+                        <option>REORDER</option>
+                        <option>CREDIT</option>
                     </select>
                     <span class="order-label" style="margin-left:2rem;">Method:</span>
                     <select class="order-input" v-model="method">
                         <option></option>
-                        <option>Method 1</option>
-                        <option>Method 2</option>
+                        <option>ONLINE</option>
+                        <option>EMAIL</option>
+                        <option>PHONE</option>
                     </select>
                 </div>
                 <div class="order-row">
@@ -81,8 +83,10 @@
                     <span class="order-label">Terms:</span>
                     <select class="order-input" v-model="terms">
                         <option></option>
-                        <option>Net 30</option>
-                        <option>Net 60</option>
+                        <option>CREDIT CARD</option>
+                        <option>NET 30</option>
+                        <option>NET 60</option>
+                        <option>NET 90</option>
                     </select>
                     <span class="order-label" style="margin-left:2rem;">Ship via:</span>
                     <input class="order-input" v-model="shipVia" />
