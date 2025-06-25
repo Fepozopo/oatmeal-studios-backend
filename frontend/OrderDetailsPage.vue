@@ -17,9 +17,10 @@
                     <span class="order-value customer-link">
                         <a :href="customerLink" target="_blank" v-if="customerData.id">{{ customerData.id }}</a><br />
                         <span v-if="customerData.business_name">{{ customerData.business_name }}</span><br />
-                        <span v-if="customerData.address">{{ customerData.address }}</span><br />
-                        <span v-if="customerData.city || customerData.state || customerData.zip">
-                            {{ customerData.city }}, {{ customerData.state }} {{ customerData.zip }}
+                        <span v-if="customerData.address_1">{{ customerData.address_1 }}</span><br />
+                        <span v-if="customerData.address_2">{{ customerData.address_2 }}</span><br />
+                        <span v-if="customerData.city || customerData.state || customerData.zip_code">
+                            {{ customerData.city }}, {{ customerData.state }} {{ customerData.zip_code }}
                         </span><br />
                         <span v-if="customerData.country">{{ customerData.country }}</span>
                     </span>
@@ -29,9 +30,10 @@
                     <span class="order-value">
                         <span v-if="locationData.id">{{ locationData.id }}</span><br />
                         <span v-if="locationData.business_name">{{ locationData.business_name }}</span><br />
-                        <span v-if="locationData.address">{{ locationData.address }}</span><br />
-                        <span v-if="locationData.city || locationData.state || locationData.zip">
-                            {{ locationData.city }}, {{ locationData.state }} {{ locationData.zip }}
+                        <span v-if="locationData.address_1">{{ locationData.address_1 }}</span><br />
+                        <span v-if="locationData.address_2">{{ locationData.address_2 }}</span><br />
+                        <span v-if="locationData.city || locationData.state || locationData.zip_code">
+                            {{ locationData.city }}, {{ locationData.state }} {{ locationData.zip_code }}
                         </span><br />
                         <span v-if="locationData.country">{{ locationData.country }}</span>
                     </span>
