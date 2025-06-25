@@ -160,7 +160,7 @@ type SalesRep struct {
 	Status    string         `json:"status"`
 	FirstName string         `json:"first_name"`
 	LastName  string         `json:"last_name"`
-	Company   string         `json:"company"`
+	Company   sql.NullString `json:"company"`
 	Address1  sql.NullString `json:"address_1"`
 	Address2  sql.NullString `json:"address_2"`
 	City      sql.NullString `json:"city"`
