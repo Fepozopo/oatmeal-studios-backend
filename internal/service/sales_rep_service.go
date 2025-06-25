@@ -27,6 +27,7 @@ func CreateSalesRep(ctx context.Context, db *database.Queries, input CreateSales
 
 	params := database.CreateSalesRepParams{
 		Status:    input.Status,
+		RepCode:   input.RepCode,
 		FirstName: input.FirstName,
 		LastName:  input.LastName,
 		Company:   input.Company,
@@ -35,6 +36,9 @@ func CreateSalesRep(ctx context.Context, db *database.Queries, input CreateSales
 		City:      sql.NullString{String: input.City, Valid: input.City != ""},
 		State:     sql.NullString{String: input.State, Valid: input.State != ""},
 		ZipCode:   sql.NullString{String: input.ZipCode, Valid: input.ZipCode != ""},
+		Country:   input.Country,
+		Phone:     sql.NullString{String: input.Phone, Valid: input.Phone != ""},
+		Email:     sql.NullString{String: input.Email, Valid: input.Email != ""},
 	}
 
 	rep, err := db.CreateSalesRep(ctx, params)
@@ -82,8 +86,8 @@ func UpdateSalesRep(ctx context.Context, db *database.Queries, input UpdateSales
 	}
 
 	params := database.UpdateSalesRepParams{
-		ID:        input.ID,
 		Status:    input.Status,
+		RepCode:   input.RepCode,
 		FirstName: input.FirstName,
 		LastName:  input.LastName,
 		Company:   input.Company,
@@ -92,6 +96,9 @@ func UpdateSalesRep(ctx context.Context, db *database.Queries, input UpdateSales
 		City:      sql.NullString{String: input.City, Valid: input.City != ""},
 		State:     sql.NullString{String: input.State, Valid: input.State != ""},
 		ZipCode:   sql.NullString{String: input.ZipCode, Valid: input.ZipCode != ""},
+		Country:   input.Country,
+		Phone:     sql.NullString{String: input.Phone, Valid: input.Phone != ""},
+		Email:     sql.NullString{String: input.Email, Valid: input.Email != ""},
 	}
 
 	rep, err := db.UpdateSalesRep(ctx, params)

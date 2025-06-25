@@ -12,11 +12,11 @@ import (
 
 const createCustomerLocation = `-- name: CreateCustomerLocation :one
 INSERT INTO customer_locations (
-    customer_id, business_name, contact_name, address_1, address_2, city, state, zip_code, country, phone, notes
+    customer_id, business_name, contact_name, address_1, address_2, city, state, zip_code, country, phone, sales_rep, notes
 ) VALUES (
-    $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11
+    $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12
 )
-RETURNING id, customer_id, address_1, address_2, city, state, zip_code, phone, notes, created_at, updated_at, business_name, contact_name, country
+RETURNING id, customer_id, address_1, address_2, city, state, zip_code, phone, notes, created_at, updated_at, business_name, contact_name, country, sales_rep
 `
 
 type CreateCustomerLocationParams struct {
@@ -30,6 +30,7 @@ type CreateCustomerLocationParams struct {
 	ZipCode      string         `json:"zip_code"`
 	Country      string         `json:"country"`
 	Phone        sql.NullString `json:"phone"`
+	SalesRep     sql.NullString `json:"sales_rep"`
 	Notes        sql.NullString `json:"notes"`
 }
 
@@ -45,6 +46,7 @@ func (q *Queries) CreateCustomerLocation(ctx context.Context, arg CreateCustomer
 		arg.ZipCode,
 		arg.Country,
 		arg.Phone,
+		arg.SalesRep,
 		arg.Notes,
 	)
 	var i CustomerLocation
@@ -63,6 +65,7 @@ func (q *Queries) CreateCustomerLocation(ctx context.Context, arg CreateCustomer
 		&i.BusinessName,
 		&i.ContactName,
 		&i.Country,
+		&i.SalesRep,
 	)
 	return i, err
 }
@@ -77,7 +80,7 @@ func (q *Queries) DeleteCustomerLocation(ctx context.Context, id int32) error {
 }
 
 const getCustomerLocationByID = `-- name: GetCustomerLocationByID :one
-SELECT id, customer_id, address_1, address_2, city, state, zip_code, phone, notes, created_at, updated_at, business_name, contact_name, country FROM customer_locations WHERE id = $1
+SELECT id, customer_id, address_1, address_2, city, state, zip_code, phone, notes, created_at, updated_at, business_name, contact_name, country, sales_rep FROM customer_locations WHERE id = $1
 `
 
 func (q *Queries) GetCustomerLocationByID(ctx context.Context, id int32) (CustomerLocation, error) {
@@ -98,12 +101,13 @@ func (q *Queries) GetCustomerLocationByID(ctx context.Context, id int32) (Custom
 		&i.BusinessName,
 		&i.ContactName,
 		&i.Country,
+		&i.SalesRep,
 	)
 	return i, err
 }
 
 const listCustomerLocationsByCustomer = `-- name: ListCustomerLocationsByCustomer :many
-SELECT id, customer_id, address_1, address_2, city, state, zip_code, phone, notes, created_at, updated_at, business_name, contact_name, country FROM customer_locations WHERE customer_id = $1 ORDER BY created_at DESC
+SELECT id, customer_id, address_1, address_2, city, state, zip_code, phone, notes, created_at, updated_at, business_name, contact_name, country, sales_rep FROM customer_locations WHERE customer_id = $1 ORDER BY created_at DESC
 `
 
 func (q *Queries) ListCustomerLocationsByCustomer(ctx context.Context, customerID int32) ([]CustomerLocation, error) {
@@ -130,6 +134,7 @@ func (q *Queries) ListCustomerLocationsByCustomer(ctx context.Context, customerI
 			&i.BusinessName,
 			&i.ContactName,
 			&i.Country,
+			&i.SalesRep,
 		); err != nil {
 			return nil, err
 		}
@@ -155,10 +160,11 @@ UPDATE customer_locations SET
     zip_code = $8,
     country = $9,
     phone = $10,
-    notes = $11,
+    sales_rep = $11,
+    notes = $12,
     updated_at = CURRENT_TIMESTAMP
 WHERE id = $1
-RETURNING id, customer_id, address_1, address_2, city, state, zip_code, phone, notes, created_at, updated_at, business_name, contact_name, country
+RETURNING id, customer_id, address_1, address_2, city, state, zip_code, phone, notes, created_at, updated_at, business_name, contact_name, country, sales_rep
 `
 
 type UpdateCustomerLocationParams struct {
@@ -172,6 +178,7 @@ type UpdateCustomerLocationParams struct {
 	ZipCode      string         `json:"zip_code"`
 	Country      string         `json:"country"`
 	Phone        sql.NullString `json:"phone"`
+	SalesRep     sql.NullString `json:"sales_rep"`
 	Notes        sql.NullString `json:"notes"`
 }
 
@@ -187,6 +194,7 @@ func (q *Queries) UpdateCustomerLocation(ctx context.Context, arg UpdateCustomer
 		arg.ZipCode,
 		arg.Country,
 		arg.Phone,
+		arg.SalesRep,
 		arg.Notes,
 	)
 	var i CustomerLocation
@@ -205,6 +213,7 @@ func (q *Queries) UpdateCustomerLocation(ctx context.Context, arg UpdateCustomer
 		&i.BusinessName,
 		&i.ContactName,
 		&i.Country,
+		&i.SalesRep,
 	)
 	return i, err
 }

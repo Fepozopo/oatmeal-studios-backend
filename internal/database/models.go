@@ -27,7 +27,6 @@ type Customer struct {
 	Terms        string         `json:"terms"`
 	Discount     float64        `json:"discount"`
 	Commission   float64        `json:"commission"`
-	SalesRep     sql.NullString `json:"sales_rep"`
 	Notes        sql.NullString `json:"notes"`
 	Country      string         `json:"country"`
 }
@@ -47,6 +46,7 @@ type CustomerLocation struct {
 	BusinessName string         `json:"business_name"`
 	ContactName  sql.NullString `json:"contact_name"`
 	Country      string         `json:"country"`
+	SalesRep     sql.NullString `json:"sales_rep"`
 }
 
 type InventoryTransaction struct {
@@ -86,8 +86,8 @@ type Order struct {
 	ShippingCost       float64        `json:"shipping_cost"`
 	FreeShipping       bool           `json:"free_shipping"`
 	ApplyToCommission  bool           `json:"apply_to_commission"`
-	SalesRep           sql.NullString `json:"sales_rep"`
 	Notes              sql.NullString `json:"notes"`
+	SalesRep           sql.NullString `json:"sales_rep"`
 }
 
 type OrderItem struct {
@@ -168,6 +168,8 @@ type SalesRep struct {
 	ZipCode   sql.NullString `json:"zip_code"`
 	Email     sql.NullString `json:"email"`
 	Phone     sql.NullString `json:"phone"`
+	Country   string         `json:"country"`
+	RepCode   string         `json:"rep_code"`
 }
 
 type User struct {

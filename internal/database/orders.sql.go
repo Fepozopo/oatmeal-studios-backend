@@ -14,7 +14,7 @@ import (
 const createOrder = `-- name: CreateOrder :one
 INSERT INTO orders (customer_id, customer_location_id, order_date, status, type, method, ship_date, po_number, shipping_cost, free_shipping, apply_to_commission, sales_rep, notes)
 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
-RETURNING id, created_at, updated_at, customer_id, customer_location_id, order_date, ship_date, status, type, method, po_number, shipping_cost, free_shipping, apply_to_commission, sales_rep, notes
+RETURNING id, created_at, updated_at, customer_id, customer_location_id, order_date, ship_date, status, type, method, po_number, shipping_cost, free_shipping, apply_to_commission, notes, sales_rep
 `
 
 type CreateOrderParams struct {
@@ -65,8 +65,8 @@ func (q *Queries) CreateOrder(ctx context.Context, arg CreateOrderParams) (Order
 		&i.ShippingCost,
 		&i.FreeShipping,
 		&i.ApplyToCommission,
-		&i.SalesRep,
 		&i.Notes,
+		&i.SalesRep,
 	)
 	return i, err
 }
@@ -82,7 +82,7 @@ func (q *Queries) DeleteOrder(ctx context.Context, id int32) error {
 }
 
 const getOrder = `-- name: GetOrder :one
-SELECT id, created_at, updated_at, customer_id, customer_location_id, order_date, ship_date, status, type, method, po_number, shipping_cost, free_shipping, apply_to_commission, sales_rep, notes
+SELECT id, created_at, updated_at, customer_id, customer_location_id, order_date, ship_date, status, type, method, po_number, shipping_cost, free_shipping, apply_to_commission, notes, sales_rep
 FROM orders
 WHERE id = $1
 `
@@ -105,14 +105,14 @@ func (q *Queries) GetOrder(ctx context.Context, id int32) (Order, error) {
 		&i.ShippingCost,
 		&i.FreeShipping,
 		&i.ApplyToCommission,
-		&i.SalesRep,
 		&i.Notes,
+		&i.SalesRep,
 	)
 	return i, err
 }
 
 const listOrdersByCustomer = `-- name: ListOrdersByCustomer :many
-SELECT id, created_at, updated_at, customer_id, customer_location_id, order_date, ship_date, status, type, method, po_number, shipping_cost, free_shipping, apply_to_commission, sales_rep, notes
+SELECT id, created_at, updated_at, customer_id, customer_location_id, order_date, ship_date, status, type, method, po_number, shipping_cost, free_shipping, apply_to_commission, notes, sales_rep
 FROM orders
 WHERE customer_id = $1
 ORDER BY order_date DESC
@@ -142,8 +142,8 @@ func (q *Queries) ListOrdersByCustomer(ctx context.Context, customerID int32) ([
 			&i.ShippingCost,
 			&i.FreeShipping,
 			&i.ApplyToCommission,
-			&i.SalesRep,
 			&i.Notes,
+			&i.SalesRep,
 		); err != nil {
 			return nil, err
 		}
@@ -159,7 +159,7 @@ func (q *Queries) ListOrdersByCustomer(ctx context.Context, customerID int32) ([
 }
 
 const listOrdersOpen = `-- name: ListOrdersOpen :many
-SELECT id, created_at, updated_at, customer_id, customer_location_id, order_date, ship_date, status, type, method, po_number, shipping_cost, free_shipping, apply_to_commission, sales_rep, notes
+SELECT id, created_at, updated_at, customer_id, customer_location_id, order_date, ship_date, status, type, method, po_number, shipping_cost, free_shipping, apply_to_commission, notes, sales_rep
 FROM orders
 WHERE status = 'Open'
 ORDER BY order_date DESC
@@ -189,8 +189,8 @@ func (q *Queries) ListOrdersOpen(ctx context.Context) ([]Order, error) {
 			&i.ShippingCost,
 			&i.FreeShipping,
 			&i.ApplyToCommission,
-			&i.SalesRep,
 			&i.Notes,
+			&i.SalesRep,
 		); err != nil {
 			return nil, err
 		}
@@ -222,7 +222,7 @@ SET customer_id = $2,
     notes = $14,
     updated_at = NOW()
 WHERE id = $1
-RETURNING id, created_at, updated_at, customer_id, customer_location_id, order_date, ship_date, status, type, method, po_number, shipping_cost, free_shipping, apply_to_commission, sales_rep, notes
+RETURNING id, created_at, updated_at, customer_id, customer_location_id, order_date, ship_date, status, type, method, po_number, shipping_cost, free_shipping, apply_to_commission, notes, sales_rep
 `
 
 type UpdateOrderParams struct {
@@ -275,8 +275,8 @@ func (q *Queries) UpdateOrder(ctx context.Context, arg UpdateOrderParams) (Order
 		&i.ShippingCost,
 		&i.FreeShipping,
 		&i.ApplyToCommission,
-		&i.SalesRep,
 		&i.Notes,
+		&i.SalesRep,
 	)
 	return i, err
 }

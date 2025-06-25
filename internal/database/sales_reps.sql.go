@@ -11,13 +11,14 @@ import (
 )
 
 const createSalesRep = `-- name: CreateSalesRep :one
-INSERT INTO sales_reps (status, first_name, last_name, company, address_1, address_2, city, state, zip_code)
-VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-RETURNING id, created_at, updated_at, status, first_name, last_name, company, address_1, address_2, city, state, zip_code, email, phone
+INSERT INTO sales_reps (status, rep_code, first_name, last_name, company, address_1, address_2, city, state, country, zip_code, phone, email, created_at, updated_at)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, NOW(), NOW())
+RETURNING id, created_at, updated_at, status, first_name, last_name, company, address_1, address_2, city, state, zip_code, email, phone, country, rep_code
 `
 
 type CreateSalesRepParams struct {
 	Status    string         `json:"status"`
+	RepCode   string         `json:"rep_code"`
 	FirstName string         `json:"first_name"`
 	LastName  string         `json:"last_name"`
 	Company   string         `json:"company"`
@@ -25,12 +26,16 @@ type CreateSalesRepParams struct {
 	Address2  sql.NullString `json:"address_2"`
 	City      sql.NullString `json:"city"`
 	State     sql.NullString `json:"state"`
+	Country   string         `json:"country"`
 	ZipCode   sql.NullString `json:"zip_code"`
+	Phone     sql.NullString `json:"phone"`
+	Email     sql.NullString `json:"email"`
 }
 
 func (q *Queries) CreateSalesRep(ctx context.Context, arg CreateSalesRepParams) (SalesRep, error) {
 	row := q.queryRow(ctx, q.createSalesRepStmt, createSalesRep,
 		arg.Status,
+		arg.RepCode,
 		arg.FirstName,
 		arg.LastName,
 		arg.Company,
@@ -38,7 +43,10 @@ func (q *Queries) CreateSalesRep(ctx context.Context, arg CreateSalesRepParams) 
 		arg.Address2,
 		arg.City,
 		arg.State,
+		arg.Country,
 		arg.ZipCode,
+		arg.Phone,
+		arg.Email,
 	)
 	var i SalesRep
 	err := row.Scan(
@@ -56,6 +64,8 @@ func (q *Queries) CreateSalesRep(ctx context.Context, arg CreateSalesRepParams) 
 		&i.ZipCode,
 		&i.Email,
 		&i.Phone,
+		&i.Country,
+		&i.RepCode,
 	)
 	return i, err
 }
@@ -71,7 +81,7 @@ func (q *Queries) DeleteSalesRep(ctx context.Context, id int32) error {
 }
 
 const getSalesRep = `-- name: GetSalesRep :one
-SELECT id, created_at, updated_at, status, first_name, last_name, company, address_1, address_2, city, state, zip_code, email, phone
+SELECT id, created_at, updated_at, status, first_name, last_name, company, address_1, address_2, city, state, zip_code, email, phone, country, rep_code
 FROM sales_reps
 WHERE id = $1
 `
@@ -94,12 +104,14 @@ func (q *Queries) GetSalesRep(ctx context.Context, id int32) (SalesRep, error) {
 		&i.ZipCode,
 		&i.Email,
 		&i.Phone,
+		&i.Country,
+		&i.RepCode,
 	)
 	return i, err
 }
 
 const listSalesReps = `-- name: ListSalesReps :many
-SELECT id, created_at, updated_at, status, first_name, last_name, company, address_1, address_2, city, state, zip_code, email, phone
+SELECT id, created_at, updated_at, status, first_name, last_name, company, address_1, address_2, city, state, zip_code, email, phone, country, rep_code
 FROM sales_reps
 ORDER BY company
 `
@@ -128,6 +140,8 @@ func (q *Queries) ListSalesReps(ctx context.Context) ([]SalesRep, error) {
 			&i.ZipCode,
 			&i.Email,
 			&i.Phone,
+			&i.Country,
+			&i.RepCode,
 		); err != nil {
 			return nil, err
 		}
@@ -145,6 +159,7 @@ func (q *Queries) ListSalesReps(ctx context.Context) ([]SalesRep, error) {
 const updateSalesRep = `-- name: UpdateSalesRep :one
 UPDATE sales_reps
 SET status = $2,
+    rep_code = $13,
     first_name = $3,
     last_name = $4,
     company = $5,
@@ -153,9 +168,12 @@ SET status = $2,
     city = $8,
     state = $9,
     zip_code = $10,
+    country = $11,
+    phone = $12,
+    email = $14,
     updated_at = NOW()
 WHERE id = $1
-RETURNING id, created_at, updated_at, status, first_name, last_name, company, address_1, address_2, city, state, zip_code, email, phone
+RETURNING id, created_at, updated_at, status, first_name, last_name, company, address_1, address_2, city, state, zip_code, email, phone, country, rep_code
 `
 
 type UpdateSalesRepParams struct {
@@ -169,6 +187,10 @@ type UpdateSalesRepParams struct {
 	City      sql.NullString `json:"city"`
 	State     sql.NullString `json:"state"`
 	ZipCode   sql.NullString `json:"zip_code"`
+	Country   string         `json:"country"`
+	Phone     sql.NullString `json:"phone"`
+	RepCode   string         `json:"rep_code"`
+	Email     sql.NullString `json:"email"`
 }
 
 func (q *Queries) UpdateSalesRep(ctx context.Context, arg UpdateSalesRepParams) (SalesRep, error) {
@@ -183,6 +205,10 @@ func (q *Queries) UpdateSalesRep(ctx context.Context, arg UpdateSalesRepParams) 
 		arg.City,
 		arg.State,
 		arg.ZipCode,
+		arg.Country,
+		arg.Phone,
+		arg.RepCode,
+		arg.Email,
 	)
 	var i SalesRep
 	err := row.Scan(
@@ -200,6 +226,8 @@ func (q *Queries) UpdateSalesRep(ctx context.Context, arg UpdateSalesRepParams) 
 		&i.ZipCode,
 		&i.Email,
 		&i.Phone,
+		&i.Country,
+		&i.RepCode,
 	)
 	return i, err
 }

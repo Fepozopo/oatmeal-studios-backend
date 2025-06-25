@@ -63,7 +63,6 @@ func CreateCustomer(ctx context.Context, db *database.Queries, input CreateCusto
 		Terms:        input.Terms,
 		Discount:     input.Discount,
 		Commission:   input.Commission,
-		SalesRep:     sql.NullString{String: input.SalesRep, Valid: input.SalesRep != ""},
 		Notes:        sql.NullString{String: input.Notes, Valid: input.Notes != ""},
 	}
 
@@ -149,7 +148,6 @@ func UpdateCustomer(ctx context.Context, db *database.Queries, input UpdateCusto
 		Terms:        input.Terms,
 		Discount:     input.Discount,
 		Commission:   input.Commission,
-		SalesRep:     sql.NullString{String: input.SalesRep, Valid: input.SalesRep != ""},
 		Notes:        sql.NullString{String: input.Notes, Valid: input.Notes != ""},
 	}
 

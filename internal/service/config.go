@@ -18,6 +18,7 @@ type AddCustomerLocationInput struct {
 	ZipCode      string `json:"zip_code"`
 	Country      string `json:"country"`
 	Phone        string `json:"phone,omitempty"`
+	SalesRep     string `json:"sales_rep,omitempty"`
 	Notes        string `json:"notes,omitempty"`
 }
 
@@ -32,6 +33,7 @@ type UpdateCustomerLocationInput struct {
 	ZipCode      string `json:"zip_code"`
 	Country      string `json:"country"`
 	Phone        string `json:"phone,omitempty"`
+	SalesRep     string `json:"sales_rep,omitempty"`
 	Notes        string `json:"notes,omitempty"`
 }
 
@@ -50,7 +52,6 @@ type CreateCustomerInput struct {
 	Terms        string  `json:"terms,omitempty"`
 	Discount     float64 `json:"discount,omitempty"`
 	Commission   float64 `json:"commission,omitempty"`
-	SalesRep     string  `json:"sales_rep,omitempty"`
 	Notes        string  `json:"notes,omitempty"`
 }
 
@@ -69,7 +70,6 @@ type UpdateCustomerInput struct {
 	Terms        string  `json:"terms,omitempty"`
 	Discount     float64 `json:"discount,omitempty"`
 	Commission   float64 `json:"commission,omitempty"`
-	SalesRep     string  `json:"sales_rep,omitempty"`
 	Notes        string  `json:"notes,omitempty"`
 }
 
@@ -237,6 +237,7 @@ type CreateRefreshTokenInput struct {
 // ------------------ Sales Rep Inputs ------------------
 type CreateSalesRepInput struct {
 	Status    string `json:"status"`
+	RepCode   string `json:"rep_code"`
 	FirstName string `json:"first_name"`
 	LastName  string `json:"last_name"`
 	Company   string `json:"company"`
@@ -245,11 +246,15 @@ type CreateSalesRepInput struct {
 	City      string `json:"city,omitempty"`
 	State     string `json:"state,omitempty"`
 	ZipCode   string `json:"zip_code,omitempty"`
+	Country   string `json:"country,omitempty"`
+	Phone     string `json:"phone,omitempty"`
+	Email     string `json:"email,omitempty"`
 }
 
 type UpdateSalesRepInput struct {
 	ID        int32  `json:"id"`
 	Status    string `json:"status"`
+	RepCode   string `json:"rep_code"`
 	FirstName string `json:"first_name"`
 	LastName  string `json:"last_name"`
 	Company   string `json:"company"`
@@ -258,6 +263,9 @@ type UpdateSalesRepInput struct {
 	City      string `json:"city,omitempty"`
 	State     string `json:"state,omitempty"`
 	ZipCode   string `json:"zip_code,omitempty"`
+	Country   string `json:"country,omitempty"`
+	Phone     string `json:"phone,omitempty"`
+	Email     string `json:"email,omitempty"`
 }
 
 // ------------------ User Inputs ------------------
