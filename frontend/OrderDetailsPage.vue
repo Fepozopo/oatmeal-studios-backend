@@ -14,8 +14,8 @@
                 </div>
                 <div class="order-row">
                     <span class="order-label">Customer:</span>
-                    <span class="order-value customer-link">
-                        <a :href="customerLink" target="_blank" v-if="customerData.id">{{ customerData.id }}</a><br />
+                    <span class="order-value">
+                        <span v-if="customerData.id">{{ customerData.id }}</span><br />
                         <span v-if="customerData.business_name">{{ customerData.business_name }}</span><br />
                         <span v-if="customerData.address_1">{{ customerData.address_1 }}</span><br />
                         <span v-if="customerData.address_2">{{ customerData.address_2 }}</span><br />
@@ -188,6 +188,7 @@ onMounted(async () => {
     if (customerId) {
         const res = await fetch(`/api/customers/${customerId}`);
         if (res.ok) {
+
             customerData.value = await res.json();
         }
     }
@@ -204,7 +205,7 @@ onMounted(async () => {
 });
 
 function generateOrderNumber() {
-    // Example: generate a random order number, replace with real logic as needed
+    // Generate a random order number
     return Math.floor(202500000 + Math.random() * 100000).toString();
 }
 </script>
