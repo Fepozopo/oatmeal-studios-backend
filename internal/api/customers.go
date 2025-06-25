@@ -3,6 +3,7 @@ package api
 import (
 	"encoding/json"
 	"net/http"
+	"strconv"
 
 	"github.com/Fepozopo/oatmeal-studios-backend/internal/service"
 )
@@ -40,13 +41,15 @@ func (cfg *ApiConfig) HandleGetCustomer(w http.ResponseWriter, r *http.Request) 
 	}
 	defer r.Body.Close()
 
-	customerID, err := idFromURLAsInt32(r)
-	if err != nil {
-		http.Error(w, "Invalid Customer ID: "+err.Error(), http.StatusBadRequest)
+	// Extract customerId from path value
+	customerIdStr := r.PathValue("id")
+	customerId, err := strconv.Atoi(customerIdStr)
+	if err != nil || customerId <= 0 {
+		http.Error(w, "Invalid customer ID", http.StatusBadRequest)
 		return
 	}
 
-	customer, err := service.GetCustomerByID(r.Context(), cfg.DbQueries, customerID)
+	customer, err := service.GetCustomerByID(r.Context(), cfg.DbQueries, int32(customerId))
 	if err != nil {
 		http.Error(w, "Failed to get customer: "+err.Error(), http.StatusInternalServerError)
 		return
@@ -104,13 +107,15 @@ func (cfg *ApiConfig) HandleDeleteCustomer(w http.ResponseWriter, r *http.Reques
 	}
 	defer r.Body.Close()
 
-	customerID, err := idFromURLAsInt32(r)
-	if err != nil {
-		http.Error(w, "Invalid Customer ID: "+err.Error(), http.StatusBadRequest)
+	// Extract customerId from path value
+	customerIdStr := r.PathValue("id")
+	customerId, err := strconv.Atoi(customerIdStr)
+	if err != nil || customerId <= 0 {
+		http.Error(w, "Invalid customer ID", http.StatusBadRequest)
 		return
 	}
 
-	err = service.DeleteCustomer(r.Context(), cfg.DbQueries, customerID)
+	err = service.DeleteCustomer(r.Context(), cfg.DbQueries, int32(customerId))
 	if err != nil {
 		http.Error(w, "Failed to delete customer: "+err.Error(), http.StatusInternalServerError)
 		return

@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"net/http"
 	"strconv"
-	"strings"
 
 	"github.com/Fepozopo/oatmeal-studios-backend/internal/service"
 )
@@ -105,15 +104,8 @@ func (cfg *ApiConfig) HandleListCustomerLocations(w http.ResponseWriter, r *http
 		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return
 	}
-	// Extract customerId from URL: /api/customers/{id}/locations
-	parts := strings.Split(r.URL.Path, "/")
-	var customerIdStr string
-	for i, part := range parts {
-		if part == "customers" && i+1 < len(parts) {
-			customerIdStr = parts[i+1]
-			break
-		}
-	}
+	// Extract customerId from path value
+	customerIdStr := r.PathValue("id")
 	customerId, err := strconv.Atoi(customerIdStr)
 	if err != nil || customerId <= 0 {
 		http.Error(w, "Invalid customer ID", http.StatusBadRequest)
