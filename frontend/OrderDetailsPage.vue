@@ -21,7 +21,7 @@
                         <span class="order-label">Customer:</span>
                         <span class="order-value">
                             <a v-if="customerData.id" :href="customerLink" class="customer-link">{{ customerData.id
-                            }}</a><br />
+                                }}</a><br />
                             <span v-if="customerData.business_name">{{ customerData.business_name }}</span><br />
                             <span v-if="customerData.address_1">{{ customerData.address_1 }}</span><br />
                             <span v-if="customerData.address_2 && customerData.address_2.Valid">{{
@@ -50,6 +50,7 @@
                 <div class="order-row">
                     <span class="order-label">Salesperson:</span>
                     <select class="order-input wide" v-model="salesperson">
+                        <option value=""></option>
                         <option v-for="rep in salesReps" :key="rep.rep_code" :value="rep.rep_code">
                             {{ rep.rep_code }} - {{ rep.first_name }} {{ rep.last_name }}
                         </option>
@@ -176,10 +177,11 @@
 </template>
 
 <script setup>
+
 import { useSalesReps } from './useSalesReps.js';
+import { ref, onMounted, computed } from 'vue';
 const salesperson = ref("");
 const { salesReps, fetchSalesReps } = useSalesReps();
-import { ref, onMounted, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
 const router = useRouter();
@@ -198,30 +200,33 @@ const customerLink = computed(() =>
     customerData.value.id ? `/customers/${customerData.value.id}` : '#'
 );
 
+
 onMounted(async () => {
     if (customerId) {
         const res = await fetch(`/api/customers/${customerId}`);
         if (res.ok) {
-
             customerData.value = await res.json();
         }
     }
+    let locationLoaded = false;
     if (customerId && locationId) {
         const res = await fetch(`/api/customers/${customerId}/locations`);
         if (res.ok) {
             const locations = await res.json();
             const location = locations.find(l => String(l.id) === String(locationId));
             if (location) {
-                // Set default salesperson from location if available
-                if (location.sales_rep && location.sales_rep !== null && location.sales_rep !== undefined) {
-                    salesperson.value = location.sales_rep;
-                }
                 locationData.value = location;
+                locationLoaded = true;
             }
         }
-
-        // Fetch all sales reps for dropdown
-        await fetchSalesReps();
+    }
+    await fetchSalesReps();
+    // Debug log to check values
+    console.log('locationData:', locationData.value);
+    console.log('salesReps:', salesReps.value);
+    // Set default salesperson if available
+    if (locationLoaded && locationData.value.sales_rep && locationData.value.sales_rep.Valid && salesReps.value.length > 0) {
+        salesperson.value = locationData.value.sales_rep.String;
     }
 });
 
