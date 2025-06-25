@@ -8,37 +8,44 @@
             <div class="order-details-title">ORDER ENTRY</div>
             <div class="order-details-section">
                 <div class="order-row">
-                    <span class="order-label">Order #:</span>
-                    <span class="order-value">{{ orderNumber }}</span>
-                    <button class="delete-btn">DELETE</button>
+                    <div style="display:flex; flex-direction:column; align-items:flex-start;">
+                        <div>
+                            <span class="order-label">Order #:</span>
+                            <span class="order-value">{{ orderNumber }}</span>
+                        </div>
+                        <button class="delete-btn" style="margin-left:0; margin-top:0.5rem;">DELETE</button>
+                    </div>
                 </div>
-                <div class="order-row">
-                    <span class="order-label">Customer:</span>
-                    <span class="order-value">
-                        <span v-if="customerData.id">{{ customerData.id }}</span><br />
-                        <span v-if="customerData.business_name">{{ customerData.business_name }}</span><br />
-                        <span v-if="customerData.address_1">{{ customerData.address_1 }}</span><br />
-                        <span v-if="customerData.address_2 && customerData.address_2.Valid">{{
-                            customerData.address_2.String }}</span><br />
-                        <span v-if="customerData.city || customerData.state || customerData.zip_code">
-                            {{ customerData.city }}, {{ customerData.state }} {{ customerData.zip_code }}
-                        </span><br />
-                        <span v-if="customerData.country">{{ customerData.country }}</span>
-                    </span>
-                </div>
-                <div class="order-row">
-                    <span class="order-label">Location:</span>
-                    <span class="order-value">
-                        <span v-if="locationData.id">{{ locationData.id }}</span><br />
-                        <span v-if="locationData.business_name">{{ locationData.business_name }}</span><br />
-                        <span v-if="locationData.address_1">{{ locationData.address_1 }}</span><br />
-                        <span v-if="locationData.address_2 && locationData.address_2.Valid">{{
-                            locationData.address_2.String }}</span><br />
-                        <span v-if="locationData.city || locationData.state || locationData.zip_code">
-                            {{ locationData.city }}, {{ locationData.state }} {{ locationData.zip_code }}
-                        </span><br />
-                        <span v-if="locationData.country">{{ locationData.country }}</span>
-                    </span>
+                <div class="order-row customer-location-row">
+                    <div class="customer-info-block">
+                        <span class="order-label">Customer:</span>
+                        <span class="order-value">
+                            <a v-if="customerData.id" :href="customerLink" class="customer-link">{{ customerData.id
+                            }}</a><br />
+                            <span v-if="customerData.business_name">{{ customerData.business_name }}</span><br />
+                            <span v-if="customerData.address_1">{{ customerData.address_1 }}</span><br />
+                            <span v-if="customerData.address_2 && customerData.address_2.Valid">{{
+                                customerData.address_2.String }}</span><br />
+                            <span v-if="customerData.city || customerData.state || customerData.zip_code">
+                                {{ customerData.city }}, {{ customerData.state }} {{ customerData.zip_code }}
+                            </span><br />
+                            <span v-if="customerData.country">{{ customerData.country }}</span>
+                        </span>
+                    </div>
+                    <div class="location-info-block">
+                        <span class="order-label">Location:</span>
+                        <span class="order-value">
+                            <span v-if="locationData.id">{{ locationData.id }}</span><br />
+                            <span v-if="locationData.business_name">{{ locationData.business_name }}</span><br />
+                            <span v-if="locationData.address_1">{{ locationData.address_1 }}</span><br />
+                            <span v-if="locationData.address_2 && locationData.address_2.Valid">{{
+                                locationData.address_2.String }}</span><br />
+                            <span v-if="locationData.city || locationData.state || locationData.zip_code">
+                                {{ locationData.city }}, {{ locationData.state }} {{ locationData.zip_code }}
+                            </span><br />
+                            <span v-if="locationData.country">{{ locationData.country }}</span>
+                        </span>
+                    </div>
                 </div>
                 <div class="order-row">
                     <span class="order-label"># Rep Group</span>
@@ -267,10 +274,24 @@ function generateOrderNumber() {
     margin-bottom: 2rem;
 }
 
+
 .order-row {
     display: flex;
     align-items: flex-start;
     margin-bottom: 0.7rem;
+}
+
+.customer-location-row {
+    display: flex;
+    flex-direction: row;
+    gap: 3rem;
+}
+
+.customer-info-block,
+.location-info-block {
+    display: flex;
+    flex-direction: column;
+    min-width: 260px;
 }
 
 .order-label {
