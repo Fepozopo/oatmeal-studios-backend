@@ -3,6 +3,7 @@ package api
 import (
 	"encoding/json"
 	"net/http"
+	"strconv"
 
 	"github.com/Fepozopo/oatmeal-studios-backend/internal/service"
 )
@@ -80,9 +81,11 @@ func (cfg *ApiConfig) HandleUpdateSalesRep(w http.ResponseWriter, r *http.Reques
 	}
 	defer r.Body.Close()
 
-	id, err := idFromURLAsInt32(r)
-	if err != nil {
-		http.Error(w, "Invalid ID: "+err.Error(), http.StatusBadRequest)
+	// Extract id from path value
+	idStr := r.PathValue("id")
+	id, err := strconv.Atoi(idStr)
+	if err != nil || id <= 0 {
+		http.Error(w, "Invalid sales rep ID", http.StatusBadRequest)
 		return
 	}
 
@@ -91,7 +94,7 @@ func (cfg *ApiConfig) HandleUpdateSalesRep(w http.ResponseWriter, r *http.Reques
 		http.Error(w, "Bad Request: "+err.Error(), http.StatusBadRequest)
 		return
 	}
-	input.ID = id
+	input.ID = int32(id)
 
 	salesRep, err := service.UpdateSalesRep(r.Context(), cfg.DbQueries, input)
 	if err != nil {
@@ -111,13 +114,15 @@ func (cfg *ApiConfig) HandleDeleteSalesRep(w http.ResponseWriter, r *http.Reques
 	}
 	defer r.Body.Close()
 
-	id, err := idFromURLAsInt32(r)
-	if err != nil {
-		http.Error(w, "Invalid ID: "+err.Error(), http.StatusBadRequest)
+	// Extract id from path value
+	idStr := r.PathValue("id")
+	id, err := strconv.Atoi(idStr)
+	if err != nil || id <= 0 {
+		http.Error(w, "Invalid sales rep ID", http.StatusBadRequest)
 		return
 	}
 
-	err = service.DeleteSalesRep(r.Context(), cfg.DbQueries, id)
+	err = service.DeleteSalesRep(r.Context(), cfg.DbQueries, int32(id))
 	if err != nil {
 		http.Error(w, "Failed to delete sales rep: "+err.Error(), http.StatusInternalServerError)
 		return
