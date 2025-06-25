@@ -21,7 +21,7 @@
                         <span class="order-label">Customer:</span>
                         <span class="order-value">
                             <a v-if="customerData.id" :href="customerLink" class="customer-link">{{ customerData.id
-                                }}</a><br />
+                            }}</a><br />
                             <span v-if="customerData.business_name">{{ customerData.business_name }}</span><br />
                             <span v-if="customerData.address_1">{{ customerData.address_1 }}</span><br />
                             <span v-if="customerData.address_2 && customerData.address_2.Valid">{{
@@ -49,7 +49,11 @@
                 </div>
                 <div class="order-row">
                     <span class="order-label">Salesperson:</span>
-                    <input class="order-input wide" v-model="salesperson" />
+                    <select class="order-input wide" v-model="salesperson">
+                        <option v-for="rep in salesReps" :key="rep.rep_code" :value="rep.rep_code">
+                            {{ rep.rep_code }} - {{ rep.first_name }} {{ rep.last_name }}
+                        </option>
+                    </select>
                 </div>
                 <div class="order-row">
                     <span class="order-label">Status:</span>
@@ -172,7 +176,9 @@
 </template>
 
 <script setup>
+import { useSalesReps } from './useSalesReps.js';
 const salesperson = ref("");
+const { salesReps, fetchSalesReps } = useSalesReps();
 import { ref, onMounted, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
@@ -206,9 +212,16 @@ onMounted(async () => {
             const locations = await res.json();
             const location = locations.find(l => String(l.id) === String(locationId));
             if (location) {
+                // Set default salesperson from location if available
+                if (location.sales_rep && location.sales_rep !== null && location.sales_rep !== undefined) {
+                    salesperson.value = location.sales_rep;
+                }
                 locationData.value = location;
             }
         }
+
+        // Fetch all sales reps for dropdown
+        await fetchSalesReps();
     }
 });
 
