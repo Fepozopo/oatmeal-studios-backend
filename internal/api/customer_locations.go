@@ -82,13 +82,15 @@ func (cfg *ApiConfig) HandleGetCustomerLocation(w http.ResponseWriter, r *http.R
 	}
 	defer r.Body.Close()
 
-	locationID, err := idFromURLAsInt32(r)
-	if err != nil {
-		http.Error(w, "Invalid Location ID: "+err.Error(), http.StatusBadRequest)
+	// Extract locationID from path value
+	locationIdStr := r.PathValue("locationID")
+	locationID, err := strconv.Atoi(locationIdStr)
+	if err != nil || locationID <= 0 {
+		http.Error(w, "Invalid location ID", http.StatusBadRequest)
 		return
 	}
 
-	location, err := service.GetCustomerLocationByID(r.Context(), cfg.DbQueries, locationID)
+	location, err := service.GetCustomerLocationByID(r.Context(), cfg.DbQueries, int32(locationID))
 	if err != nil {
 		http.Error(w, "Failed to get customer location: "+err.Error(), http.StatusInternalServerError)
 		return
@@ -105,7 +107,7 @@ func (cfg *ApiConfig) HandleListCustomerLocations(w http.ResponseWriter, r *http
 		return
 	}
 	// Extract customerId from path value
-	customerIdStr := r.PathValue("id")
+	customerIdStr := r.PathValue("customerId")
 	customerId, err := strconv.Atoi(customerIdStr)
 	if err != nil || customerId <= 0 {
 		http.Error(w, "Invalid customer ID", http.StatusBadRequest)

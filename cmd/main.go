@@ -53,15 +53,15 @@ func main() {
 
 	mux.HandleFunc("GET /api/customers", apiCfg.HandleListCustomers)
 	mux.HandleFunc("POST /api/customers", apiCfg.HandleCreateCustomer)
-	mux.HandleFunc("GET /api/customers/{id}", apiCfg.HandleGetCustomer)
-	mux.HandleFunc("PUT /api/customers/{id}", apiCfg.HandleUpdateCustomer)
-	mux.HandleFunc("DELETE /api/customers/{id}", apiCfg.HandleDeleteCustomer)
+	mux.HandleFunc("GET /api/customers/{customerId}", apiCfg.HandleGetCustomer)
+	mux.HandleFunc("PUT /api/customers/{customerId}", apiCfg.HandleUpdateCustomer)
+	mux.HandleFunc("DELETE /api/customers/{customerId}", apiCfg.HandleDeleteCustomer)
 
-	mux.HandleFunc("GET /api/customers/{id}/locations", apiCfg.HandleListCustomerLocations)
-	mux.HandleFunc("POST /api/customers/{id}/locations", apiCfg.HandleAddCustomerLocation)
+	mux.HandleFunc("GET /api/customers/{customerId}/locations", apiCfg.HandleListCustomerLocations)
+	mux.HandleFunc("POST /api/customers/{customerId}/locations", apiCfg.HandleAddCustomerLocation)
 	mux.HandleFunc("DELETE /api/customers/locations/{locationID}", apiCfg.HandleDeleteCustomerLocation)
 	mux.HandleFunc("PUT /api/customers/locations/{locationID}", apiCfg.HandleUpdateCustomerLocation)
-	mux.HandleFunc("GET /api/customers/{id}/locations/{locationID}", apiCfg.HandleGetCustomerLocation)
+	mux.HandleFunc("GET /api/customers/{customerId}/locations/{locationID}", apiCfg.HandleGetCustomerLocation)
 
 	// Run the server on the specified port
 	log.Printf("Server is running on port %s\n", port)

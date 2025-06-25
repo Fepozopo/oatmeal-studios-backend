@@ -42,7 +42,7 @@ func (cfg *ApiConfig) HandleGetCustomer(w http.ResponseWriter, r *http.Request) 
 	defer r.Body.Close()
 
 	// Extract customerId from path value
-	customerIdStr := r.PathValue("id")
+	customerIdStr := r.PathValue("customerId")
 	customerId, err := strconv.Atoi(customerIdStr)
 	if err != nil || customerId <= 0 {
 		http.Error(w, "Invalid customer ID", http.StatusBadRequest)
@@ -108,7 +108,7 @@ func (cfg *ApiConfig) HandleDeleteCustomer(w http.ResponseWriter, r *http.Reques
 	defer r.Body.Close()
 
 	// Extract customerId from path value
-	customerIdStr := r.PathValue("id")
+	customerIdStr := r.PathValue("customerId")
 	customerId, err := strconv.Atoi(customerIdStr)
 	if err != nil || customerId <= 0 {
 		http.Error(w, "Invalid customer ID", http.StatusBadRequest)
