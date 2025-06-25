@@ -16,6 +16,7 @@ type AddCustomerLocationInput struct {
 	City         string `json:"city"`
 	State        string `json:"state"`
 	ZipCode      string `json:"zip_code"`
+	Country      string `json:"country"`
 	Phone        string `json:"phone,omitempty"`
 	Notes        string `json:"notes,omitempty"`
 }
@@ -29,6 +30,7 @@ type UpdateCustomerLocationInput struct {
 	City         string `json:"city"`
 	State        string `json:"state"`
 	ZipCode      string `json:"zip_code"`
+	Country      string `json:"country"`
 	Phone        string `json:"phone,omitempty"`
 	Notes        string `json:"notes,omitempty"`
 }
@@ -44,6 +46,7 @@ type CreateCustomerInput struct {
 	City         string  `json:"city,omitempty"`
 	State        string  `json:"state,omitempty"`
 	ZipCode      string  `json:"zip_code,omitempty"`
+	Country      string  `json:"country,omitempty"`
 	Terms        string  `json:"terms,omitempty"`
 	Discount     float64 `json:"discount,omitempty"`
 	Commission   float64 `json:"commission,omitempty"`
@@ -62,6 +65,7 @@ type UpdateCustomerInput struct {
 	City         string  `json:"city,omitempty"`
 	State        string  `json:"state,omitempty"`
 	ZipCode      string  `json:"zip_code,omitempty"`
+	Country      string  `json:"country,omitempty"`
 	Terms        string  `json:"terms,omitempty"`
 	Discount     float64 `json:"discount,omitempty"`
 	Commission   float64 `json:"commission,omitempty"`

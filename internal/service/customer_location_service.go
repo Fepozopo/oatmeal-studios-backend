@@ -48,6 +48,7 @@ func AddCustomerLocation(ctx context.Context, db *database.Queries, input AddCus
 		City:         input.City,
 		State:        input.State,
 		ZipCode:      input.ZipCode,
+		Country:      input.Country,
 		Phone:        sql.NullString{String: input.Phone, Valid: input.Phone != ""},
 		Notes:        sql.NullString{String: input.Notes, Valid: input.Notes != ""},
 	}
@@ -112,6 +113,7 @@ func UpdateCustomerLocation(ctx context.Context, db *database.Queries, input Upd
 		City:         input.City,
 		State:        input.State,
 		ZipCode:      input.ZipCode,
+		Country:      input.Country,
 		Phone:        sql.NullString{String: input.Phone, Valid: input.Phone != ""},
 		Notes:        sql.NullString{String: input.Notes, Valid: input.Notes != ""},
 	}

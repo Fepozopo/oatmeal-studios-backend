@@ -11,9 +11,9 @@ import (
 )
 
 const createCustomer = `-- name: CreateCustomer :one
-INSERT INTO customers (business_name, contact_name, email, phone, address_1, address_2, city, state, zip_code, terms, discount, commission, sales_rep, notes)
-VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
-RETURNING id, created_at, updated_at, business_name, contact_name, email, phone, address_1, address_2, city, state, zip_code, terms, discount, commission, sales_rep, notes
+INSERT INTO customers (business_name, contact_name, email, phone, address_1, address_2, city, state, zip_code, country, terms, discount, commission, sales_rep, notes)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
+RETURNING id, created_at, updated_at, business_name, contact_name, email, phone, address_1, address_2, city, state, zip_code, terms, discount, commission, sales_rep, notes, country
 `
 
 type CreateCustomerParams struct {
@@ -26,6 +26,7 @@ type CreateCustomerParams struct {
 	City         string         `json:"city"`
 	State        string         `json:"state"`
 	ZipCode      string         `json:"zip_code"`
+	Country      string         `json:"country"`
 	Terms        string         `json:"terms"`
 	Discount     float64        `json:"discount"`
 	Commission   float64        `json:"commission"`
@@ -44,6 +45,7 @@ func (q *Queries) CreateCustomer(ctx context.Context, arg CreateCustomerParams) 
 		arg.City,
 		arg.State,
 		arg.ZipCode,
+		arg.Country,
 		arg.Terms,
 		arg.Discount,
 		arg.Commission,
@@ -69,6 +71,7 @@ func (q *Queries) CreateCustomer(ctx context.Context, arg CreateCustomerParams) 
 		&i.Commission,
 		&i.SalesRep,
 		&i.Notes,
+		&i.Country,
 	)
 	return i, err
 }
@@ -84,7 +87,7 @@ func (q *Queries) DeleteCustomer(ctx context.Context, id int32) error {
 }
 
 const getCustomer = `-- name: GetCustomer :one
-SELECT id, created_at, updated_at, business_name, contact_name, email, phone, address_1, address_2, city, state, zip_code, terms, discount, commission, sales_rep, notes
+SELECT id, created_at, updated_at, business_name, contact_name, email, phone, address_1, address_2, city, state, zip_code, terms, discount, commission, sales_rep, notes, country
 FROM customers
 WHERE id = $1
 `
@@ -110,12 +113,13 @@ func (q *Queries) GetCustomer(ctx context.Context, id int32) (Customer, error) {
 		&i.Commission,
 		&i.SalesRep,
 		&i.Notes,
+		&i.Country,
 	)
 	return i, err
 }
 
 const listCustomers = `-- name: ListCustomers :many
-SELECT id, created_at, updated_at, business_name, contact_name, email, phone, address_1, address_2, city, state, zip_code, terms, discount, commission, sales_rep, notes
+SELECT id, created_at, updated_at, business_name, contact_name, email, phone, address_1, address_2, city, state, zip_code, terms, discount, commission, sales_rep, notes, country
 FROM customers
 ORDER BY business_name
 `
@@ -147,6 +151,7 @@ func (q *Queries) ListCustomers(ctx context.Context) ([]Customer, error) {
 			&i.Commission,
 			&i.SalesRep,
 			&i.Notes,
+			&i.Country,
 		); err != nil {
 			return nil, err
 		}
@@ -172,14 +177,15 @@ SET business_name = $2,
     city = $8,
     state = $9,
     zip_code = $10,
-    terms = $11,
-    discount = $12,
-    commission = $13,
-    sales_rep = $14,
-    notes = $15,
+    country = $11,
+    terms = $12,
+    discount = $13,
+    commission = $14,
+    sales_rep = $15,
+    notes = $16,
     updated_at = NOW()
 WHERE id = $1
-RETURNING id, created_at, updated_at, business_name, contact_name, email, phone, address_1, address_2, city, state, zip_code, terms, discount, commission, sales_rep, notes
+RETURNING id, created_at, updated_at, business_name, contact_name, email, phone, address_1, address_2, city, state, zip_code, terms, discount, commission, sales_rep, notes, country
 `
 
 type UpdateCustomerParams struct {
@@ -193,6 +199,7 @@ type UpdateCustomerParams struct {
 	City         string         `json:"city"`
 	State        string         `json:"state"`
 	ZipCode      string         `json:"zip_code"`
+	Country      string         `json:"country"`
 	Terms        string         `json:"terms"`
 	Discount     float64        `json:"discount"`
 	Commission   float64        `json:"commission"`
@@ -212,6 +219,7 @@ func (q *Queries) UpdateCustomer(ctx context.Context, arg UpdateCustomerParams) 
 		arg.City,
 		arg.State,
 		arg.ZipCode,
+		arg.Country,
 		arg.Terms,
 		arg.Discount,
 		arg.Commission,
@@ -237,6 +245,7 @@ func (q *Queries) UpdateCustomer(ctx context.Context, arg UpdateCustomerParams) 
 		&i.Commission,
 		&i.SalesRep,
 		&i.Notes,
+		&i.Country,
 	)
 	return i, err
 }

@@ -29,6 +29,7 @@ type Customer struct {
 	Commission   float64        `json:"commission"`
 	SalesRep     sql.NullString `json:"sales_rep"`
 	Notes        sql.NullString `json:"notes"`
+	Country      string         `json:"country"`
 }
 
 type CustomerLocation struct {
@@ -45,6 +46,7 @@ type CustomerLocation struct {
 	UpdatedAt    time.Time      `json:"updated_at"`
 	BusinessName string         `json:"business_name"`
 	ContactName  sql.NullString `json:"contact_name"`
+	Country      string         `json:"country"`
 }
 
 type InventoryTransaction struct {
