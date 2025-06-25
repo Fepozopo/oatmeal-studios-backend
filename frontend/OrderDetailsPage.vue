@@ -21,7 +21,7 @@
                         <span class="order-label">Customer:</span>
                         <span class="order-value">
                             <a v-if="customerData.id" :href="customerLink" class="customer-link">{{ customerData.id
-                            }}</a><br />
+                                }}</a><br />
                             <span v-if="customerData.business_name">{{ customerData.business_name }}</span><br />
                             <span v-if="customerData.address_1">{{ customerData.address_1 }}</span><br />
                             <span v-if="customerData.address_2 && customerData.address_2.Valid">{{
@@ -48,10 +48,8 @@
                     </div>
                 </div>
                 <div class="order-row">
-                    <span class="order-label"># Rep Group</span>
-                    <input class="order-input short" v-model="repGroup" />
-                    <span class="order-label" style="margin-left:2rem;">Rep/Source</span>
-                    <input class="order-input short" v-model="repSource" />
+                    <span class="order-label">Salesperson:</span>
+                    <input class="order-input wide" v-model="salesperson" />
                 </div>
                 <div class="order-row">
                     <span class="order-label">Status:</span>
@@ -174,6 +172,7 @@
 </template>
 
 <script setup>
+const salesperson = ref("");
 import { ref, onMounted, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
