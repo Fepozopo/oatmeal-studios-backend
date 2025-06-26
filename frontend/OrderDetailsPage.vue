@@ -21,7 +21,7 @@
                         <span class="order-label">Customer:</span>
                         <span class="order-value">
                             <a v-if="customerData.id" :href="customerLink" class="customer-link">{{ customerData.id
-                            }}</a><br />
+                                }}</a><br />
                             <span v-if="customerData.business_name">{{ customerData.business_name }}</span><br />
                             <span v-if="customerData.address_1">{{ customerData.address_1 }}</span><br />
                             <span v-if="customerData.address_2 && customerData.address_2.Valid">{{
@@ -46,15 +46,15 @@
                             <span v-if="locationData.country">{{ locationData.country }}</span>
                         </span>
                     </div>
-                </div>
-                <div class="order-row">
-                    <span class="order-label">Salesperson:</span>
-                    <select class="order-input wide" v-model="salesperson">
-                        <option value=""></option>
-                        <option v-for="rep in salesReps" :key="rep.rep_code" :value="rep.rep_code">
-                            {{ rep.rep_code }} - {{ rep.first_name }} {{ rep.last_name }}
-                        </option>
-                    </select>
+                    <div class="order-row">
+                        <span class="order-label">Salesperson:</span>
+                        <select class="order-input wide" v-model="salesperson">
+                            <option value=""></option>
+                            <option v-for="rep in salesReps" :key="rep.rep_code" :value="rep.rep_code">
+                                {{ rep.rep_code }} - {{ rep.first_name }} {{ rep.last_name }}
+                            </option>
+                        </select>
+                    </div>
                 </div>
                 <div class="order-row">
                     <span class="order-label">Status:</span>
@@ -78,8 +78,6 @@
                     </select>
                 </div>
                 <div class="order-row">
-                    <span class="order-label">Last Order:</span>
-                    <input class="order-input" v-model="lastOrder" type="date" />
                     <span class="order-label" style="margin-left:2rem;">Write date:</span>
                     <input class="order-input" v-model="writeDate" type="date" />
                     <span class="order-label" style="margin-left:2rem;">Ship date:</span>
@@ -88,10 +86,6 @@
                 <div class="order-row">
                     <span class="order-label">PO #:</span>
                     <input class="order-input" v-model="poNumber" />
-                    <span class="order-label" style="margin-left:2rem;">PCP:</span>
-                    <input class="order-input short" v-model="pcp" />
-                    <span class="order-label" style="margin-left:2rem;">Subs:</span>
-                    <span>N</span>
                 </div>
                 <div class="order-row">
                     <span class="order-label">Terms:</span>
@@ -103,7 +97,15 @@
                         <option>NET 90</option>
                     </select>
                     <span class="order-label" style="margin-left:2rem;">Ship via:</span>
-                    <input class="order-input" v-model="shipVia" />
+                    <select class="order-input" v-model="shipVia">
+                        <option></option>
+                        <option>UPS GROUND</option>
+                        <option>UPS 3-DAY</option>
+                        <option>FEDEX GROUND</option>
+                        <option>FEDEX 3-DAY</option>
+                        <option>USPS GROUND ADVANTAGE</option>
+                        <option>USPS PRIORITY</option>
+                    </select>
                     <span class="order-label" style="margin-left:2rem;">Free shipping:</span>
                     <label><input type="checkbox" v-model="freeShippingProduct" /> Product</label>
                     <label style="margin-left:1rem;"><input type="checkbox" v-model="freeShippingDisplays" />
@@ -120,12 +122,9 @@
                         N</label>
                 </div>
                 <div class="order-row">
-                    <span class="order-label">Restricted items:</span>
-                    <input class="order-input wide" v-model="restrictedItems" />
-                </div>
-                <div class="order-row">
                     <span class="order-label">Special instructions:</span>
-                    <textarea class="order-input wide" v-model="specialInstructions"></textarea>
+                    <textarea class="order-input wide" v-model="specialInstructions" rows="4"
+                        style="width:600px;"></textarea>
                 </div>
                 <div class="order-row">
                     <span class="order-label">Default Qty:</span>
