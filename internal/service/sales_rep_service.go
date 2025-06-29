@@ -36,7 +36,7 @@ func CreateSalesRep(ctx context.Context, db *database.Queries, input CreateSales
 		City:      sql.NullString{String: input.City, Valid: input.City != ""},
 		State:     sql.NullString{String: input.State, Valid: input.State != ""},
 		ZipCode:   sql.NullString{String: input.ZipCode, Valid: input.ZipCode != ""},
-		Country:   input.Country,
+		Country:   sql.NullString{String: input.Country, Valid: input.Country != ""},
 		Phone:     sql.NullString{String: input.Phone, Valid: input.Phone != ""},
 		Email:     sql.NullString{String: input.Email, Valid: input.Email != ""},
 	}
@@ -96,7 +96,7 @@ func UpdateSalesRep(ctx context.Context, db *database.Queries, input UpdateSales
 		City:      sql.NullString{String: input.City, Valid: input.City != ""},
 		State:     sql.NullString{String: input.State, Valid: input.State != ""},
 		ZipCode:   sql.NullString{String: input.ZipCode, Valid: input.ZipCode != ""},
-		Country:   input.Country,
+		Country:   sql.NullString{String: input.Country, Valid: input.Country != ""},
 		Phone:     sql.NullString{String: input.Phone, Valid: input.Phone != ""},
 		Email:     sql.NullString{String: input.Email, Valid: input.Email != ""},
 	}

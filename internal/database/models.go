@@ -168,7 +168,7 @@ type SalesRep struct {
 	ZipCode   sql.NullString `json:"zip_code"`
 	Email     sql.NullString `json:"email"`
 	Phone     sql.NullString `json:"phone"`
-	Country   string         `json:"country"`
+	Country   sql.NullString `json:"country"`
 	RepCode   string         `json:"rep_code"`
 }
 

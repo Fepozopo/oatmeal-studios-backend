@@ -26,7 +26,7 @@ type CreateSalesRepParams struct {
 	Address2  sql.NullString `json:"address_2"`
 	City      sql.NullString `json:"city"`
 	State     sql.NullString `json:"state"`
-	Country   string         `json:"country"`
+	Country   sql.NullString `json:"country"`
 	ZipCode   sql.NullString `json:"zip_code"`
 	Phone     sql.NullString `json:"phone"`
 	Email     sql.NullString `json:"email"`
@@ -187,7 +187,7 @@ type UpdateSalesRepParams struct {
 	City      sql.NullString `json:"city"`
 	State     sql.NullString `json:"state"`
 	ZipCode   sql.NullString `json:"zip_code"`
-	Country   string         `json:"country"`
+	Country   sql.NullString `json:"country"`
 	Phone     sql.NullString `json:"phone"`
 	RepCode   string         `json:"rep_code"`
 	Email     sql.NullString `json:"email"`
