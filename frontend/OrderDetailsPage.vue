@@ -135,40 +135,46 @@
                     <label><input type="radio" value="Y" v-model="freeDisplay" /> Y</label>
                     <label style="margin-left:1rem;"><input type="radio" value="N" v-model="freeDisplay" /> N</label>
                 </div>
-                <div class="order-row">
-                    <div style="display:flex;align-items:center;gap:0.5rem;">
-                        <button @click="decrementItemCount">-</button>
-                        <input class="order-input short" v-model="itemCount" style="width:2.5em;text-align:center;" />
-                        <button @click="incrementItemCount">+</button>
-                    </div>
-                </div>
                 <div class="order-items-table">
                     <div class="order-items-header">
+                        <span style="min-width: 60px;"></span>
                         <span>Pocket #</span>
                         <span>Item #</span>
                         <span>Qty</span>
-                        <span>Description</span>
                         <span>List Price</span>
                         <span>Discount %</span>
                         <span>Discount Price</span>
                         <span>Total</span>
                     </div>
-                    <div class="order-items-row" v-for="n in itemCount" :key="n">
-                        <input class="order-input tiny" />
-                        <input class="order-input tiny" />
-                        <input class="order-input tiny" />
-                        <input class="order-input wide" />
-                        <input class="order-input tiny" />
-                        <input class="order-input tiny" />
-                        <input class="order-input tiny" />
-                        <input class="order-input tiny" />
+                    <div v-for="(item, idx) in lineItems" :key="idx" class="order-items-row"
+                        style="align-items:center;">
+                        <div class="row-controls-horizontal">
+                            <button @click="removeLineItem(idx)" :disabled="lineItems.length === 1"
+                                class="row-btn-small">-</button>
+                            <span class="row-number">{{ idx + 1 }}</span>
+                        </div>
+                        <input class="order-input tiny" v-model="item.pocket" />
+                        <input class="order-input tiny" v-model="item.itemNumber" />
+                        <input class="order-input tiny" v-model="item.qty" />
+                        <input class="order-input tiny" v-model="item.listPrice" />
+                        <input class="order-input tiny" v-model="item.discountPct"
+                            @keydown.tab="onDiscountTab(idx, $event)" />
+                        <span class="order-value">{{ formatCurrency(discountPrice(item)) }}</span>
+                        <span class="order-value">{{ formatCurrency(lineTotal(item)) }}</span>
+                    </div>
+                    <div class="order-items-row" style="align-items:center;">
+                        <div class="row-controls-horizontal">
+                            <button @click="addLineItem" class="row-btn-small">+</button>
+                        </div>
+                        <span style="flex:1"></span>
                     </div>
                 </div>
                 <div class="order-row">
-                    <span style="margin-left:auto;">Item total <b>0</b></span>
+                    <span style="margin-left:auto; min-width: 650px; text-align:right; display:block;">Item total
+                        <b>0</b></span>
                 </div>
                 <div class="order-row">
-                    <button class="continue-btn">CONTINUE</button>
+                    <button class="continue-btn">SUBMIT</button>
                 </div>
             </div>
         </div>
@@ -176,9 +182,8 @@
 </template>
 
 <script setup>
-
 import { useSalesReps } from './useSalesReps.js';
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted, computed, nextTick } from 'vue';
 const salesperson = ref("");
 const { salesReps, fetchSalesReps } = useSalesReps();
 import { useRoute, useRouter } from 'vue-router';
@@ -199,6 +204,63 @@ const customerLink = computed(() =>
     customerData.value.id ? `/customers/${customerData.value.id}` : '#'
 );
 
+function discountPrice(item) {
+    const price = parseFloat(item.listPrice) || 0;
+    const pct = parseFloat(item.discountPct) || 0;
+    return price * (1 - pct / 100);
+}
+function lineTotal(item) {
+    const qty = parseFloat(item.qty) || 0;
+    return discountPrice(item) * qty;
+}
+function formatCurrency(val) {
+    if (isNaN(val)) return '';
+    return '$' + val.toFixed(2);
+}
+
+// --- Line items state ---
+const lineItems = ref([
+    { pocket: '', itemNumber: '', qty: '', description: '', listPrice: '', discountPct: '', discountPrice: '', total: '' }
+]);
+
+function addLineItem() {
+    lineItems.value.push({ pocket: '', itemNumber: '', qty: '', description: '', listPrice: '', discountPct: '', discountPrice: '', total: '' });
+    nextTick(() => {
+        // Focus the first input of the new row
+        const rows = document.querySelectorAll('.order-items-row');
+        if (rows.length > 0) {
+            const lastRow = rows[rows.length - 1];
+            const firstInput = lastRow.querySelector('input');
+            if (firstInput) firstInput.focus();
+        }
+    });
+}
+
+function addLineItemAt(idx) {
+    lineItems.value.splice(idx + 1, 0, { pocket: '', itemNumber: '', qty: '', description: '', listPrice: '', discountPct: '', discountPrice: '', total: '' });
+    nextTick(() => {
+        // Focus the first input of the new row
+        const rows = document.querySelectorAll('.order-items-row');
+        if (rows.length > idx + 1) {
+            const newRow = rows[idx + 1];
+            const firstInput = newRow.querySelector('input');
+            if (firstInput) firstInput.focus();
+        }
+    });
+}
+
+function removeLineItem(idx) {
+    if (lineItems.value.length > 1) {
+        lineItems.value.splice(idx, 1);
+    }
+}
+
+function onDiscountTab(idx, event) {
+    // Only add if tabbing out of last discount % input
+    if (idx === lineItems.value.length - 1 && !event.shiftKey) {
+        addLineItem();
+    }
+}
 
 onMounted(async () => {
     if (customerId) {
@@ -236,6 +298,91 @@ function generateOrderNumber() {
 </script>
 
 <style scoped>
+.order-items-table {
+    background: #dbdbdb;
+    padding: 1rem 0.5rem 0.5rem 0.5rem;
+    border-radius: 6px;
+    width: 100%;
+    min-width: 900px;
+}
+
+.order-items-header {
+    display: grid;
+    grid-template-columns: 60px 100px 100px 80px 1.5fr 100px 100px 100px 100px;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+    align-items: center;
+}
+
+.order-items-row {
+    display: grid;
+    grid-template-columns: 60px 100px 100px 80px 1.5fr 100px 100px 100px 100px;
+    margin-bottom: 0.3rem;
+    align-items: center;
+}
+
+.row-controls {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 2.5em;
+}
+
+.row-controls-horizontal {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    min-width: 2.5em;
+    gap: 0.2em;
+}
+
+.row-btn {
+    width: 2em;
+    height: 2em;
+    font-size: 1.2em;
+    background: #eaeaea;
+    border: 1px solid #aaa;
+    border-radius: 6px;
+    margin: 0.1em 0;
+    cursor: pointer;
+    padding: 0;
+}
+
+.row-btn-small {
+    width: 1.5em;
+    height: 1.5em;
+    font-size: 1em;
+    background: #eaeaea;
+    border: 1px solid #aaa;
+    border-radius: 6px;
+    margin: 0 0.1em 0 0;
+    cursor: pointer;
+    padding: 0;
+}
+
+.row-btn:disabled,
+.row-btn-small:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.row-number {
+    font-size: 1.1em;
+    font-weight: 500;
+    margin: 0.2em 0;
+    min-width: 1.2em;
+    text-align: center;
+}
+
+.order-input.tiny {
+    width: 90%;
+    min-width: 0;
+}
+
+.order-input.wide {
+    width: 98%;
+}
+
 .order-details-wrapper {
     min-height: 100vh;
     background: #dbdbdb;
