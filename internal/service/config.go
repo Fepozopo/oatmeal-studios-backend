@@ -53,6 +53,7 @@ type CreateCustomerInput struct {
 	Discount     float64 `json:"discount,omitempty"`
 	Commission   float64 `json:"commission,omitempty"`
 	Notes        string  `json:"notes,omitempty"`
+	FreeShipping bool    `json:"free_shipping,omitempty"`
 }
 
 type UpdateCustomerInput struct {
@@ -71,6 +72,7 @@ type UpdateCustomerInput struct {
 	Discount     float64 `json:"discount,omitempty"`
 	Commission   float64 `json:"commission,omitempty"`
 	Notes        string  `json:"notes,omitempty"`
+	FreeShipping bool    `json:"free_shipping,omitempty"`
 }
 
 // ------------------ Invoice and Order Inputs ------------------

@@ -64,6 +64,7 @@ func CreateCustomer(ctx context.Context, db *database.Queries, input CreateCusto
 		Discount:     input.Discount,
 		Commission:   input.Commission,
 		Notes:        sql.NullString{String: input.Notes, Valid: input.Notes != ""},
+		FreeShipping: input.FreeShipping,
 	}
 
 	customer, err := db.CreateCustomer(ctx, params)
@@ -149,6 +150,7 @@ func UpdateCustomer(ctx context.Context, db *database.Queries, input UpdateCusto
 		Discount:     input.Discount,
 		Commission:   input.Commission,
 		Notes:        sql.NullString{String: input.Notes, Valid: input.Notes != ""},
+		FreeShipping: input.FreeShipping,
 	}
 
 	customer, err := db.UpdateCustomer(ctx, params)

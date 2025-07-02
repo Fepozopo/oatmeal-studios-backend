@@ -29,6 +29,7 @@ type Customer struct {
 	Commission   float64        `json:"commission"`
 	Notes        sql.NullString `json:"notes"`
 	Country      string         `json:"country"`
+	FreeShipping bool           `json:"free_shipping"`
 }
 
 type CustomerLocation struct {
