@@ -207,6 +207,9 @@ const customerLink = computed(() =>
     customerData.value.id ? `/customers/${customerData.value.id}` : '#'
 );
 
+const freeShippingProduct = ref(false);
+const freeShippingDisplays = ref(false);
+
 function discountPrice(item) {
     const price = parseFloat(item.listPrice) || 0;
     const pct = parseFloat(item.discountPct) || 0;
@@ -270,6 +273,11 @@ onMounted(async () => {
         const res = await fetch(`/api/customers/${customerId}`);
         if (res.ok) {
             customerData.value = await res.json();
+            // Set free shipping checkboxes if customer gets free shipping
+            if (customerData.value.free_shipping) {
+                freeShippingProduct.value = true;
+                freeShippingDisplays.value = true;
+            }
         }
     }
     let locationLoaded = false;
