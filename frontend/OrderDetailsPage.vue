@@ -59,8 +59,11 @@
                 <div class="order-row">
                     <span class="order-label">Status:</span>
                     <select class="order-input" v-model="status">
-                        <option>PENDING</option>
-                        <option>COMPLETE</option>
+                        <option>APPROVED</option>
+                        <option>FUTURE SHIP</option>
+                        <option>HOLD</option>
+                        <option>SENT TO SHIPPING</option>
+                        <option>INVOICED</option>
                     </select>
                     <span class="order-label" style="margin-left:2rem;">Type:</span>
                     <select class="order-input" v-model="type">
@@ -194,8 +197,21 @@ const goHome = () => {
     router.push('/home');
 };
 
-// Set default to "Y"
+const status = ref("APPROVED");
+const type = ref("REORDER");
+const method = ref("ONLINE");
+
+const terms = ref("");
+const shipVia = ref("UPS GROUND");
+const freeShippingProduct = ref(false);
+const freeShippingDisplays = ref(false);
+const shipAmount = ref(0);
+
 const applyCommission = ref("Y");
+
+const freeDisplay = ref("N");
+const defaultQty = ref(6);
+const defaultDiscount = ref(0);
 
 const orderNumber = ref(generateOrderNumber());
 const customerId = route.query.customerId;
@@ -207,8 +223,11 @@ const customerLink = computed(() =>
     customerData.value.id ? `/customers/${customerData.value.id}` : '#'
 );
 
-const freeShippingProduct = ref(false);
-const freeShippingDisplays = ref(false);
+function getPSTDateString() {
+    return new Date().toLocaleDateString('en-CA', { timeZone: 'America/Los_Angeles' });
+}
+const writeDate = ref(getPSTDateString());
+const shipDate = ref(getPSTDateString());
 
 function discountPrice(item) {
     const price = parseFloat(item.listPrice) || 0;
@@ -277,6 +296,10 @@ onMounted(async () => {
             if (customerData.value.free_shipping) {
                 freeShippingProduct.value = true;
                 freeShippingDisplays.value = true;
+            }
+            // Set default terms if available
+            if (customerData.value.terms) {
+                terms.value = customerData.value.terms;
             }
         }
     }
