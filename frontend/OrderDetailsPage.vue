@@ -194,6 +194,9 @@ const goHome = () => {
     router.push('/home');
 };
 
+// Set default to "Y"
+const applyCommission = ref("Y");
+
 const orderNumber = ref(generateOrderNumber());
 const customerId = route.query.customerId;
 const locationId = route.query.locationId;
