@@ -52,14 +52,14 @@ func main() {
 	mux.HandleFunc("PUT /api/users/{id}/name", apiCfg.HandleUpdateUserName)
 	mux.HandleFunc("PUT /api/users/{id}/password", apiCfg.HandleUpdateUserPassword)
 
-	// Sales Rep routes
+	// Customer routes
 	mux.HandleFunc("GET /api/customers", apiCfg.HandleListCustomers)
 	mux.HandleFunc("POST /api/customers", apiCfg.HandleCreateCustomer)
 	mux.HandleFunc("GET /api/customers/{customerId}", apiCfg.HandleGetCustomer)
 	mux.HandleFunc("PUT /api/customers/{customerId}", apiCfg.HandleUpdateCustomer)
 	mux.HandleFunc("DELETE /api/customers/{customerId}", apiCfg.HandleDeleteCustomer)
 
-	// Sales Rep routes
+	// Customer Location routes
 	mux.HandleFunc("GET /api/customers/{customerId}/locations", apiCfg.HandleListCustomerLocations)
 	mux.HandleFunc("POST /api/customers/{customerId}/locations", apiCfg.HandleAddCustomerLocation)
 	mux.HandleFunc("DELETE /api/customers/locations/{locationID}", apiCfg.HandleDeleteCustomerLocation)
@@ -79,6 +79,24 @@ func main() {
 	mux.HandleFunc("PUT /api/products/{id}", apiCfg.HandleUpdateProduct)
 	mux.HandleFunc("DELETE /api/products/{id}", apiCfg.HandleDeleteProduct)
 	mux.HandleFunc("GET /api/products/sku/{sku}", apiCfg.HandleGetProductBySKU)
+
+	// Order routes
+	mux.HandleFunc("POST /api/orders", apiCfg.HandleCreateOrder)
+	mux.HandleFunc("GET /api/orders/{id}", apiCfg.HandleGetOrder)
+	mux.HandleFunc("PUT /api/orders/{id}", apiCfg.HandleUpdateOrder)
+	mux.HandleFunc("DELETE /api/orders/{id}", apiCfg.HandleDeleteOrder)
+
+	// Planogram routes
+	mux.HandleFunc("POST /api/planograms", apiCfg.HandleCreatePlanogram)
+	mux.HandleFunc("GET /api/planograms/{id}", apiCfg.HandleGetPlanogram)
+	mux.HandleFunc("PUT /api/planograms/{id}", apiCfg.HandleUpdatePlanogram)
+	mux.HandleFunc("DELETE /api/planograms/{id}", apiCfg.HandleDeletePlanogram)
+
+	// Invoice routes
+	mux.HandleFunc("POST /api/invoices", apiCfg.HandleCreateInvoice)
+	mux.HandleFunc("GET /api/invoices/{id}", apiCfg.HandleGetInvoice)
+	mux.HandleFunc("PUT /api/invoices/{id}", apiCfg.HandleUpdateInvoice)
+	mux.HandleFunc("DELETE /api/invoices/{id}", apiCfg.HandleDeleteInvoice)
 
 	// Run the server on the specified port
 	log.Printf("Server is running on port %s\n", port)
