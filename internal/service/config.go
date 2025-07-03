@@ -198,10 +198,10 @@ type GetPlanogramPocketByNumberInput struct {
 type CreateProductInput struct {
 	Type           string    `json:"type"`
 	Sku            string    `json:"sku"`
-	Upc            string    `json:"upc"`
+	Upc            string    `json:"upc,omitempty"`
 	Status         string    `json:"status"`
-	Cost           float64   `json:"cost"`
-	Price          float64   `json:"price"`
+	Cost           float64   `json:"cost,omitempty"`
+	Price          float64   `json:"price,omitempty"`
 	Envelope       string    `json:"envelope,omitempty"`
 	Artist         string    `json:"artist,omitempty"`
 	Category       string    `json:"category,omitempty"`
@@ -216,10 +216,10 @@ type UpdateProductInput struct {
 	ID             uuid.UUID `json:"id"`
 	Type           string    `json:"type"`
 	Sku            string    `json:"sku"`
-	Upc            string    `json:"upc"`
+	Upc            string    `json:"upc,omitempty"`
 	Status         string    `json:"status"`
-	Cost           float64   `json:"cost"`
-	Price          float64   `json:"price"`
+	Cost           float64   `json:"cost,omitempty"`
+	Price          float64   `json:"price,omitempty"`
 	Envelope       string    `json:"envelope,omitempty"`
 	Artist         string    `json:"artist,omitempty"`
 	Category       string    `json:"category,omitempty"`

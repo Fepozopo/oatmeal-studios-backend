@@ -22,20 +22,20 @@ RETURNING id, created_at, updated_at, type, sku, upc, status, cost, price, envel
 `
 
 type CreateProductParams struct {
-	Type           string         `json:"type"`
-	Sku            string         `json:"sku"`
-	Upc            string         `json:"upc"`
-	Status         string         `json:"status"`
-	Cost           float64        `json:"cost"`
-	Price          float64        `json:"price"`
-	Envelope       sql.NullString `json:"envelope"`
-	Artist         sql.NullString `json:"artist"`
-	Category       sql.NullString `json:"category"`
-	ReleaseDate    sql.NullTime   `json:"release_date"`
-	LastBoughtDate sql.NullTime   `json:"last_bought_date"`
-	Description    sql.NullString `json:"description"`
-	TextFront      sql.NullString `json:"text_front"`
-	TextInside     sql.NullString `json:"text_inside"`
+	Type           string          `json:"type"`
+	Sku            string          `json:"sku"`
+	Upc            sql.NullString  `json:"upc"`
+	Status         string          `json:"status"`
+	Cost           sql.NullFloat64 `json:"cost"`
+	Price          sql.NullFloat64 `json:"price"`
+	Envelope       sql.NullString  `json:"envelope"`
+	Artist         sql.NullString  `json:"artist"`
+	Category       sql.NullString  `json:"category"`
+	ReleaseDate    sql.NullTime    `json:"release_date"`
+	LastBoughtDate sql.NullTime    `json:"last_bought_date"`
+	Description    sql.NullString  `json:"description"`
+	TextFront      sql.NullString  `json:"text_front"`
+	TextInside     sql.NullString  `json:"text_inside"`
 }
 
 func (q *Queries) CreateProduct(ctx context.Context, arg CreateProductParams) (Product, error) {
@@ -347,21 +347,21 @@ RETURNING id, created_at, updated_at, type, sku, upc, status, cost, price, envel
 `
 
 type UpdateProductParams struct {
-	ID             uuid.UUID      `json:"id"`
-	Type           string         `json:"type"`
-	Sku            string         `json:"sku"`
-	Upc            string         `json:"upc"`
-	Status         string         `json:"status"`
-	Cost           float64        `json:"cost"`
-	Price          float64        `json:"price"`
-	Envelope       sql.NullString `json:"envelope"`
-	Artist         sql.NullString `json:"artist"`
-	Category       sql.NullString `json:"category"`
-	ReleaseDate    sql.NullTime   `json:"release_date"`
-	LastBoughtDate sql.NullTime   `json:"last_bought_date"`
-	Description    sql.NullString `json:"description"`
-	TextFront      sql.NullString `json:"text_front"`
-	TextInside     sql.NullString `json:"text_inside"`
+	ID             uuid.UUID       `json:"id"`
+	Type           string          `json:"type"`
+	Sku            string          `json:"sku"`
+	Upc            sql.NullString  `json:"upc"`
+	Status         string          `json:"status"`
+	Cost           sql.NullFloat64 `json:"cost"`
+	Price          sql.NullFloat64 `json:"price"`
+	Envelope       sql.NullString  `json:"envelope"`
+	Artist         sql.NullString  `json:"artist"`
+	Category       sql.NullString  `json:"category"`
+	ReleaseDate    sql.NullTime    `json:"release_date"`
+	LastBoughtDate sql.NullTime    `json:"last_bought_date"`
+	Description    sql.NullString  `json:"description"`
+	TextFront      sql.NullString  `json:"text_front"`
+	TextInside     sql.NullString  `json:"text_inside"`
 }
 
 func (q *Queries) UpdateProduct(ctx context.Context, arg UpdateProductParams) (Product, error) {

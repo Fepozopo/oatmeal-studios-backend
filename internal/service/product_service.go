@@ -11,16 +11,16 @@ import (
 )
 
 func CreateProduct(ctx context.Context, db *database.Queries, input CreateProductInput) (*database.Product, error) {
-	if input.Type == "" || input.Sku == "" || input.Upc == "" || input.Status == "" {
-		return nil, errors.New("type, sku, upc, and status are required")
+	if input.Type == "" || input.Sku == "" || input.Status == "" {
+		return nil, errors.New("type, sku, and status are required")
 	}
 	params := database.CreateProductParams{
 		Type:           input.Type,
 		Sku:            input.Sku,
-		Upc:            input.Upc,
+		Upc:            sql.NullString{String: input.Upc, Valid: input.Upc != ""},
 		Status:         input.Status,
-		Cost:           input.Cost,
-		Price:          input.Price,
+		Cost:           sql.NullFloat64{Float64: input.Cost, Valid: input.Cost != 0},
+		Price:          sql.NullFloat64{Float64: input.Price, Valid: input.Price != 0},
 		Envelope:       sql.NullString{String: input.Envelope, Valid: input.Envelope != ""},
 		Artist:         sql.NullString{String: input.Artist, Valid: input.Artist != ""},
 		Category:       sql.NullString{String: input.Category, Valid: input.Category != ""},
@@ -91,10 +91,10 @@ func UpdateProduct(ctx context.Context, db *database.Queries, input UpdateProduc
 		ID:             input.ID,
 		Type:           input.Type,
 		Sku:            input.Sku,
-		Upc:            input.Upc,
+		Upc:            sql.NullString{String: input.Upc, Valid: input.Upc != ""},
 		Status:         input.Status,
-		Cost:           input.Cost,
-		Price:          input.Price,
+		Cost:           sql.NullFloat64{Float64: input.Cost, Valid: input.Cost != 0},
+		Price:          sql.NullFloat64{Float64: input.Price, Valid: input.Price != 0},
 		Envelope:       sql.NullString{String: input.Envelope, Valid: input.Envelope != ""},
 		Artist:         sql.NullString{String: input.Artist, Valid: input.Artist != ""},
 		Category:       sql.NullString{String: input.Category, Valid: input.Category != ""},
@@ -104,6 +104,7 @@ func UpdateProduct(ctx context.Context, db *database.Queries, input UpdateProduc
 		TextFront:      sql.NullString{String: input.TextFront, Valid: input.TextFront != ""},
 		TextInside:     sql.NullString{String: input.TextInside, Valid: input.TextInside != ""},
 	}
+
 	prod, err := db.UpdateProduct(ctx, params)
 	if err != nil {
 		return nil, fmt.Errorf("failed to update product: %w", err)

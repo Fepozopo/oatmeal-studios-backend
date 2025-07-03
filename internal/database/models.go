@@ -126,23 +126,23 @@ type PlanogramPocket struct {
 }
 
 type Product struct {
-	ID             uuid.UUID      `json:"id"`
-	CreatedAt      time.Time      `json:"created_at"`
-	UpdatedAt      time.Time      `json:"updated_at"`
-	Type           string         `json:"type"`
-	Sku            string         `json:"sku"`
-	Upc            string         `json:"upc"`
-	Status         string         `json:"status"`
-	Cost           float64        `json:"cost"`
-	Price          float64        `json:"price"`
-	Envelope       sql.NullString `json:"envelope"`
-	Artist         sql.NullString `json:"artist"`
-	Category       sql.NullString `json:"category"`
-	ReleaseDate    sql.NullTime   `json:"release_date"`
-	LastBoughtDate sql.NullTime   `json:"last_bought_date"`
-	Description    sql.NullString `json:"description"`
-	TextFront      sql.NullString `json:"text_front"`
-	TextInside     sql.NullString `json:"text_inside"`
+	ID             uuid.UUID       `json:"id"`
+	CreatedAt      time.Time       `json:"created_at"`
+	UpdatedAt      time.Time       `json:"updated_at"`
+	Type           string          `json:"type"`
+	Sku            string          `json:"sku"`
+	Upc            sql.NullString  `json:"upc"`
+	Status         string          `json:"status"`
+	Cost           sql.NullFloat64 `json:"cost"`
+	Price          sql.NullFloat64 `json:"price"`
+	Envelope       sql.NullString  `json:"envelope"`
+	Artist         sql.NullString  `json:"artist"`
+	Category       sql.NullString  `json:"category"`
+	ReleaseDate    sql.NullTime    `json:"release_date"`
+	LastBoughtDate sql.NullTime    `json:"last_bought_date"`
+	Description    sql.NullString  `json:"description"`
+	TextFront      sql.NullString  `json:"text_front"`
+	TextInside     sql.NullString  `json:"text_inside"`
 }
 
 type RefreshToken struct {
