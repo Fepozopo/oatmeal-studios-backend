@@ -306,11 +306,19 @@ function handleItemNumberChange(idx) {
                 return;
             }
             const product = await res.json();
+            // Prevent adding inactive products
+            if ((product.status || '').trim() === 'INACTIVE') {
+                alert(`Product "${itemNumber}" is inactive and cannot be added to the order.`);
+                item.listPrice = '';
+                item.qty = '';
+                item.discountPct = '';
+                return;
+            }
             // Set fields from defaults and product
             item.qty = defaultQty.value;
             item.discountPct = defaultDiscount.value;
             item.listPrice = typeof product.price === 'object' && product.price !== null
-                ? (product.price.Float64 ?? product.price.value ?? '') // adjust property as needed
+                ? (product.price.Float64 ?? product.price.value ?? '')
                 : product.price;
         })
         .catch(() => {
@@ -333,11 +341,19 @@ function onItemNumberBlur(idx) {
                 return;
             }
             const product = await res.json();
+            // Prevent adding inactive products
+            if ((product.status || '').trim() === 'INACTIVE') {
+                alert(`Product "${itemNumber}" is inactive and cannot be added to the order.`);
+                item.listPrice = '';
+                item.qty = '';
+                item.discountPct = '';
+                return;
+            }
             // Set fields from defaults and product
             item.qty = defaultQty.value;
             item.discountPct = defaultDiscount.value;
             item.listPrice = typeof product.price === 'object' && product.price !== null
-                ? (product.price.Float64 ?? product.price.value ?? '') // adjust property as needed
+                ? (product.price.Float64 ?? product.price.value ?? '')
                 : product.price;
         })
         .catch(() => {
