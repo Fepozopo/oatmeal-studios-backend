@@ -62,7 +62,14 @@ func (cfg *ApiConfig) HandleGetProductBySKU(w http.ResponseWriter, r *http.Reque
 	}
 	defer r.Body.Close()
 
-	sku := r.URL.Query().Get("sku")
+	// Extract SKU from path
+	// Example: /api/products/sku/ABC123
+	prefix := "/api/products/sku/"
+	if len(r.URL.Path) <= len(prefix) {
+		http.Error(w, "Missing SKU", http.StatusBadRequest)
+		return
+	}
+	sku := r.URL.Path[len(prefix):]
 	if sku == "" {
 		http.Error(w, "Missing SKU", http.StatusBadRequest)
 		return

@@ -73,6 +73,13 @@ func main() {
 	mux.HandleFunc("PUT /api/sales-reps/{id}", apiCfg.HandleUpdateSalesRep)
 	mux.HandleFunc("DELETE /api/sales-reps/{id}", apiCfg.HandleDeleteSalesRep)
 
+	// Product routes
+	mux.HandleFunc("POST /api/products", apiCfg.HandleCreateProduct)
+	mux.HandleFunc("GET /api/products/{id}", apiCfg.HandleGetProductByID)
+	mux.HandleFunc("PUT /api/products/{id}", apiCfg.HandleUpdateProduct)
+	mux.HandleFunc("DELETE /api/products/{id}", apiCfg.HandleDeleteProduct)
+	mux.HandleFunc("GET /api/products/sku/{sku}", apiCfg.HandleGetProductBySKU)
+
 	// Run the server on the specified port
 	log.Printf("Server is running on port %s\n", port)
 	http.ListenAndServe(port, mux)

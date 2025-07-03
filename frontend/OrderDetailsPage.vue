@@ -157,7 +157,11 @@
                             <span class="row-number">{{ idx + 1 }}</span>
                         </div>
                         <input class="order-input tiny" v-model="item.pocket" />
-                        <input class="order-input tiny" v-model="item.itemNumber" />
+                        <input
+                            class="order-input tiny"
+                            v-model="item.itemNumber"
+                            @blur="onItemNumberBlur(idx)"
+                        />
                         <input class="order-input tiny" v-model="item.qty" />
                         <input class="order-input tiny" v-model="item.listPrice" />
                         <input class="order-input tiny" v-model="item.discountPct"
@@ -186,7 +190,7 @@
 
 <script setup>
 import { useSalesReps } from './useSalesReps.js';
-import { ref, onMounted, computed, nextTick } from 'vue';
+import { ref, onMounted, computed, nextTick, watch } from 'vue';
 const salesperson = ref("");
 const { salesReps, fetchSalesReps } = useSalesReps();
 import { useRoute, useRouter } from 'vue-router';
@@ -285,6 +289,56 @@ function onDiscountTab(idx, event) {
     if (idx === lineItems.value.length - 1 && !event.shiftKey) {
         addLineItem();
     }
+}
+
+function handleItemNumberChange(idx) {
+    const item = lineItems.value[idx];
+    const itemNumber = item.itemNumber?.trim();
+    if (!itemNumber) return;
+
+    fetch(`/api/products/sku/${encodeURIComponent(itemNumber)}`)
+        .then(async res => {
+            if (!res.ok) {
+                alert(`Product with SKU "${itemNumber}" not found.`);
+                item.listPrice = '';
+                item.qty = '';
+                item.discountPct = '';
+                return;
+            }
+            const product = await res.json();
+            // Set fields from defaults and product
+            item.qty = defaultQty.value;
+            item.discountPct = defaultDiscount.value;
+            item.listPrice = product.price;
+        })
+        .catch(() => {
+            alert(`Error looking up product "${itemNumber}".`);
+        });
+}
+
+function onItemNumberBlur(idx) {
+    const item = lineItems.value[idx];
+    const itemNumber = item.itemNumber?.trim();
+    if (!itemNumber) return;
+
+    fetch(`/api/products/sku/${encodeURIComponent(itemNumber)}`)
+        .then(async res => {
+            if (!res.ok) {
+                alert(`Product with SKU "${itemNumber}" not found.`);
+                item.listPrice = '';
+                item.qty = '';
+                item.discountPct = '';
+                return;
+            }
+            const product = await res.json();
+            // Set fields from defaults and product
+            item.qty = defaultQty.value;
+            item.discountPct = defaultDiscount.value;
+            item.listPrice = product.price;
+        })
+        .catch(() => {
+            alert(`Error looking up product "${itemNumber}".`);
+        });
 }
 
 onMounted(async () => {
