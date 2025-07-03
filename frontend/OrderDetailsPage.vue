@@ -309,7 +309,9 @@ function handleItemNumberChange(idx) {
             // Set fields from defaults and product
             item.qty = defaultQty.value;
             item.discountPct = defaultDiscount.value;
-            item.listPrice = product.price;
+            item.listPrice = typeof product.price === 'object' && product.price !== null
+                ? (product.price.Float64 ?? product.price.value ?? '') // adjust property as needed
+                : product.price;
         })
         .catch(() => {
             alert(`Error looking up product "${itemNumber}".`);
@@ -334,7 +336,9 @@ function onItemNumberBlur(idx) {
             // Set fields from defaults and product
             item.qty = defaultQty.value;
             item.discountPct = defaultDiscount.value;
-            item.listPrice = product.price;
+            item.listPrice = typeof product.price === 'object' && product.price !== null
+                ? (product.price.Float64 ?? product.price.value ?? '') // adjust property as needed
+                : product.price;
         })
         .catch(() => {
             alert(`Error looking up product "${itemNumber}".`);
