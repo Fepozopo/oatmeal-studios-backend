@@ -35,7 +35,8 @@
                     <div class="location-info-block">
                         <span class="order-label">Location:</span>
                         <span class="order-value">
-                            <span v-if="locationData.id">{{ locationData.id }}</span><br />
+                            <span v-if="locationData.location_num && locationData.location_num.Valid">{{
+                                locationData.location_num.Int32 }}</span><br />
                             <span v-if="locationData.business_name">{{ locationData.business_name }}</span><br />
                             <span v-if="locationData.address_1">{{ locationData.address_1 }}</span><br />
                             <span v-if="locationData.address_2 && locationData.address_2.Valid">{{
