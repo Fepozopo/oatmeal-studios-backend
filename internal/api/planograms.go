@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strconv"
+	"strings"
 
 	"github.com/Fepozopo/oatmeal-studios-backend/internal/service"
 )
@@ -184,13 +186,21 @@ func (cfg *ApiConfig) HandleGetPlanogramsByLocation(w http.ResponseWriter, r *ht
 	}
 	defer r.Body.Close()
 
-	customerLocationID, err := idFromURLAsInt32(r)
+	// Extract locationID from path
+	prefix := "/api/planograms/"
+	if !strings.HasPrefix(r.URL.Path, prefix) {
+		http.Error(w, "Invalid path", http.StatusBadRequest)
+		return
+	}
+	idStr := strings.TrimPrefix(r.URL.Path, prefix)
+	idStr = strings.TrimSuffix(idStr, "/planograms") // Remove the suffix from the path
+	locationID, err := strconv.Atoi(idStr)
 	if err != nil {
-		http.Error(w, "Invalid customer location ID", http.StatusBadRequest)
+		http.Error(w, "Invalid location ID", http.StatusBadRequest)
 		return
 	}
 
-	planograms, err := service.GetPlanogramsByLocation(r.Context(), cfg.DbQueries, customerLocationID)
+	planograms, err := service.GetPlanogramsByLocation(r.Context(), cfg.DbQueries, int32(locationID))
 	if err != nil {
 		http.Error(w, "Failed to get planograms by location", http.StatusInternalServerError)
 		return
@@ -236,13 +246,21 @@ func (cfg *ApiConfig) HandleListPocketsForPlanogram(w http.ResponseWriter, r *ht
 	}
 	defer r.Body.Close()
 
-	planogramID, err := idFromURLAsInt32(r)
+	// Extract planogramID from path
+	prefix := "/api/planograms/"
+	if !strings.HasPrefix(r.URL.Path, prefix) {
+		http.Error(w, "Invalid path", http.StatusBadRequest)
+		return
+	}
+	idStr := strings.TrimPrefix(r.URL.Path, prefix)
+	idStr = strings.TrimSuffix(idStr, "/pockets") // Remove the suffix from the path
+	planogramID, err := strconv.Atoi(idStr)
 	if err != nil {
 		http.Error(w, "Invalid planogram ID", http.StatusBadRequest)
 		return
 	}
 
-	pockets, err := service.ListPocketsForPlanogram(r.Context(), cfg.DbQueries, planogramID)
+	pockets, err := service.ListPocketsForPlanogram(r.Context(), cfg.DbQueries, int32(planogramID))
 	if err != nil {
 		http.Error(w, "Failed to list pockets for planogram", http.StatusInternalServerError)
 		return

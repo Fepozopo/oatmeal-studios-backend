@@ -157,10 +157,23 @@
                                 class="row-btn-small">-</button>
                             <span class="row-number">{{ idx + 1 }}</span>
                         </div>
-                        <input class="order-input tiny" v-model="item.pocket" />
+                        <!-- Pocket # column: dropdown if planogram, disabled input if not -->
+                        <template v-if="hasPlanogram">
+                          <select class="order-input tiny" v-model="item.pocket" @change="onPocketChange(idx)">
+                            <option value=""></option>
+                            <option v-for="pocket in planogramPockets" :key="pocket.pocket_number" :value="pocket.pocket_number">
+                              Pocket {{ pocket.pocket_number }} - {{ pocket.sku }}
+                            </option>
+                          </select>
+                        </template>
+                        <template v-else>
+                          <input class="order-input tiny" v-model="item.pocket" disabled style="background:#eee;" />
+                        </template>
+                        <!-- Item # column: auto-filled if planogram, editable if not -->
                         <input
                             class="order-input tiny"
                             v-model="item.itemNumber"
+                            :readonly="hasPlanogram"
                             @blur="onItemNumberBlur(idx)"
                         />
                         <input class="order-input tiny" v-model="item.qty" />
@@ -246,6 +259,60 @@ function lineTotal(item) {
 function formatCurrency(val) {
     if (isNaN(val)) return '';
     return '$' + val.toFixed(2);
+}
+
+// --- Planogram logic ---
+const hasPlanogram = ref(false);
+const planogramId = ref(null);
+const planogramPockets = ref([]); // [{pocket_number, sku, ...}]
+
+// Fetch planogram for this location, then fetch pockets if exists
+async function fetchPlanogramAndPockets() {
+  if (!locationId) return;
+  // Get planogram assigned to this location
+  const planogramRes = await fetch(`/api/planograms/${locationId}/planograms`);
+  if (planogramRes.ok) {
+    const planogram = await planogramRes.json();
+    if (planogram && planogram.id) {
+      hasPlanogram.value = true;
+      planogramId.value = planogram.id;
+      // Fetch pockets for this planogram
+      const pocketsRes = await fetch(`/api/planograms/${planogram.id}/pockets`);
+      if (pocketsRes.ok) {
+        planogramPockets.value = await pocketsRes.json();
+      } else {
+        planogramPockets.value = [];
+      }
+    } else {
+      hasPlanogram.value = false;
+      planogramId.value = null;
+      planogramPockets.value = [];
+    }
+  } else {
+    hasPlanogram.value = false;
+    planogramId.value = null;
+    planogramPockets.value = [];
+  }
+}
+
+// When a pocket is selected, auto-fill the itemNumber (SKU) for that line
+function onPocketChange(idx) {
+  const item = lineItems.value[idx];
+  const pocketNum = item.pocket;
+  const pocket = planogramPockets.value.find(p => String(p.pocket_number) === String(pocketNum));
+  if (pocket && pocket.sku) {
+    item.itemNumber = pocket.sku;
+    // Optionally, you could also auto-fetch product info here if needed
+    // and set listPrice, qty, etc.
+  } else {
+    item.itemNumber = '';
+  }
+}
+
+// Utility to get SKU for a pocket number (if needed in template)
+function getSkuForPocket(pocketNum) {
+  const pocket = planogramPockets.value.find(p => String(p.pocket_number) === String(pocketNum));
+  return pocket ? pocket.sku : '';
 }
 
 // --- Line items state ---
@@ -391,6 +458,8 @@ onMounted(async () => {
         }
     }
     await fetchSalesReps();
+    // Fetch planogram and pockets for this location
+    await fetchPlanogramAndPockets();
     // Debug log to check values
     console.log('locationData:', locationData.value);
     console.log('salesReps:', salesReps.value);
