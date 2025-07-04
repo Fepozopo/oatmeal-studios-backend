@@ -118,11 +118,11 @@ type PlanogramCustomerLocation struct {
 }
 
 type PlanogramPocket struct {
-	ID           int32         `json:"id"`
-	PlanogramID  int32         `json:"planogram_id"`
-	PocketNumber int32         `json:"pocket_number"`
-	Category     string        `json:"category"`
-	ProductID    uuid.NullUUID `json:"product_id"`
+	ID           int32          `json:"id"`
+	PlanogramID  int32          `json:"planogram_id"`
+	PocketNumber int32          `json:"pocket_number"`
+	Category     string         `json:"category"`
+	Sku          sql.NullString `json:"sku"`
 }
 
 type Product struct {

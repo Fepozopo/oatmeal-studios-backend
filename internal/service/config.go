@@ -167,16 +167,16 @@ type UpdatePlanogramInput struct {
 }
 
 type CreatePlanogramPocketInput struct {
-	PlanogramID  int32     `json:"planogram_id"`
-	PocketNumber int32     `json:"pocket_number"`
-	Category     string    `json:"category"`
-	ProductID    uuid.UUID `json:"product_id"`
+	PlanogramID  int32  `json:"planogram_id"`
+	PocketNumber int32  `json:"pocket_number"`
+	Category     string `json:"category"`
+	Sku          string `json:"sku"`
 }
 
 type UpdatePlanogramPocketInput struct {
-	ID        int32     `json:"id"`
-	Category  string    `json:"category"`
-	ProductID uuid.UUID `json:"product_id"`
+	ID       int32  `json:"id"`
+	Category string `json:"category"`
+	Sku      string `json:"sku"`
 }
 
 type AssignPlanogramToLocationInput struct {

@@ -8,8 +8,6 @@ package database
 import (
 	"context"
 	"database/sql"
-
-	"github.com/google/uuid"
 )
 
 const assignPlanogramToLocation = `-- name: AssignPlanogramToLocation :one
@@ -58,16 +56,16 @@ func (q *Queries) CreatePlanogram(ctx context.Context, arg CreatePlanogramParams
 }
 
 const createPlanogramPocket = `-- name: CreatePlanogramPocket :one
-INSERT INTO planogram_pockets (planogram_id, pocket_number, category, product_id)
+INSERT INTO planogram_pockets (planogram_id, pocket_number, category, sku)
 VALUES ($1, $2, $3, $4)
-RETURNING id, planogram_id, pocket_number, category, product_id
+RETURNING id, planogram_id, pocket_number, category, sku
 `
 
 type CreatePlanogramPocketParams struct {
-	PlanogramID  int32         `json:"planogram_id"`
-	PocketNumber int32         `json:"pocket_number"`
-	Category     string        `json:"category"`
-	ProductID    uuid.NullUUID `json:"product_id"`
+	PlanogramID  int32          `json:"planogram_id"`
+	PocketNumber int32          `json:"pocket_number"`
+	Category     string         `json:"category"`
+	Sku          sql.NullString `json:"sku"`
 }
 
 func (q *Queries) CreatePlanogramPocket(ctx context.Context, arg CreatePlanogramPocketParams) (PlanogramPocket, error) {
@@ -75,7 +73,7 @@ func (q *Queries) CreatePlanogramPocket(ctx context.Context, arg CreatePlanogram
 		arg.PlanogramID,
 		arg.PocketNumber,
 		arg.Category,
-		arg.ProductID,
+		arg.Sku,
 	)
 	var i PlanogramPocket
 	err := row.Scan(
@@ -83,7 +81,7 @@ func (q *Queries) CreatePlanogramPocket(ctx context.Context, arg CreatePlanogram
 		&i.PlanogramID,
 		&i.PocketNumber,
 		&i.Category,
-		&i.ProductID,
+		&i.Sku,
 	)
 	return i, err
 }
@@ -125,7 +123,7 @@ func (q *Queries) GetPlanogram(ctx context.Context, id int32) (Planogram, error)
 }
 
 const getPlanogramPocket = `-- name: GetPlanogramPocket :one
-SELECT id, planogram_id, pocket_number, category, product_id FROM planogram_pockets WHERE id = $1
+SELECT id, planogram_id, pocket_number, category, sku FROM planogram_pockets WHERE id = $1
 `
 
 func (q *Queries) GetPlanogramPocket(ctx context.Context, id int32) (PlanogramPocket, error) {
@@ -136,13 +134,13 @@ func (q *Queries) GetPlanogramPocket(ctx context.Context, id int32) (PlanogramPo
 		&i.PlanogramID,
 		&i.PocketNumber,
 		&i.Category,
-		&i.ProductID,
+		&i.Sku,
 	)
 	return i, err
 }
 
 const getPlanogramPocketByNumber = `-- name: GetPlanogramPocketByNumber :one
-SELECT id, planogram_id, pocket_number, category, product_id FROM planogram_pockets WHERE planogram_id = $1 AND pocket_number = $2
+SELECT id, planogram_id, pocket_number, category, sku FROM planogram_pockets WHERE planogram_id = $1 AND pocket_number = $2
 `
 
 type GetPlanogramPocketByNumberParams struct {
@@ -158,7 +156,7 @@ func (q *Queries) GetPlanogramPocketByNumber(ctx context.Context, arg GetPlanogr
 		&i.PlanogramID,
 		&i.PocketNumber,
 		&i.Category,
-		&i.ProductID,
+		&i.Sku,
 	)
 	return i, err
 }
@@ -266,7 +264,7 @@ func (q *Queries) ListPlanograms(ctx context.Context) ([]Planogram, error) {
 }
 
 const listPocketsForPlanogram = `-- name: ListPocketsForPlanogram :many
-SELECT id, planogram_id, pocket_number, category, product_id FROM planogram_pockets WHERE planogram_id = $1 ORDER BY pocket_number
+SELECT id, planogram_id, pocket_number, category, sku FROM planogram_pockets WHERE planogram_id = $1 ORDER BY pocket_number
 `
 
 func (q *Queries) ListPocketsForPlanogram(ctx context.Context, planogramID int32) ([]PlanogramPocket, error) {
@@ -283,7 +281,7 @@ func (q *Queries) ListPocketsForPlanogram(ctx context.Context, planogramID int32
 			&i.PlanogramID,
 			&i.PocketNumber,
 			&i.Category,
-			&i.ProductID,
+			&i.Sku,
 		); err != nil {
 			return nil, err
 		}
@@ -352,26 +350,26 @@ func (q *Queries) UpdatePlanogram(ctx context.Context, arg UpdatePlanogramParams
 const updatePlanogramPocket = `-- name: UpdatePlanogramPocket :one
 UPDATE planogram_pockets
 SET category = $2,
-    product_id = $3
+    sku = $3
 WHERE id = $1
-RETURNING id, planogram_id, pocket_number, category, product_id
+RETURNING id, planogram_id, pocket_number, category, sku
 `
 
 type UpdatePlanogramPocketParams struct {
-	ID        int32         `json:"id"`
-	Category  string        `json:"category"`
-	ProductID uuid.NullUUID `json:"product_id"`
+	ID       int32          `json:"id"`
+	Category string         `json:"category"`
+	Sku      sql.NullString `json:"sku"`
 }
 
 func (q *Queries) UpdatePlanogramPocket(ctx context.Context, arg UpdatePlanogramPocketParams) (PlanogramPocket, error) {
-	row := q.queryRow(ctx, q.updatePlanogramPocketStmt, updatePlanogramPocket, arg.ID, arg.Category, arg.ProductID)
+	row := q.queryRow(ctx, q.updatePlanogramPocketStmt, updatePlanogramPocket, arg.ID, arg.Category, arg.Sku)
 	var i PlanogramPocket
 	err := row.Scan(
 		&i.ID,
 		&i.PlanogramID,
 		&i.PocketNumber,
 		&i.Category,
-		&i.ProductID,
+		&i.Sku,
 	)
 	return i, err
 }

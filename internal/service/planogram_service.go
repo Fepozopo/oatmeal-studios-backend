@@ -6,7 +6,6 @@ import (
 	"fmt"
 
 	"github.com/Fepozopo/oatmeal-studios-backend/internal/database"
-	"github.com/google/uuid"
 )
 
 func GetPlanogram(ctx context.Context, db *database.Queries, id int32) (*database.Planogram, error) {
@@ -173,7 +172,7 @@ func CreatePlanogramPocket(ctx context.Context, db *database.Queries, input Crea
 		PlanogramID:  input.PlanogramID,
 		PocketNumber: input.PocketNumber,
 		Category:     input.Category,
-		ProductID:    uuid.NullUUID{UUID: input.ProductID, Valid: input.ProductID != uuid.Nil},
+		Sku:          sql.NullString{String: input.Sku, Valid: input.Sku != ""},
 	})
 	if err != nil {
 		return nil, fmt.Errorf("failed to create planogram pocket: %w", err)
@@ -187,9 +186,9 @@ func UpdatePlanogramPocket(ctx context.Context, db *database.Queries, input Upda
 		return nil, fmt.Errorf("invalid input for updating planogram pocket")
 	}
 	pocket, err := db.UpdatePlanogramPocket(ctx, database.UpdatePlanogramPocketParams{
-		ID:        input.ID,
-		Category:  input.Category,
-		ProductID: uuid.NullUUID{UUID: input.ProductID, Valid: input.ProductID != uuid.Nil},
+		ID:       input.ID,
+		Category: input.Category,
+		Sku:      sql.NullString{String: input.Sku, Valid: input.Sku != ""},
 	})
 	if err != nil {
 		if err == sql.ErrNoRows {

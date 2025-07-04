@@ -51,14 +51,14 @@ SELECT * FROM planogram_pockets WHERE planogram_id = $1 ORDER BY pocket_number;
 SELECT * FROM planogram_pockets WHERE id = $1;
 
 -- name: CreatePlanogramPocket :one
-INSERT INTO planogram_pockets (planogram_id, pocket_number, category, product_id)
+INSERT INTO planogram_pockets (planogram_id, pocket_number, category, sku)
 VALUES ($1, $2, $3, $4)
 RETURNING *;
 
 -- name: UpdatePlanogramPocket :one
 UPDATE planogram_pockets
 SET category = $2,
-    product_id = $3
+    sku = $3
 WHERE id = $1
 RETURNING *;
 
