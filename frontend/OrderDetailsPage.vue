@@ -162,7 +162,7 @@
                           <select class="order-input tiny" v-model="item.pocket" @change="onPocketChange(idx)">
                             <option value=""></option>
                             <option v-for="pocket in planogramPockets" :key="pocket.pocket_number" :value="pocket.pocket_number">
-                              Pocket {{ pocket.pocket_number }} - {{ pocket.sku }}
+                              Pocket {{ pocket.pocket_number }} - {{ pocket.sku && pocket.sku.String ? pocket.sku.String : '' }}
                             </option>
                           </select>
                         </template>
@@ -300,8 +300,8 @@ function onPocketChange(idx) {
   const item = lineItems.value[idx];
   const pocketNum = item.pocket;
   const pocket = planogramPockets.value.find(p => String(p.pocket_number) === String(pocketNum));
-  if (pocket && pocket.sku) {
-    item.itemNumber = pocket.sku;
+  if (pocket && pocket.sku && pocket.sku.Valid) {
+    item.itemNumber = pocket.sku.String;
     // Optionally, you could also auto-fetch product info here if needed
     // and set listPrice, qty, etc.
   } else {
@@ -312,7 +312,7 @@ function onPocketChange(idx) {
 // Utility to get SKU for a pocket number (if needed in template)
 function getSkuForPocket(pocketNum) {
   const pocket = planogramPockets.value.find(p => String(p.pocket_number) === String(pocketNum));
-  return pocket ? pocket.sku : '';
+  return pocket && pocket.sku && pocket.sku.Valid ? pocket.sku.String : '';
 }
 
 // --- Line items state ---
