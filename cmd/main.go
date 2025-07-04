@@ -96,6 +96,7 @@ func main() {
 	mux.HandleFunc("GET /api/planograms", apiCfg.HandleListPlanograms)
 	mux.HandleFunc("GET /api/planograms/{id}/pockets", apiCfg.HandleListPocketsForPlanogram)
 	mux.HandleFunc("GET /api/planograms/{id}/locations", apiCfg.HandleListLocationsByPlanogram)
+	mux.HandleFunc("GET /api/planograms/{locationID}/planograms", apiCfg.HandleGetPlanogramsByLocation)
 
 	// Planogram Pocket routes
 	mux.HandleFunc("GET /api/planogram-pockets/{id}", apiCfg.HandleGetPlanogramPocket)
