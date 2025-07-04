@@ -158,17 +158,15 @@
                             <span class="row-number">{{ idx + 1 }}</span>
                         </div>
                         <!-- Pocket # column: dropdown if planogram, disabled input if not -->
-                        <template v-if="hasPlanogram">
-                          <select class="order-input tiny" v-model="item.pocket" @change="onPocketChange(idx)" @blur="onPocketChange(idx)">
-                            <option value=""></option>
-                            <option v-for="pocket in planogramPockets" :key="pocket.pocket_number" :value="pocket.pocket_number">
-                              Pocket {{ pocket.pocket_number }} - {{ pocket.sku && pocket.sku.String ? pocket.sku.String : '' }}
-                            </option>
-                          </select>
-                        </template>
-                        <template v-else>
-                          <input class="order-input tiny" v-model="item.pocket" disabled style="background:#eee;" />
-                        </template>
+                        <input
+                            class="order-input tiny"
+                            v-model="item.pocket"
+                            type="number"
+                            min="1"
+                            @blur="onPocketChange(idx)"
+                            @change="onPocketChange(idx)"
+                            placeholder="Pocket #"
+                        />
                         <!-- Item # column: always editable -->
                         <input
                             class="order-input tiny"
