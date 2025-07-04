@@ -159,7 +159,7 @@
                         </div>
                         <!-- Pocket # column: dropdown if planogram, disabled input if not -->
                         <template v-if="hasPlanogram">
-                          <select class="order-input tiny" v-model="item.pocket" @change="onPocketChange(idx)">
+                          <select class="order-input tiny" v-model="item.pocket" @change="onPocketChange(idx)" @blur="onPocketChange(idx)">
                             <option value=""></option>
                             <option v-for="pocket in planogramPockets" :key="pocket.pocket_number" :value="pocket.pocket_number">
                               Pocket {{ pocket.pocket_number }} - {{ pocket.sku && pocket.sku.String ? pocket.sku.String : '' }}
@@ -169,12 +169,12 @@
                         <template v-else>
                           <input class="order-input tiny" v-model="item.pocket" disabled style="background:#eee;" />
                         </template>
-                        <!-- Item # column: auto-filled if planogram, editable if not -->
+                        <!-- Item # column: always editable -->
                         <input
                             class="order-input tiny"
                             v-model="item.itemNumber"
-                            :readonly="hasPlanogram"
                             @blur="onItemNumberBlur(idx)"
+                            @change="onSkuChange(idx)"
                         />
                         <input class="order-input tiny" v-model="item.qty" />
                         <input class="order-input tiny" v-model="item.listPrice" />
@@ -296,16 +296,88 @@ async function fetchPlanogramAndPockets() {
 }
 
 // When a pocket is selected, auto-fill the itemNumber (SKU) for that line
-function onPocketChange(idx) {
+async function onPocketChange(idx) {
   const item = lineItems.value[idx];
   const pocketNum = item.pocket;
   const pocket = planogramPockets.value.find(p => String(p.pocket_number) === String(pocketNum));
   if (pocket && pocket.sku && pocket.sku.Valid) {
     item.itemNumber = pocket.sku.String;
-    // Optionally, you could also auto-fetch product info here if needed
-    // and set listPrice, qty, etc.
+    // Auto-fetch product info and set qty, discount, price
+    try {
+      const res = await fetch(`/api/products/sku/${encodeURIComponent(item.itemNumber)}`);
+      if (res.ok) {
+        const product = await res.json();
+        if ((product.status || '').trim() !== 'INACTIVE') {
+          item.qty = defaultQty.value;
+          item.discountPct = defaultDiscount.value;
+          item.listPrice = typeof product.price === 'object' && product.price !== null
+            ? (product.price.Float64 ?? product.price.value ?? '')
+            : product.price;
+        } else {
+          item.qty = '';
+          item.discountPct = '';
+          item.listPrice = '';
+        }
+      } else {
+        item.qty = '';
+        item.discountPct = '';
+        item.listPrice = '';
+      }
+    } catch {
+      item.qty = '';
+      item.discountPct = '';
+      item.listPrice = '';
+    }
   } else {
-    item.itemNumber = '';
+    // If pocket is cleared, don't clear SKU, just leave as is
+    // item.itemNumber = '';
+    item.qty = '';
+    item.discountPct = '';
+    item.listPrice = '';
+  }
+}
+
+// When SKU is changed, update pocket selection if it matches a pocket, and fetch product info
+async function onSkuChange(idx) {
+  const item = lineItems.value[idx];
+  const sku = (item.itemNumber || '').trim();
+  if (!sku) {
+    item.pocket = '';
+    item.qty = '';
+    item.discountPct = '';
+    item.listPrice = '';
+    return;
+  }
+  // If planogram, try to match pocket
+  if (hasPlanogram.value) {
+    const pocket = planogramPockets.value.find(p => p.sku && p.sku.Valid && p.sku.String === sku);
+    item.pocket = pocket ? pocket.pocket_number : '';
+  }
+  // Fetch product info
+  try {
+    const res = await fetch(`/api/products/sku/${encodeURIComponent(sku)}`);
+    if (res.ok) {
+      const product = await res.json();
+      if ((product.status || '').trim() !== 'INACTIVE') {
+        item.qty = defaultQty.value;
+        item.discountPct = defaultDiscount.value;
+        item.listPrice = typeof product.price === 'object' && product.price !== null
+          ? (product.price.Float64 ?? product.price.value ?? '')
+          : product.price;
+      } else {
+        item.qty = '';
+        item.discountPct = '';
+        item.listPrice = '';
+      }
+    } else {
+      item.qty = '';
+      item.discountPct = '';
+      item.listPrice = '';
+    }
+  } catch {
+    item.qty = '';
+    item.discountPct = '';
+    item.listPrice = '';
   }
 }
 
@@ -321,7 +393,14 @@ const lineItems = ref([
 ]);
 
 function addLineItem() {
-    lineItems.value.push({ pocket: '', itemNumber: '', qty: '', description: '', listPrice: '', discountPct: '', discountPrice: '', total: '' });
+    // If planogram, set defaults for new line
+    let newItem = { pocket: '', itemNumber: '', qty: '', description: '', listPrice: '', discountPct: '', discountPrice: '', total: '' };
+    if (hasPlanogram.value) {
+      newItem.qty = defaultQty.value;
+      newItem.discountPct = defaultDiscount.value;
+      newItem.listPrice = 0;
+    }
+    lineItems.value.push(newItem);
     nextTick(() => {
         // Focus the first input of the new row
         const rows = document.querySelectorAll('.order-items-row');
