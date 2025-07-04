@@ -48,6 +48,7 @@ type CustomerLocation struct {
 	ContactName  sql.NullString `json:"contact_name"`
 	Country      string         `json:"country"`
 	SalesRep     sql.NullString `json:"sales_rep"`
+	LocationNum  sql.NullInt32  `json:"location_num"`
 }
 
 type InventoryTransaction struct {

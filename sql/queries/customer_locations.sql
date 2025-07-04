@@ -1,8 +1,8 @@
 -- name: CreateCustomerLocation :one
 INSERT INTO customer_locations (
-    customer_id, business_name, contact_name, address_1, address_2, city, state, zip_code, country, phone, sales_rep, notes
+    customer_id, business_name, contact_name, address_1, address_2, city, state, zip_code, country, phone, sales_rep, notes, location_num
 ) VALUES (
-    $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12
+    $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13
 )
 RETURNING *;
 
@@ -25,6 +25,7 @@ UPDATE customer_locations SET
     phone = $10,
     sales_rep = $11,
     notes = $12,
+    location_num = $13,
     updated_at = CURRENT_TIMESTAMP
 WHERE id = $1
 RETURNING *;

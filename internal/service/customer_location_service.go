@@ -52,6 +52,7 @@ func AddCustomerLocation(ctx context.Context, db *database.Queries, input AddCus
 		Phone:        sql.NullString{String: input.Phone, Valid: input.Phone != ""},
 		SalesRep:     sql.NullString{String: input.SalesRep, Valid: input.SalesRep != ""},
 		Notes:        sql.NullString{String: input.Notes, Valid: input.Notes != ""},
+		LocationNum:  sql.NullInt32{Int32: int32(input.LocationNum), Valid: input.LocationNum != 0},
 	}
 
 	location, err := db.CreateCustomerLocation(ctx, params)
@@ -118,6 +119,7 @@ func UpdateCustomerLocation(ctx context.Context, db *database.Queries, input Upd
 		Phone:        sql.NullString{String: input.Phone, Valid: input.Phone != ""},
 		SalesRep:     sql.NullString{String: input.SalesRep, Valid: input.SalesRep != ""},
 		Notes:        sql.NullString{String: input.Notes, Valid: input.Notes != ""},
+		LocationNum:  sql.NullInt32{Int32: int32(input.LocationNum), Valid: input.LocationNum != 0},
 	}
 
 	location, err := db.UpdateCustomerLocation(ctx, params)

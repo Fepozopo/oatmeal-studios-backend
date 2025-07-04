@@ -183,7 +183,7 @@ func (q *Queries) GetPlanogramsByLocation(ctx context.Context, customerLocationI
 }
 
 const listLocationsByPlanogram = `-- name: ListLocationsByPlanogram :many
-SELECT cl.id, cl.customer_id, cl.address_1, cl.address_2, cl.city, cl.state, cl.zip_code, cl.phone, cl.notes, cl.created_at, cl.updated_at, cl.business_name, cl.contact_name, cl.country, cl.sales_rep
+SELECT cl.id, cl.customer_id, cl.address_1, cl.address_2, cl.city, cl.state, cl.zip_code, cl.phone, cl.notes, cl.created_at, cl.updated_at, cl.business_name, cl.contact_name, cl.country, cl.sales_rep, cl.location_num
 FROM customer_locations cl
 JOIN planogram_customer_locations pcl ON cl.id = pcl.customer_location_id
 WHERE pcl.planogram_id = $1
@@ -215,6 +215,7 @@ func (q *Queries) ListLocationsByPlanogram(ctx context.Context, planogramID int3
 			&i.ContactName,
 			&i.Country,
 			&i.SalesRep,
+			&i.LocationNum,
 		); err != nil {
 			return nil, err
 		}

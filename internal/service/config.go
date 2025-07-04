@@ -20,6 +20,7 @@ type AddCustomerLocationInput struct {
 	Phone        string `json:"phone,omitempty"`
 	SalesRep     string `json:"sales_rep,omitempty"`
 	Notes        string `json:"notes,omitempty"`
+	LocationNum  int    `json:"location_num,omitempty"`
 }
 
 type UpdateCustomerLocationInput struct {
@@ -35,6 +36,7 @@ type UpdateCustomerLocationInput struct {
 	Phone        string `json:"phone,omitempty"`
 	SalesRep     string `json:"sales_rep,omitempty"`
 	Notes        string `json:"notes,omitempty"`
+	LocationNum  int    `json:"location_num,omitempty"`
 }
 
 // ------------------ Customer Inputs ------------------
