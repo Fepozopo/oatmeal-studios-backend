@@ -190,7 +190,7 @@
                 </div>
                 <div class="order-row">
                     <span style="margin-left:auto; min-width: 650px; text-align:right; display:block;">Item total
-                        <b>0</b></span>
+                        <b>{{ formatCurrency(itemTotal) }}</b></span>
                 </div>
                 <div class="order-row">
                     <button class="continue-btn">SUBMIT</button>
@@ -207,11 +207,20 @@ const salesperson = ref("");
 const { salesReps, fetchSalesReps } = useSalesReps();
 import { useRoute, useRouter } from 'vue-router';
 
+
 const router = useRouter();
 const route = useRoute();
 const goHome = () => {
     router.push('/home');
 };
+
+// Computed property for item total
+const itemTotal = computed(() => {
+    return lineItems.value.reduce((sum, item) => {
+        const total = parseFloat(item.qty) ? lineTotal(item) : 0;
+        return sum + total;
+    }, 0);
+});
 
 const status = ref("APPROVED");
 const type = ref("REORDER");
