@@ -91,6 +91,17 @@ func main() {
 	mux.HandleFunc("GET /api/planograms/{id}", apiCfg.HandleGetPlanogram)
 	mux.HandleFunc("PUT /api/planograms/{id}", apiCfg.HandleUpdatePlanogram)
 	mux.HandleFunc("DELETE /api/planograms/{id}", apiCfg.HandleDeletePlanogram)
+	mux.HandleFunc("POST /api/planograms/{id}/assign", apiCfg.HandleAssignPlanogramToLocation)
+	mux.HandleFunc("DELETE /api/planograms/{id}/remove", apiCfg.HandleRemovePlanogramFromLocation)
+	mux.HandleFunc("GET /api/planograms", apiCfg.HandleListPlanograms)
+	mux.HandleFunc("GET /api/planograms/{id}/pockets", apiCfg.HandleListPocketsForPlanogram)
+	mux.HandleFunc("GET /api/planograms/{id}/locations", apiCfg.HandleListLocationsByPlanogram)
+
+	// Planogram Pocket routes
+	mux.HandleFunc("GET /api/planogram-pockets/{id}", apiCfg.HandleGetPlanogramPocket)
+	mux.HandleFunc("PUT /api/planogram-pockets/{id}", apiCfg.HandleUpdatePlanogramPocket)
+	mux.HandleFunc("DELETE /api/planogram-pockets/{id}", apiCfg.HandleDeletePlanogramPocket)
+	mux.HandleFunc("POST /api/planogram-pockets", apiCfg.HandleCreatePlanogramPocket)
 
 	// Invoice routes
 	mux.HandleFunc("POST /api/invoices", apiCfg.HandleCreateInvoice)

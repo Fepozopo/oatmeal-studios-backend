@@ -2,6 +2,7 @@ package api
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/Fepozopo/oatmeal-studios-backend/internal/service"
@@ -68,7 +69,7 @@ func (cfg *ApiConfig) HandleCreatePlanogram(w http.ResponseWriter, r *http.Reque
 
 	planogram, err := service.CreatePlanogram(r.Context(), cfg.DbQueries, input)
 	if err != nil {
-		http.Error(w, "Failed to create planogram", http.StatusInternalServerError)
+		http.Error(w, fmt.Sprintf("Failed to create planogram: %v", err), http.StatusInternalServerError)
 		return
 	}
 
