@@ -297,41 +297,58 @@ async function fetchPlanogramAndPockets() {
 async function onPocketChange(idx) {
   const item = lineItems.value[idx];
   const pocketNum = item.pocket;
-  const pocket = planogramPockets.value.find(p => String(p.pocket_number) === String(pocketNum));
-  if (pocket && pocket.sku && pocket.sku.Valid) {
-    item.itemNumber = pocket.sku.String;
-    // Auto-fetch product info and set qty, discount, price
-    try {
-      const res = await fetch(`/api/products/sku/${encodeURIComponent(item.itemNumber)}`);
-      if (res.ok) {
-        const product = await res.json();
-        if ((product.status || '').trim() !== 'INACTIVE') {
-          item.qty = defaultQty.value;
-          item.discountPct = defaultDiscount.value;
-          item.listPrice = typeof product.price === 'object' && product.price !== null
-            ? (product.price.Float64 ?? product.price.value ?? '')
-            : product.price;
+  if (!pocketNum) {
+    // If cleared, just clear fields
+    item.qty = '';
+    item.discountPct = '';
+    item.listPrice = '';
+    return;
+  }
+  // Only check for valid pocket if planogram is present
+  if (hasPlanogram.value) {
+    const pocket = planogramPockets.value.find(p => String(p.pocket_number) === String(pocketNum));
+    if (!pocket) {
+      alert(`Pocket #${pocketNum} does not exist in the assigned planogram.`);
+      item.pocket = '';
+      item.qty = '';
+      item.discountPct = '';
+      item.listPrice = '';
+      return;
+    }
+    if (pocket.sku && pocket.sku.Valid) {
+      item.itemNumber = pocket.sku.String;
+      // Auto-fetch product info and set qty, discount, price
+      try {
+        const res = await fetch(`/api/products/sku/${encodeURIComponent(item.itemNumber)}`);
+        if (res.ok) {
+          const product = await res.json();
+          if ((product.status || '').trim() !== 'INACTIVE') {
+            item.qty = defaultQty.value;
+            item.discountPct = defaultDiscount.value;
+            item.listPrice = typeof product.price === 'object' && product.price !== null
+              ? (product.price.Float64 ?? product.price.value ?? '')
+              : product.price;
+          } else {
+            item.qty = '';
+            item.discountPct = '';
+            item.listPrice = '';
+          }
         } else {
           item.qty = '';
           item.discountPct = '';
           item.listPrice = '';
         }
-      } else {
+      } catch {
         item.qty = '';
         item.discountPct = '';
         item.listPrice = '';
       }
-    } catch {
+    } else {
+      // If pocket exists but no SKU, just clear fields
       item.qty = '';
       item.discountPct = '';
       item.listPrice = '';
     }
-  } else {
-    // If pocket is cleared, don't clear SKU, just leave as is
-    // item.itemNumber = '';
-    item.qty = '';
-    item.discountPct = '';
-    item.listPrice = '';
   }
 }
 
