@@ -142,7 +142,10 @@
                     <label style="margin-left:1rem;"><input type="radio" value="N" v-model="freeDisplay" /> N</label>
                 </div>
                 <div class="order-items-table">
-                    <div class="order-items-header" :style="hasPlanogram ? '' : 'grid-template-columns: 60px 100px 80px 1.5fr 100px 100px 100px 100px;'">
+                    <div
+                        class="order-items-header"
+                        :style="{ gridTemplateColumns: orderItemsGridTemplate }"
+                    >
                         <span style="min-width: 60px;"></span>
                         <span v-if="hasPlanogram">Pocket #</span>
                         <span>Item #</span>
@@ -152,14 +155,17 @@
                         <span>Discount Price</span>
                         <span>Total</span>
                     </div>
-                    <div v-for="(item, idx) in lineItems" :key="idx" class="order-items-row"
-                        :style="hasPlanogram ? '' : 'grid-template-columns: 60px 100px 80px 1.5fr 100px 100px 100px 100px; align-items:center;'">
+                    <div
+                        v-for="(item, idx) in lineItems"
+                        :key="idx"
+                        class="order-items-row"
+                        :style="{ gridTemplateColumns: orderItemsGridTemplate, alignItems: 'center' }"
+                    >
                         <div class="row-controls-horizontal">
                             <button @click="removeLineItem(idx)" :disabled="lineItems.length === 1"
                                 class="row-btn-small">-</button>
                             <span class="row-number">{{ idx + 1 }}</span>
                         </div>
-                        <!-- Pocket # column: only if planogram -->
                         <input
                             v-if="hasPlanogram"
                             class="order-input tiny"
@@ -170,7 +176,6 @@
                             @change="onPocketChange(idx)"
                             placeholder="Pocket #"
                         />
-                        <!-- Item # column: always editable -->
                         <input
                             class="order-input tiny"
                             v-model="item.itemNumber"
@@ -583,6 +588,12 @@ function generateOrderNumber() {
     // Generate a random order number
     return Math.floor(202500000 + Math.random() * 100000).toString();
 }
+
+const orderItemsGridTemplate = computed(() =>
+  hasPlanogram.value
+    ? '60px 100px 100px 80px 1.5fr 100px 100px 100px 100px'
+    : '60px 100px 80px 1.5fr 100px 100px 100px 100px'
+);
 </script>
 
 <style scoped>
@@ -596,7 +607,6 @@ function generateOrderNumber() {
 
 .order-items-header {
     display: grid;
-    grid-template-columns: 60px 100px 100px 80px 1.5fr 100px 100px 100px 100px;
     font-weight: bold;
     margin-bottom: 0.5rem;
     align-items: center;
@@ -604,8 +614,7 @@ function generateOrderNumber() {
 
 .order-items-row {
     display: grid;
-    grid-template-columns: 60px 100px 100px 80px 1.5fr 100px 100px 100px 100px;
-    margin-bottom: 0.3rem;
+    margin-bottom: 0.5rem;
     align-items: center;
 }
 
