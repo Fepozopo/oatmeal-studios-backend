@@ -25,7 +25,8 @@
                             <span v-if="customerData.business_name">{{ customerData.business_name }}</span><br />
                             <span v-if="customerData.address_1">{{ customerData.address_1 }}</span><br />
                             <span v-if="customerData.address_2 && customerData.address_2.Valid">{{
-                                customerData.address_2.String }}</span><br />
+                                customerData.address_2.String }}<br />
+                            </span>
                             <span v-if="customerData.city || customerData.state || customerData.zip_code">
                                 {{ customerData.city }}, {{ customerData.state }} {{ customerData.zip_code }}
                             </span><br />
@@ -40,7 +41,8 @@
                             <span v-if="locationData.business_name">{{ locationData.business_name }}</span><br />
                             <span v-if="locationData.address_1">{{ locationData.address_1 }}</span><br />
                             <span v-if="locationData.address_2 && locationData.address_2.Valid">{{
-                                locationData.address_2.String }}</span><br />
+                                locationData.address_2.String }}<br />
+                            </span>
                             <span v-if="locationData.city || locationData.state || locationData.zip_code">
                                 {{ locationData.city }}, {{ locationData.state }} {{ locationData.zip_code }}
                             </span><br />
