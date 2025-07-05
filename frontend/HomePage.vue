@@ -10,7 +10,7 @@
                     <div class="menu-col-title">MAINTENANCE</div>
                     <button class="menu-btn" @click="goToUsers">Users</button>
                     <button class="menu-btn">Sales Reps</button>
-                    <button class="menu-btn">Customers</button>
+                    <button class="menu-btn" @click="goToCustomers">Customers</button>
                     <button class="menu-btn">Rep Groups</button>
                     <button class="menu-btn">Items</button>
                     <button class="menu-btn">Pack Contents</button>
@@ -108,6 +108,9 @@ const goToUsers = () => {
 };
 const goToOrderEntry = () => {
     router.push('/order-entry');
+};
+const goToCustomers = () => {
+    router.push('/customers');
 };
 </script>
 
