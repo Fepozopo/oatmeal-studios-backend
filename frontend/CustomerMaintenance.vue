@@ -15,7 +15,7 @@
                     <select class="customer-select" v-model="selectedCustomer">
                         <option value="" disabled>Select by name</option>
                         <option v-for="customer in customers" :key="customer.id" :value="customer.id">
-                            {{ customer.business_name }}
+                            {{ customer.business_name }} - {{ customer.id }}
                         </option>
                     </select>
                 </div>
@@ -130,6 +130,7 @@ const editCustomer = () => {
 .customer-edit-label {
     font-size: 0.95rem;
     margin-right: 0.5rem;
+    white-space: nowrap;
 }
 
 .customer-edit-row {
@@ -146,7 +147,7 @@ const editCustomer = () => {
 }
 
 .customer-select {
-    width: 220px;
+    width: 700px;
     padding: 2px 6px;
     font-size: 1rem;
 }
