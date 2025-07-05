@@ -548,6 +548,10 @@ onMounted(async () => {
             if (customerData.value.terms) {
                 terms.value = customerData.value.terms;
             }
+            // Set default discount if available
+            if (typeof customerData.value.discount !== 'undefined' && customerData.value.discount !== null) {
+                defaultDiscount.value = customerData.value.discount;
+            }
         }
     }
     let locationLoaded = false;
