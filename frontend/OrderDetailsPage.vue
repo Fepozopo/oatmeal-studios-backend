@@ -142,9 +142,9 @@
                     <label style="margin-left:1rem;"><input type="radio" value="N" v-model="freeDisplay" /> N</label>
                 </div>
                 <div class="order-items-table">
-                    <div class="order-items-header">
+                    <div class="order-items-header" :style="hasPlanogram ? '' : 'grid-template-columns: 60px 100px 80px 1.5fr 100px 100px 100px 100px;'">
                         <span style="min-width: 60px;"></span>
-                        <span>Pocket #</span>
+                        <span v-if="hasPlanogram">Pocket #</span>
                         <span>Item #</span>
                         <span>Qty</span>
                         <span>List Price</span>
@@ -153,14 +153,15 @@
                         <span>Total</span>
                     </div>
                     <div v-for="(item, idx) in lineItems" :key="idx" class="order-items-row"
-                        style="align-items:center;">
+                        :style="hasPlanogram ? '' : 'grid-template-columns: 60px 100px 80px 1.5fr 100px 100px 100px 100px; align-items:center;'">
                         <div class="row-controls-horizontal">
                             <button @click="removeLineItem(idx)" :disabled="lineItems.length === 1"
                                 class="row-btn-small">-</button>
                             <span class="row-number">{{ idx + 1 }}</span>
                         </div>
-                        <!-- Pocket # column: dropdown if planogram, disabled input if not -->
+                        <!-- Pocket # column: only if planogram -->
                         <input
+                            v-if="hasPlanogram"
                             class="order-input tiny"
                             v-model="item.pocket"
                             type="number"
