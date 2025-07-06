@@ -177,7 +177,44 @@ const location = ref({
 const fetchCustomer = async () => {
   const id = route.params.id;
   const res = await fetch(`/api/customers/${id}`);
-  if (res.ok) customer.value = await res.json();
+  if (res.ok) {
+    const data = await res.json();
+    // Normalize fields to ensure they are strings or numbers, not objects
+    const normalize = (val) => {
+      if (val === null || val === undefined) return '';
+      if (typeof val === 'object') {
+        // Handle Go sql.NullString pattern
+        if ('String' in val && 'Valid' in val) return val.Valid ? val.String : '';
+        if ('value' in val) return val.value;
+        if ('text' in val) return val.text;
+        // fallback: show JSON string for debugging
+        try {
+          return JSON.stringify(val);
+        } catch {
+          return '';
+        }
+      }
+      return val;
+    };
+    customer.value = {
+      ...data,
+      business_name: normalize(data.business_name),
+      contact_name: normalize(data.contact_name),
+      email: normalize(data.email),
+      phone: normalize(data.phone),
+      address_1: normalize(data.address_1),
+      address_2: normalize(data.address_2),
+      city: normalize(data.city),
+      state: normalize(data.state),
+      zip_code: normalize(data.zip_code),
+      country: normalize(data.country),
+      notes: normalize(data.notes),
+      terms: normalize(data.terms),
+      discount: data.discount ?? 0,
+      commission: data.commission ?? 0,
+      free_shipping: !!data.free_shipping
+    };
+  }
 };
 const fetchLocations = async () => {
   const id = route.params.id;
@@ -191,6 +228,20 @@ onMounted(async () => {
 });
 
 watch(selectedLocationId, (val) => {
+  const normalize = (val) => {
+    if (val === null || val === undefined) return '';
+    if (typeof val === 'object') {
+      if ('String' in val && 'Valid' in val) return val.Valid ? val.String : '';
+      if ('value' in val) return val.value;
+      if ('text' in val) return val.text;
+      try {
+        return JSON.stringify(val);
+      } catch {
+        return '';
+      }
+    }
+    return val;
+  };
   if (!val) {
     location.value = {
       location_num: '',
@@ -207,7 +258,22 @@ watch(selectedLocationId, (val) => {
     };
   } else {
     const loc = locations.value.find(l => l.id == val);
-    if (loc) location.value = { ...loc };
+    if (loc) {
+      location.value = {
+        ...loc,
+        location_num: normalize(loc.location_num),
+        business_name: normalize(loc.business_name),
+        contact_name: normalize(loc.contact_name),
+        phone: normalize(loc.phone),
+        address_1: normalize(loc.address_1),
+        address_2: normalize(loc.address_2),
+        city: normalize(loc.city),
+        state: normalize(loc.state),
+        zip_code: normalize(loc.zip_code),
+        country: normalize(loc.country),
+        notes: normalize(loc.notes)
+      };
+    }
   }
 });
 
