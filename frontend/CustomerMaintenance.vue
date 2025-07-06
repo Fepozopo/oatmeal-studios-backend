@@ -6,7 +6,7 @@
         </div>
         <div class="customer-maint-content">
             <div class="customer-maint-title">CUSTOMER MAINTENANCE</div>
-            <button class="customer-btn">CREATE NEW CUSTOMER</button>
+            <button class="customer-btn" @click="goToCreateCustomer">CREATE NEW CUSTOMER</button>
             <div class="customer-edit-section">
                 <div class="customer-edit-label">OR EDIT EXISTING CUSTOMER</div>
                 <div class="customer-edit-row">
@@ -32,9 +32,14 @@ const router = useRouter();
 const goHome = () => {
     router.push('/home');
 };
+
 const customerNumber = ref('');
 const selectedCustomer = ref('');
 const customers = ref([]);
+
+const goToCreateCustomer = () => {
+    router.push('/customers/new');
+};
 
 const fetchCustomers = async () => {
     try {
@@ -53,8 +58,12 @@ const fetchCustomers = async () => {
 onMounted(fetchCustomers);
 
 const editCustomer = () => {
-    // Implement navigation or logic for editing customer
-    alert('Edit customer: ' + (customerNumber.value || selectedCustomer.value));
+    const id = customerNumber.value || selectedCustomer.value;
+    if (id) {
+        router.push(`/customers/${id}/edit`);
+    } else {
+        alert('Please enter or select a customer.');
+    }
 };
 </script>
 
