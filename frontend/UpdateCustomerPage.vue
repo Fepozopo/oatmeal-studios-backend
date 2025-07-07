@@ -1,5 +1,6 @@
 <template>
   <div class="update-customer-wrapper">
+    <div v-if="successMessage" class="success-message">{{ successMessage }}</div>
     <div class="header">
       <img src="/logo.png" alt="oatmeal studios logo" class="logo" />
       <div class="breadcrumb" @click="goHome" style="cursor:pointer">HOME</div>
@@ -122,7 +123,10 @@
         </div>
         <div class="form-row">
           <label>State:</label>
-          <input v-model="location.state" />
+          <select v-model="location.state">
+            <option value="">Select State</option>
+            <option v-for="abbr in stateOptions" :key="abbr" :value="abbr">{{ abbr }}</option>
+          </select>
         </div>
         <div class="form-row">
           <label>Zip Code:</label>
@@ -184,6 +188,13 @@ const location = ref({
   country: 'USA',
   notes: ''
 });
+const successMessage = ref('');
+function showSuccess(msg) {
+  successMessage.value = msg;
+  setTimeout(() => {
+    successMessage.value = '';
+  }, 2500);
+}
 
 const fetchCustomer = async () => {
   const id = route.params.id;
@@ -356,14 +367,17 @@ async function updateCustomer() {
     }
     // Only refresh if update succeeded
     await fetchCustomer();
+    showSuccess('Customer updated successfully!');
   } catch (err) {
     alert('Failed to update customer: ' + (err?.message || err));
   }
 }
 async function saveLocation() {
   const id = route.params.id;
+  let isUpdate = false;
   if (selectedLocationId.value) {
     // update
+    isUpdate = true;
     await fetch(`/api/customers/${id}/locations/${selectedLocationId.value}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
@@ -379,6 +393,7 @@ async function saveLocation() {
   }
   await fetchLocations();
   selectedLocationId.value = '';
+  showSuccess(isUpdate ? 'Location updated successfully!' : 'Location added successfully!');
 }
 </script>
 
@@ -388,6 +403,20 @@ async function saveLocation() {
   background: #dbdbdb;
   margin: 0;
   padding: 0;
+}
+.success-message {
+  background: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+  padding: 0.75rem 1.25rem;
+  margin: 1rem auto 0.5rem auto;
+  border-radius: 4px;
+  width: 600px;
+  font-size: 1.05rem;
+  text-align: center;
+  font-family: sans-serif;
+  font-weight: 500;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.04);
 }
 .header {
   background: #ffd16a;
