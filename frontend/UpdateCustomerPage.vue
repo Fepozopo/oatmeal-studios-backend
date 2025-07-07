@@ -83,7 +83,7 @@
           <select v-model="selectedLocationId" @change="onLocationSelect">
             <option value="">New Location</option>
             <option v-for="loc in locations" :key="loc.id" :value="loc.id">
-              {{ loc.location_num ? ('#' + loc.location_num + ' - ') : '' }}{{ loc.business_name }}
+              {{ loc.location_num && loc.business_name ? loc.location_num + ' - ' + loc.business_name : loc.business_name || loc.location_num || 'Location' }}
             </option>
           </select>
         </div>
@@ -219,7 +219,44 @@ const fetchCustomer = async () => {
 const fetchLocations = async () => {
   const id = route.params.id;
   const res = await fetch(`/api/customers/${id}/locations`);
-  if (res.ok) locations.value = await res.json();
+  if (res.ok) {
+    const data = await res.json();
+    const normalize = (val) => {
+      if (val === null || val === undefined) return '';
+      if (typeof val === 'object') {
+        if ('String' in val && 'Valid' in val) return val.Valid ? val.String : '';
+        if ('value' in val) return val.value;
+        if ('text' in val) return val.text;
+        try {
+          return JSON.stringify(val);
+        } catch {
+          return '';
+        }
+      }
+      return val;
+    };
+    locations.value = data.map(loc => ({
+      ...loc,
+      location_num: (typeof loc.location_num === 'object' && 'Int32' in loc.location_num && 'Valid' in loc.location_num)
+        ? (loc.location_num.Valid ? loc.location_num.Int32 : '')
+        : normalize(loc.location_num),
+      business_name: normalize(loc.business_name),
+      contact_name: normalize(loc.contact_name),
+      phone: normalize(loc.phone),
+      address_1: normalize(loc.address_1),
+      address_2: normalize(loc.address_2),
+      city: normalize(loc.city),
+      state: normalize(loc.state),
+      zip_code: normalize(loc.zip_code),
+      country: normalize(loc.country),
+      notes: normalize(loc.notes)
+    })).sort((a, b) => {
+      const numA = Number(a.location_num);
+      const numB = Number(b.location_num);
+      if (!isNaN(numA) && !isNaN(numB)) return numA - numB;
+      return String(a.location_num).localeCompare(String(b.location_num));
+    });
+  }
 };
 
 onMounted(async () => {
@@ -228,8 +265,11 @@ onMounted(async () => {
 });
 
 watch(selectedLocationId, (val) => {
-  const normalize = (val) => {
+  const normalize = (val, key) => {
     if (val === null || val === undefined) return '';
+    if (key === 'location_num' && typeof val === 'object' && 'Int32' in val && 'Valid' in val) {
+      return val.Valid ? val.Int32 : '';
+    }
     if (typeof val === 'object') {
       if ('String' in val && 'Valid' in val) return val.Valid ? val.String : '';
       if ('value' in val) return val.value;
@@ -261,7 +301,7 @@ watch(selectedLocationId, (val) => {
     if (loc) {
       location.value = {
         ...loc,
-        location_num: normalize(loc.location_num),
+        location_num: normalize(loc.location_num, 'location_num'),
         business_name: normalize(loc.business_name),
         contact_name: normalize(loc.contact_name),
         phone: normalize(loc.phone),
