@@ -39,7 +39,10 @@
         </div>
         <div class="form-row">
           <label>State:</label>
-          <input v-model="customer.state" />
+          <select v-model="customer.state">
+            <option value="">Select State</option>
+            <option v-for="abbr in stateOptions" :key="abbr" :value="abbr">{{ abbr }}</option>
+          </select>
         </div>
         <div class="form-row">
           <label>Zip Code:</label>
@@ -145,6 +148,14 @@ import { useRouter, useRoute } from 'vue-router';
 const router = useRouter();
 const route = useRoute();
 const goHome = () => router.push('/home');
+
+const stateOptions = [
+  'AK', 'AL', 'AR', 'AZ', 'CA', 'CO', 'CT', 'DC', 'DE', 'FL',
+  'GA', 'HI', 'IA', 'ID', 'IL', 'IN', 'KS', 'KY', 'LA', 'MA',
+  'MD', 'ME', 'MI', 'MN', 'MO', 'MS', 'MT', 'NC', 'ND', 'NE',
+  'NH', 'NJ', 'NM', 'NV', 'NY', 'OH', 'OK', 'OR', 'PA', 'RI',
+  'SC', 'SD', 'TN', 'TX', 'UT', 'VA', 'VT', 'WA', 'WI', 'WV'
+];
 
 const termsOptions = [
   'NET 30',
@@ -326,10 +337,12 @@ function onLocationCountryInput(e) {
 
 async function updateCustomer() {
   const id = route.params.id;
+  // Defensive: ensure all fields are up to date and valid
+  const updatedCustomer = { ...customer.value };
   await fetch(`/api/customers/${id}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(customer.value)
+    body: JSON.stringify(updatedCustomer)
   });
   await fetchCustomer();
 }
