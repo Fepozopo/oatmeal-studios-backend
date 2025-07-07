@@ -59,7 +59,7 @@ type CreateCustomerInput struct {
 }
 
 type UpdateCustomerInput struct {
-	ID           int32   `json:"customer_id"`
+	ID           int32   `json:"id"`
 	BusinessName string  `json:"business_name"`
 	ContactName  string  `json:"contact_name,omitempty"`
 	Email        string  `json:"email,omitempty"`
