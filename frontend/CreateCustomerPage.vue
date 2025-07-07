@@ -37,7 +37,10 @@
         </div>
         <div class="form-row">
           <label>State:</label>
-          <input v-model="customer.state" />
+          <select v-model="customer.state">
+            <option value="">Select State</option>
+            <option v-for="abbr in stateOptions" :key="abbr" :value="abbr">{{ abbr }}</option>
+          </select>
         </div>
         <div class="form-row">
           <label>Zip Code:</label>
@@ -88,6 +91,14 @@ const termsOptions = [
   'NET 90',
 ];
 
+const stateOptions = [
+  'AK', 'AL', 'AR', 'AZ', 'CA', 'CO', 'CT', 'DC', 'DE', 'FL',
+  'GA', 'HI', 'IA', 'ID', 'IL', 'IN', 'KS', 'KY', 'LA', 'MA',
+  'MD', 'ME', 'MI', 'MN', 'MO', 'MS', 'MT', 'NC', 'ND', 'NE',
+  'NH', 'NJ', 'NM', 'NV', 'NY', 'OH', 'OK', 'OR', 'PA', 'RI',
+  'SC', 'SD', 'TN', 'TX', 'UT', 'VA', 'VT', 'WA', 'WI', 'WV'
+];
+
 const customer = ref({
   business_name: '',
   contact_name: '',
@@ -101,7 +112,7 @@ const customer = ref({
   country: 'USA',
   terms: 'NET 30',
   discount: 0,
-  commission: 0,
+  commission: 20,
   notes: '',
   free_shipping: false
 });
