@@ -337,14 +337,28 @@ function onLocationCountryInput(e) {
 
 async function updateCustomer() {
   const id = route.params.id;
-  // Defensive: ensure all fields are up to date and valid
+  console.log('Attempting to update customer with id:', id);
+  if (!id || isNaN(Number(id))) {
+    alert('Invalid customer ID. Cannot update.');
+    return;
+  }
   const updatedCustomer = { ...customer.value };
-  await fetch(`/api/customers/${id}`, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(updatedCustomer)
-  });
-  await fetchCustomer();
+  try {
+    const res = await fetch(`/api/customers/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(updatedCustomer)
+    });
+    if (!res.ok) {
+      const msg = await res.text();
+      alert('Failed to update customer: ' + msg);
+      return;
+    }
+    // Only refresh if update succeeded
+    await fetchCustomer();
+  } catch (err) {
+    alert('Failed to update customer: ' + (err?.message || err));
+  }
 }
 async function saveLocation() {
   const id = route.params.id;
