@@ -385,10 +385,11 @@ async function saveLocation() {
     });
   } else {
     // create
+    const payload = { ...location.value, customer_id: Number(id) };
     await fetch(`/api/customers/${id}/locations`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(location.value)
+      body: JSON.stringify(payload)
     });
   }
   await fetchLocations();
