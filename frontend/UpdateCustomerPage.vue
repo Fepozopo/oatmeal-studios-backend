@@ -137,6 +137,15 @@
           <input v-model="location.country" maxlength="3" @input="onLocationCountryInput" />
         </div>
         <div class="form-row">
+          <label>Sales Rep:</label>
+          <select v-model="location.sales_rep">
+            <option value="">Select Sales Rep</option>
+            <option v-for="rep in salesReps" :key="rep.id" :value="rep.code">
+              {{ rep.code && (rep.first_name || rep.last_name) ? rep.code + ' - ' + [rep.first_name, rep.last_name].filter(Boolean).join(' ') : rep.code }}
+            </option>
+          </select>
+        </div>
+        <div class="form-row">
           <label>Notes:</label>
           <textarea v-model="location.notes"></textarea>
         </div>
@@ -186,8 +195,24 @@ const location = ref({
   state: '',
   zip_code: '',
   country: 'USA',
+  sales_rep: '',
   notes: ''
 });
+const salesReps = ref([]);
+// Fetch sales reps for dropdown
+const fetchSalesReps = async () => {
+  const res = await fetch('/api/sales-reps');
+  if (res.ok) {
+    const data = await res.json();
+    // Normalize code and name fields
+    salesReps.value = data.map(rep => ({
+      id: rep.id,
+      code: rep.code || rep.rep_code || '',
+      first_name: rep.first_name || '',
+      last_name: rep.last_name || ''
+    }));
+  }
+};
 const successMessage = ref('');
 function showSuccess(msg) {
   successMessage.value = msg;
@@ -284,6 +309,7 @@ const fetchLocations = async () => {
 onMounted(async () => {
   await fetchCustomer();
   await fetchLocations();
+  await fetchSalesReps();
 });
 
 watch(selectedLocationId, (val) => {
@@ -316,6 +342,7 @@ watch(selectedLocationId, (val) => {
       state: '',
       zip_code: '',
       country: 'USA',
+      sales_rep: '',
       notes: ''
     };
   } else {
@@ -333,6 +360,7 @@ watch(selectedLocationId, (val) => {
         state: normalize(loc.state),
         zip_code: normalize(loc.zip_code),
         country: normalize(loc.country),
+        sales_rep: normalize(loc.sales_rep),
         notes: normalize(loc.notes)
       };
     }
@@ -375,17 +403,25 @@ async function updateCustomer() {
 async function saveLocation() {
   const id = route.params.id;
   let isUpdate = false;
+  // Ensure sales_rep is a string or undefined
+  if (location.value.sales_rep && typeof location.value.sales_rep !== 'string') {
+    location.value.sales_rep = String(location.value.sales_rep);
+  }
   if (selectedLocationId.value) {
     // update
     isUpdate = true;
-    await fetch(`/api/customers/${id}/locations/${selectedLocationId.value}`, {
+    // Remove sales_rep if empty
+    const payload = { ...location.value };
+    if (payload.sales_rep === undefined || payload.sales_rep === null) delete payload.sales_rep;
+    await fetch(`/api/customers/locations/${selectedLocationId.value}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(location.value)
+      body: JSON.stringify(payload)
     });
   } else {
     // create
     const payload = { ...location.value, customer_id: Number(id) };
+    if (payload.sales_rep === undefined || payload.sales_rep === null) delete payload.sales_rep;
     await fetch(`/api/customers/${id}/locations`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
