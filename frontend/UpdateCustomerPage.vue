@@ -149,6 +149,15 @@
           <label>Notes:</label>
           <textarea v-model="location.notes"></textarea>
         </div>
+        <div class="form-row">
+          <label>Planogram:</label>
+          <select v-model="selectedPlanogramId">
+            <option value="">None</option>
+            <option v-for="plan in planograms" :key="plan.id" :value="plan.id">
+              {{ plan.name }} ({{ plan.num_pockets }} pockets)
+            </option>
+          </select>
+        </div>
         <button class="submit-btn" type="submit">{{ selectedLocationId ? 'UPDATE' : 'ADD' }} LOCATION</button>
       </form>
     </div>
@@ -199,6 +208,35 @@ const location = ref({
   notes: ''
 });
 const salesReps = ref([]);
+const planograms = ref([]);
+const selectedPlanogramId = ref("");
+// Fetch all planograms for dropdown
+const fetchPlanograms = async () => {
+  const res = await fetch('/api/planograms');
+  if (res.ok) {
+    const data = await res.json();
+    planograms.value = data;
+  }
+};
+
+// Fetch assigned planogram for a location
+const fetchAssignedPlanogram = async (locationId) => {
+  if (!locationId) {
+    selectedPlanogramId.value = "";
+    return;
+  }
+  const res = await fetch(`/api/planograms/${locationId}/planograms`);
+  if (res.ok) {
+    const data = await res.json();
+    if (data && data.id) {
+      selectedPlanogramId.value = data.id;
+    } else {
+      selectedPlanogramId.value = "";
+    }
+  } else {
+    selectedPlanogramId.value = "";
+  }
+};
 // Fetch sales reps for dropdown
 const fetchSalesReps = async () => {
   const res = await fetch('/api/sales-reps');
@@ -310,9 +348,10 @@ onMounted(async () => {
   await fetchCustomer();
   await fetchLocations();
   await fetchSalesReps();
+  await fetchPlanograms();
 });
 
-watch(selectedLocationId, (val) => {
+watch(selectedLocationId, async (val) => {
   const normalize = (val, key) => {
     if (val === null || val === undefined) return '';
     if (key === 'location_num' && typeof val === 'object' && 'Int32' in val && 'Valid' in val) {
@@ -345,6 +384,7 @@ watch(selectedLocationId, (val) => {
       sales_rep: '',
       notes: ''
     };
+    selectedPlanogramId.value = "";
   } else {
     const loc = locations.value.find(l => l.id == val);
     if (loc) {
@@ -363,6 +403,7 @@ watch(selectedLocationId, (val) => {
         sales_rep: normalize(loc.sales_rep),
         notes: normalize(loc.notes)
       };
+      await fetchAssignedPlanogram(loc.id);
     }
   }
 });
@@ -407,6 +448,7 @@ async function saveLocation() {
   if (location.value.sales_rep && typeof location.value.sales_rep !== 'string') {
     location.value.sales_rep = String(location.value.sales_rep);
   }
+  let locationId = null;
   if (selectedLocationId.value) {
     // update
     isUpdate = true;
@@ -418,16 +460,31 @@ async function saveLocation() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
     });
+    locationId = selectedLocationId.value;
   } else {
     // create
     const payload = { ...location.value, customer_id: Number(id) };
     if (payload.sales_rep === undefined || payload.sales_rep === null) delete payload.sales_rep;
-    await fetch(`/api/customers/${id}/locations`, {
+    const res = await fetch(`/api/customers/${id}/locations`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
     });
+    if (res.ok) {
+      const data = await res.json();
+      locationId = data.id;
+    }
   }
+
+  // Assign planogram if selected
+  if (selectedPlanogramId.value && locationId) {
+    await fetch(`/api/planograms/${selectedPlanogramId.value}/assign`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ planogram_id: Number(selectedPlanogramId.value), customer_location_id: Number(locationId) })
+    });
+  }
+
   await fetchLocations();
   selectedLocationId.value = '';
   showSuccess(isUpdate ? 'Location updated successfully!' : 'Location added successfully!');
