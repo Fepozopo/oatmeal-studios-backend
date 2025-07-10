@@ -448,12 +448,20 @@ async function saveLocation() {
   if (location.value.sales_rep && typeof location.value.sales_rep !== 'string') {
     location.value.sales_rep = String(location.value.sales_rep);
   }
+  // Ensure location_num is a number or null
+  let locNum = location.value.location_num;
+  if (locNum === '' || locNum === null || locNum === undefined) {
+    locNum = null;
+  } else {
+    locNum = Number(locNum);
+    if (isNaN(locNum)) locNum = null;
+  }
   let locationId = null;
   if (selectedLocationId.value) {
     // update
     isUpdate = true;
     // Remove sales_rep if empty
-    const payload = { ...location.value };
+    const payload = { ...location.value, location_num: locNum };
     if (payload.sales_rep === undefined || payload.sales_rep === null) delete payload.sales_rep;
     await fetch(`/api/customers/locations/${selectedLocationId.value}`, {
       method: 'PUT',
@@ -463,7 +471,7 @@ async function saveLocation() {
     locationId = selectedLocationId.value;
   } else {
     // create
-    const payload = { ...location.value, customer_id: Number(id) };
+    const payload = { ...location.value, location_num: locNum, customer_id: Number(id) };
     if (payload.sales_rep === undefined || payload.sales_rep === null) delete payload.sales_rep;
     const res = await fetch(`/api/customers/${id}/locations`, {
       method: 'POST',
