@@ -31,6 +31,7 @@ func main() {
 	dbQueries := database.New(db)
 	apiCfg := &api.ApiConfig{
 		DbQueries:   dbQueries,
+		DB:          db,
 		TokenSecret: tokenSecret,
 	}
 

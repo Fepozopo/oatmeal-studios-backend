@@ -97,15 +97,12 @@ func AssignPlanogramToLocation(ctx context.Context, db *database.Queries, input 
 	return &pcl, nil
 }
 
-// RemovePlanogramFromLocation removes a planogram from a customer location.
-func RemovePlanogramFromLocation(ctx context.Context, db *database.Queries, input RemovePlanogramFromLocationInput) error {
-	if input.PlanogramID <= 0 || input.CustomerLocationID <= 0 {
-		return fmt.Errorf("invalid planogram_id or customer_location_id")
+// RemovePlanogramFromLocation removes any planogram from a customer location.
+func RemovePlanogramFromLocation(ctx context.Context, db *database.Queries, customerLocationID int32) error {
+	if customerLocationID <= 0 {
+		return fmt.Errorf("invalid customer_location_id")
 	}
-	err := db.RemovePlanogramFromLocation(ctx, database.RemovePlanogramFromLocationParams{
-		PlanogramID:        input.PlanogramID,
-		CustomerLocationID: input.CustomerLocationID,
-	})
+	err := db.RemovePlanogramFromLocation(ctx, customerLocationID)
 	if err != nil {
 		return fmt.Errorf("failed to remove planogram from location: %w", err)
 	}
@@ -230,16 +227,44 @@ func GetPlanogramPocketByNumber(ctx context.Context, db *database.Queries, input
 }
 
 // ReassignPlanogramToLocation reassigns a planogram to a different customer location.
-func ReassignPlanogramToLocation(ctx context.Context, db *database.Queries, input ReassignPlanogramToLocationInput) (*database.PlanogramCustomerLocation, error) {
+func ReassignPlanogramToLocation(ctx context.Context, db *sql.DB, queries *database.Queries, input ReassignPlanogramToLocationInput) (*database.PlanogramCustomerLocation, error) {
 	if input.PlanogramID <= 0 || input.CustomerLocationID <= 0 {
 		return nil, fmt.Errorf("invalid planogram_id or new_customer_location_id")
 	}
-	pcl, err := db.ReassignPlanogramToLocation(ctx, database.ReassignPlanogramToLocationParams{
+
+	tx, err := db.BeginTx(ctx, nil)
+	if err != nil {
+		return nil, fmt.Errorf("failed to begin transaction: %w", err)
+	}
+	defer func() {
+		if p := recover(); p != nil {
+			tx.Rollback()
+			panic(p)
+		} else if err != nil {
+			tx.Rollback()
+		} else {
+			err = tx.Commit()
+		}
+	}()
+
+	qtx := database.New(tx)
+
+	// Remove any existing planogram assignment for this customer location
+	delErr := qtx.RemovePlanogramFromLocation(ctx, input.CustomerLocationID)
+	if delErr != nil && delErr != sql.ErrNoRows {
+		err = fmt.Errorf("failed to remove existing planogram assignment: %w", delErr)
+		return nil, err
+	}
+
+	// Assign the new planogram
+	pcl, insErr := qtx.AssignPlanogramToLocation(ctx, database.AssignPlanogramToLocationParams{
 		PlanogramID:        input.PlanogramID,
 		CustomerLocationID: input.CustomerLocationID,
 	})
-	if err != nil {
-		return nil, fmt.Errorf("failed to reassign planogram to location: %w", err)
+	if insErr != nil {
+		err = fmt.Errorf("failed to assign planogram to location: %w", insErr)
+		return nil, err
 	}
+
 	return &pcl, nil
 }

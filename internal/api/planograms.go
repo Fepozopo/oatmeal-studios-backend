@@ -3,6 +3,7 @@ package api
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -164,7 +165,7 @@ func (cfg *ApiConfig) HandleRemovePlanogramFromLocation(w http.ResponseWriter, r
 	}
 	defer r.Body.Close()
 
-	// Extract planogram_id from path: /api/planograms/{id}/remove
+	// Extract customer_location_id from path: /api/planograms/{id}/remove
 	prefix := "/api/planograms/"
 	suffix := "/remove"
 	path := r.URL.Path
@@ -174,21 +175,13 @@ func (cfg *ApiConfig) HandleRemovePlanogramFromLocation(w http.ResponseWriter, r
 	}
 	idStr := strings.TrimPrefix(path, prefix)
 	idStr = strings.TrimSuffix(idStr, suffix)
-	planogramID, err := strconv.Atoi(idStr)
+	locationID, err := strconv.Atoi(idStr)
 	if err != nil {
-		http.Error(w, "Invalid planogram ID", http.StatusBadRequest)
+		http.Error(w, "Invalid location ID", http.StatusBadRequest)
 		return
 	}
 
-	var input service.RemovePlanogramFromLocationInput
-	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
-		http.Error(w, "Invalid input", http.StatusBadRequest)
-		return
-	}
-
-	input.PlanogramID = int32(planogramID)
-
-	err = service.RemovePlanogramFromLocation(r.Context(), cfg.DbQueries, input)
+	err = service.RemovePlanogramFromLocation(r.Context(), cfg.DbQueries, int32(locationID))
 	if err != nil {
 		http.Error(w, "Failed to remove planogram from location", http.StatusInternalServerError)
 		return
@@ -425,14 +418,33 @@ func (cfg *ApiConfig) HandleReassignPlanogramToLocation(w http.ResponseWriter, r
 	}
 	defer r.Body.Close()
 
+	// Extract planogram_id from path: /api/planograms/{id}/reassign
+	prefix := "/api/planograms/"
+	suffix := "/reassign"
+	path := r.URL.Path
+	if !strings.HasPrefix(path, prefix) || !strings.HasSuffix(path, suffix) {
+		http.Error(w, "Invalid path", http.StatusBadRequest)
+		return
+	}
+	idStr := strings.TrimPrefix(path, prefix)
+	idStr = strings.TrimSuffix(idStr, suffix)
+	planogramID, err := strconv.Atoi(idStr)
+	if err != nil {
+		http.Error(w, "Invalid planogram ID", http.StatusBadRequest)
+		return
+	}
+
 	var input service.ReassignPlanogramToLocationInput
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
 		http.Error(w, "Invalid input", http.StatusBadRequest)
 		return
 	}
+	input.PlanogramID = int32(planogramID)
 
-	planogram, err := service.ReassignPlanogramToLocation(r.Context(), cfg.DbQueries, input)
+	// Pass cfg.DB (your *sql.DB) and cfg.DbQueries to the service
+	planogram, err := service.ReassignPlanogramToLocation(r.Context(), cfg.DB, cfg.DbQueries, input)
 	if err != nil {
+		log.Printf("ReassignPlanogramToLocation error: %v", err)
 		http.Error(w, "Failed to reassign planogram to location", http.StatusInternalServerError)
 		return
 	}

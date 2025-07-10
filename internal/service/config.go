@@ -186,11 +186,6 @@ type AssignPlanogramToLocationInput struct {
 	CustomerLocationID int32 `json:"customer_location_id"`
 }
 
-type RemovePlanogramFromLocationInput struct {
-	PlanogramID        int32 `json:"planogram_id"`
-	CustomerLocationID int32 `json:"customer_location_id"`
-}
-
 type GetPlanogramPocketByNumberInput struct {
 	PlanogramID  int32 `json:"planogram_id"`
 	PocketNumber int32 `json:"pocket_number"`

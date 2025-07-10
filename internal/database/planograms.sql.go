@@ -298,9 +298,12 @@ func (q *Queries) ListPocketsForPlanogram(ctx context.Context, planogramID int32
 }
 
 const reassignPlanogramToLocation = `-- name: ReassignPlanogramToLocation :one
-UPDATE planogram_customer_locations
-SET customer_location_id = $2
-WHERE planogram_id = $1
+WITH deleted AS (
+  DELETE FROM planogram_customer_locations
+  WHERE customer_location_id = $2
+)
+INSERT INTO planogram_customer_locations (planogram_id, customer_location_id)
+VALUES ($1, $2)
 RETURNING id, planogram_id, customer_location_id
 `
 
@@ -318,16 +321,11 @@ func (q *Queries) ReassignPlanogramToLocation(ctx context.Context, arg ReassignP
 
 const removePlanogramFromLocation = `-- name: RemovePlanogramFromLocation :exec
 DELETE FROM planogram_customer_locations
-WHERE planogram_id = $1 AND customer_location_id = $2
+WHERE customer_location_id = $1
 `
 
-type RemovePlanogramFromLocationParams struct {
-	PlanogramID        int32 `json:"planogram_id"`
-	CustomerLocationID int32 `json:"customer_location_id"`
-}
-
-func (q *Queries) RemovePlanogramFromLocation(ctx context.Context, arg RemovePlanogramFromLocationParams) error {
-	_, err := q.exec(ctx, q.removePlanogramFromLocationStmt, removePlanogramFromLocation, arg.PlanogramID, arg.CustomerLocationID)
+func (q *Queries) RemovePlanogramFromLocation(ctx context.Context, customerLocationID int32) error {
+	_, err := q.exec(ctx, q.removePlanogramFromLocationStmt, removePlanogramFromLocation, customerLocationID)
 	return err
 }
 

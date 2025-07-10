@@ -484,29 +484,37 @@ async function saveLocation() {
     }
   }
 
-  // Assign or remove planogram
+  // Assign, reassign, or remove planogram
   if (locationId) {
-    // Find the currently assigned planogram for this location
+    // Get the currently assigned planogram for this location
     let prevPlanogramId = null;
-    // Try to find from planograms API (optional, fallback to selectedPlanogramId before change if needed)
-    // For now, we assume fetchAssignedPlanogram has set selectedPlanogramId correctly before editing
-    // If user sets to None, remove assignment
+    const res = await fetch(`/api/planograms/${locationId}/planograms`);
+    if (res.ok) {
+      const data = await res.json();
+      if (data && data.id) {
+        prevPlanogramId = data.id;
+      }
+    }
+
     if (selectedPlanogramId.value) {
-      await fetch(`/api/planograms/${selectedPlanogramId.value}/assign`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ planogram_id: Number(selectedPlanogramId.value), customer_location_id: Number(locationId) })
-      });
+      if (prevPlanogramId && prevPlanogramId !== selectedPlanogramId.value) {
+        // Reassign to a different planogram
+        await fetch(`/api/planograms/${selectedPlanogramId.value}/reassign`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ customer_location_id: Number(locationId) })
+        });
+      } else if (!prevPlanogramId) {
+        // Assign if none assigned
+        await fetch(`/api/planograms/${selectedPlanogramId.value}/assign`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ planogram_id: Number(selectedPlanogramId.value), customer_location_id: Number(locationId) })
+        });
+      }
+      // else: already assigned to this planogram, do nothing
     } else {
       // Remove planogram assignment if there was one before
-      // Try to get the previously assigned planogram for this location
-      const res = await fetch(`/api/planograms/${locationId}/planograms`);
-      if (res.ok) {
-        const data = await res.json();
-        if (data && data.id) {
-          prevPlanogramId = data.id;
-        }
-      }
       if (prevPlanogramId) {
         await fetch(`/api/planograms/${prevPlanogramId}/remove`, {
           method: 'DELETE',

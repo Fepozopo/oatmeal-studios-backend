@@ -323,7 +323,8 @@ async function onPocketChange(idx) {
   }
   // Only check for valid pocket if planogram is present
   if (hasPlanogram.value) {
-    const pocket = planogramPockets.value.find(p => String(p.pocket_number) === String(pocketNum));
+    const pockets = Array.isArray(planogramPockets.value) ? planogramPockets.value : [];
+    const pocket = pockets.find(p => String(p.pocket_number) === String(pocketNum));
     if (!pocket) {
       alert(`Pocket #${pocketNum} does not exist in the assigned planogram.`);
       item.pocket = '';
@@ -382,7 +383,8 @@ async function onSkuChange(idx) {
   }
   // If planogram, try to match pocket
   if (hasPlanogram.value) {
-    const pocket = planogramPockets.value.find(p => p.sku && p.sku.Valid && p.sku.String === sku);
+    const pockets = Array.isArray(planogramPockets.value) ? planogramPockets.value : [];
+    const pocket = pockets.find(p => p.sku && p.sku.Valid && p.sku.String === sku);
     item.pocket = pocket ? pocket.pocket_number : '';
   }
   // Fetch product info
@@ -415,7 +417,8 @@ async function onSkuChange(idx) {
 
 // Utility to get SKU for a pocket number (if needed in template)
 function getSkuForPocket(pocketNum) {
-  const pocket = planogramPockets.value.find(p => String(p.pocket_number) === String(pocketNum));
+  const pockets = Array.isArray(planogramPockets.value) ? planogramPockets.value : [];
+  const pocket = pockets.find(p => String(p.pocket_number) === String(pocketNum));
   return pocket && pocket.sku && pocket.sku.Valid ? pocket.sku.String : '';
 }
 
