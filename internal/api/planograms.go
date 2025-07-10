@@ -164,13 +164,31 @@ func (cfg *ApiConfig) HandleRemovePlanogramFromLocation(w http.ResponseWriter, r
 	}
 	defer r.Body.Close()
 
+	// Extract planogram_id from path: /api/planograms/{id}/remove
+	prefix := "/api/planograms/"
+	suffix := "/remove"
+	path := r.URL.Path
+	if !strings.HasPrefix(path, prefix) || !strings.HasSuffix(path, suffix) {
+		http.Error(w, "Invalid path", http.StatusBadRequest)
+		return
+	}
+	idStr := strings.TrimPrefix(path, prefix)
+	idStr = strings.TrimSuffix(idStr, suffix)
+	planogramID, err := strconv.Atoi(idStr)
+	if err != nil {
+		http.Error(w, "Invalid planogram ID", http.StatusBadRequest)
+		return
+	}
+
 	var input service.RemovePlanogramFromLocationInput
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
 		http.Error(w, "Invalid input", http.StatusBadRequest)
 		return
 	}
 
-	err := service.RemovePlanogramFromLocation(r.Context(), cfg.DbQueries, input)
+	input.PlanogramID = int32(planogramID)
+
+	err = service.RemovePlanogramFromLocation(r.Context(), cfg.DbQueries, input)
 	if err != nil {
 		http.Error(w, "Failed to remove planogram from location", http.StatusInternalServerError)
 		return
