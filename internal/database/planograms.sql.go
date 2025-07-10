@@ -297,6 +297,25 @@ func (q *Queries) ListPocketsForPlanogram(ctx context.Context, planogramID int32
 	return items, nil
 }
 
+const reassignPlanogramToLocation = `-- name: ReassignPlanogramToLocation :one
+UPDATE planogram_customer_locations
+SET customer_location_id = $2
+WHERE planogram_id = $1
+RETURNING id, planogram_id, customer_location_id
+`
+
+type ReassignPlanogramToLocationParams struct {
+	PlanogramID        int32 `json:"planogram_id"`
+	CustomerLocationID int32 `json:"customer_location_id"`
+}
+
+func (q *Queries) ReassignPlanogramToLocation(ctx context.Context, arg ReassignPlanogramToLocationParams) (PlanogramCustomerLocation, error) {
+	row := q.queryRow(ctx, q.reassignPlanogramToLocationStmt, reassignPlanogramToLocation, arg.PlanogramID, arg.CustomerLocationID)
+	var i PlanogramCustomerLocation
+	err := row.Scan(&i.ID, &i.PlanogramID, &i.CustomerLocationID)
+	return i, err
+}
+
 const removePlanogramFromLocation = `-- name: RemovePlanogramFromLocation :exec
 DELETE FROM planogram_customer_locations
 WHERE planogram_id = $1 AND customer_location_id = $2

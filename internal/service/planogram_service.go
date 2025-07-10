@@ -228,3 +228,18 @@ func GetPlanogramPocketByNumber(ctx context.Context, db *database.Queries, input
 	}
 	return &pocket, nil
 }
+
+// ReassignPlanogramToLocation reassigns a planogram to a different customer location.
+func ReassignPlanogramToLocation(ctx context.Context, db *database.Queries, input ReassignPlanogramToLocationInput) (*database.PlanogramCustomerLocation, error) {
+	if input.PlanogramID <= 0 || input.CustomerLocationID <= 0 {
+		return nil, fmt.Errorf("invalid planogram_id or new_customer_location_id")
+	}
+	pcl, err := db.ReassignPlanogramToLocation(ctx, database.ReassignPlanogramToLocationParams{
+		PlanogramID:        input.PlanogramID,
+		CustomerLocationID: input.CustomerLocationID,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("failed to reassign planogram to location: %w", err)
+	}
+	return &pcl, nil
+}

@@ -210,6 +210,9 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.listUsersStmt, err = db.PrepareContext(ctx, listUsers); err != nil {
 		return nil, fmt.Errorf("error preparing query ListUsers: %w", err)
 	}
+	if q.reassignPlanogramToLocationStmt, err = db.PrepareContext(ctx, reassignPlanogramToLocation); err != nil {
+		return nil, fmt.Errorf("error preparing query ReassignPlanogramToLocation: %w", err)
+	}
 	if q.removePlanogramFromLocationStmt, err = db.PrepareContext(ctx, removePlanogramFromLocation); err != nil {
 		return nil, fmt.Errorf("error preparing query RemovePlanogramFromLocation: %w", err)
 	}
@@ -564,6 +567,11 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing listUsersStmt: %w", cerr)
 		}
 	}
+	if q.reassignPlanogramToLocationStmt != nil {
+		if cerr := q.reassignPlanogramToLocationStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing reassignPlanogramToLocationStmt: %w", cerr)
+		}
+	}
 	if q.removePlanogramFromLocationStmt != nil {
 		if cerr := q.removePlanogramFromLocationStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing removePlanogramFromLocationStmt: %w", cerr)
@@ -730,6 +738,7 @@ type Queries struct {
 	listProductsByTypeStmt              *sql.Stmt
 	listSalesRepsStmt                   *sql.Stmt
 	listUsersStmt                       *sql.Stmt
+	reassignPlanogramToLocationStmt     *sql.Stmt
 	removePlanogramFromLocationStmt     *sql.Stmt
 	revokeRefreshTokenStmt              *sql.Stmt
 	updateCustomerStmt                  *sql.Stmt
@@ -811,6 +820,7 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		listProductsByTypeStmt:              q.listProductsByTypeStmt,
 		listSalesRepsStmt:                   q.listSalesRepsStmt,
 		listUsersStmt:                       q.listUsersStmt,
+		reassignPlanogramToLocationStmt:     q.reassignPlanogramToLocationStmt,
 		removePlanogramFromLocationStmt:     q.removePlanogramFromLocationStmt,
 		revokeRefreshTokenStmt:              q.revokeRefreshTokenStmt,
 		updateCustomerStmt:                  q.updateCustomerStmt,

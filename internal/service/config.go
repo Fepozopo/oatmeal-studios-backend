@@ -196,6 +196,11 @@ type GetPlanogramPocketByNumberInput struct {
 	PocketNumber int32 `json:"pocket_number"`
 }
 
+type ReassignPlanogramToLocationInput struct {
+	PlanogramID        int32 `json:"planogram_id"`
+	CustomerLocationID int32 `json:"customer_location_id"`
+}
+
 // ------------------ Product Inputs ------------------
 type CreateProductInput struct {
 	Type           string    `json:"type"`

@@ -417,3 +417,29 @@ func (cfg *ApiConfig) HandleGetPlanogramPocketByNumber(w http.ResponseWriter, r 
 		return
 	}
 }
+
+func (cfg *ApiConfig) HandleReassignPlanogramToLocation(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPut {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+	defer r.Body.Close()
+
+	var input service.ReassignPlanogramToLocationInput
+	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
+		http.Error(w, "Invalid input", http.StatusBadRequest)
+		return
+	}
+
+	planogram, err := service.ReassignPlanogramToLocation(r.Context(), cfg.DbQueries, input)
+	if err != nil {
+		http.Error(w, "Failed to reassign planogram to location", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	if err := json.NewEncoder(w).Encode(planogram); err != nil {
+		http.Error(w, "Failed to encode reassigned planogram", http.StatusInternalServerError)
+		return
+	}
+}

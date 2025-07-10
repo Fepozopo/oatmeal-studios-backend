@@ -27,6 +27,12 @@ VALUES ($1, $2)
 ON CONFLICT (planogram_id, customer_location_id) DO NOTHING
 RETURNING *;
 
+-- name: ReassignPlanogramToLocation :one
+UPDATE planogram_customer_locations
+SET customer_location_id = $2
+WHERE planogram_id = $1
+RETURNING *;
+
 -- name: RemovePlanogramFromLocation :exec
 DELETE FROM planogram_customer_locations
 WHERE planogram_id = $1 AND customer_location_id = $2;
