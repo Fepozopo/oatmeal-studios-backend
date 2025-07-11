@@ -42,13 +42,13 @@ const goHome = () => {
     router.push('/home');
 };
 
-// 1. Reactive variables
+// Reactive variables
 const customers = ref([]);
 const selectedCustomerId = ref("");
 const locations = ref([]);
 const selectedLocationId = ref("");
 const errorMessage = ref("");
-// 4. Handle create order button click
+// Handle create order button click
 const handleCreateOrder = () => {
     if (!selectedCustomerId.value || !selectedLocationId.value) {
         errorMessage.value = "The customer and location are both required";
@@ -65,7 +65,7 @@ const handleCreateOrder = () => {
     });
 };
 
-// 2. Fetch customers on mount
+// Fetch customers on mount
 onMounted(async () => {
     const res = await fetch('/api/customers');
     if (res.ok) {
@@ -73,7 +73,7 @@ onMounted(async () => {
     }
 });
 
-// 3. Watch for customer selection and fetch locations
+// Watch for customer selection and fetch locations
 import { watch } from 'vue';
 watch(selectedCustomerId, async (newId) => {
     if (newId) {
