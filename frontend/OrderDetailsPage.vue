@@ -119,7 +119,7 @@
                 </div>
                 <div class="order-row">
                     <span class="order-label">Ship Amount:</span>
-                    <input class="order-input" v-model="shipAmount" />
+                    <input class="order-input" v-model.number="shipAmount" type="number" min="0" step="0.01" />
                 </div>
                 <div class="order-row">
                     <span class="order-label">Apply to commission:</span>
