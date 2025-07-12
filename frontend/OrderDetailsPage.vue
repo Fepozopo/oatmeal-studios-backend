@@ -196,9 +196,18 @@
                         <span style="flex:1"></span>
                     </div>
                 </div>
+                <!-- Order Totals Section -->
                 <div class="order-row">
-                    <span style="margin-left:auto; min-width: 650px; text-align:right; display:block;">Item total
+                    <span style="margin-left:auto; min-width: 650px; text-align:right; display:block;">Order total
                         <b>{{ formatCurrency(itemTotal) }}</b></span>
+                </div>
+                <div class="order-row">
+                    <span style="margin-left:auto; min-width: 650px; text-align:right; display:block;">Shipping amount
+                        <b>{{ formatCurrency(shipAmount) }}</b></span>
+                </div>
+                <div class="order-row">
+                    <span style="margin-left:auto; min-width: 650px; text-align:right; display:block;">Total
+                        <b>{{ formatCurrency(grandTotal) }}</b></span>
                 </div>
                 <div class="order-row">
                     <button class="continue-btn">SUBMIT</button>
@@ -239,6 +248,11 @@ const shipVia = ref("UPS GROUND");
 const freeShippingProduct = ref(false);
 const freeShippingDisplays = ref(false);
 const shipAmount = ref(0);
+// Grand total includes item total and shipping amount
+const grandTotal = computed(() => {
+    const shipping = parseFloat(shipAmount.value) || 0;
+    return itemTotal.value + shipping;
+});
 
 const applyCommission = ref("Y");
 
